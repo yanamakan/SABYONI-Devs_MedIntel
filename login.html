@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedIntel - Login</title>
+  </head>
+  <body>
+    <!-- Header Section -->
+    <header>
+      <h1>MedIntel</h1>
+      <p>Intelligent Medical Support</p>
+      <p>
+        Revolutionizing healthcare with AI-powered patient management and
+        centralized medical records
+      </p>
+    </header>
+
+    <!-- Features Section -->
+    <section>
+      <h2>AI-Powered Triage</h2>
+      <p>
+        Intelligent symptom analysis and urgency categorization to optimize
+        patient flow
+      </p>
+
+      <h2>Centralized Records</h2>
+      <p>
+        Secure cloud-based storage for complete patient histories and
+        prescriptions
+      </p>
+
+      <h2>POPIA Compliant</h2>
+      <p>
+        Enterprise-grade security with encrypted data and role-based access
+        control
+      </p>
+    </section>
+
+    <!-- Access Section -->
+    <hr />
+
+    <h3>Access MedIntel</h3>
+    <p>Staff: Login with credentials | Patients: Sign up to get started</p>
+
+    <!-- Buttons to switch between Login and Sign Up -->
+    <button onclick="showLogin()">Login</button>
+    <button onclick="showSignUp()">Sign Up</button>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <h3>Login</h3>
+
+      <label>Email:</label><br />
+      <input type="email" id="loginEmail" placeholder="Email" /><br /><br />
+
+      <label>Password:</label><br />
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Password"
+      /><br /><br />
+
+
+      <button onclick="handleLogin()">Login</button>
+    </div>
+
+    <!-- Sign Up Form  -->
+    <div id="signupForm" style="display: none">
+      <h3>Sign Up</h3>
+
+      <label>Full Name:</label><br />
+      <input type="text" id="signupName" placeholder="Full Name" value="John Doe"><br><br>
+
+
+       <label>Email:</label><br>
+        <input type="email" id="signupEmail" placeholder="Email" value="john.doe@example.com"><br><br>
+
+      <label>Phone Number:</label><br>
+        <input type="tel" id="signupPhone" placeholder="Phone Number" value="+27 82 123 4567"><br><br>
+
+      <label>Password:</label><br />
+      <input
+        type="password"
+        id="signupPassword"
+        placeholder="Password"
+      /><br /><br />
+
+      <label>Confirm Password:</label><br />
+      <input
+        type="password"
+        id="signupConfirmPassword"
+        placeholder="Confirm Password"
+      /><br /><br />
+
+      <button onclick="handleSignUp()">Sign Up</button>
+
+       <p><small>Note: Only patients can self-register. Staff accounts are created by administrators.</small></p>
+    </div>
+
+    <!-- Message Display Area -->
+    <div id="message" style="margin-top: 20px"></div>
+
+    <script>
+      // Function to show Login form and hide Sign Up form
+      function showLogin() {
+        document.getElementById("loginForm").style.display = "block";
+        document.getElementById("signupForm").style.display = "none";
+        clearMessage();
+      }
+
+      // Function to show Sign Up form and hide Login form
+      function showSignUp() {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("signupForm").style.display = "block";
+        clearMessage();
+      }
+
+      // Function to clear message
+      function clearMessage() {
+        document.getElementById("message").innerHTML = "";
+      }
+
+      // Function to display messages
+      function displayMessage(text, isError = true) {
+        const messageDiv = document.getElementById("message");
+        messageDiv.innerHTML = text;
+        if (isError) {
+          messageDiv.style.color = "red";
+        } else {
+          messageDiv.style.color = "green";
+        }
+      }
+
+      // Handle Login
+      function handleLogin() {
+        // Get values from input fields
+        let email = document.getElementById("loginEmail").value;
+        let password = document.getElementById("loginPassword").value;
+
+        // Check if fields are empty
+        if (email === "" || password === "") {
+          displayMessage("Please fill in all fields (Email and Password)");
+          return;
+        }
+
+        // Demo credentials for validation
+        // Super Admin
+        if (email === "superadmin@medintel.com" && password === "super123") {
+          displayMessage(
+            "Login successful! Redirecting to Super Admin Dashboard...",
+            false,
+          );
+          // Here you can redirect to super admin dashboard
+          // window.location.href = "superadmin.html";
+          return;
+        }
+
+        // Admin
+        if (email === "admin@medintel.com" && password === "admin123") {
+          displayMessage(
+            "Login successful! Redirecting to Admin Dashboard...",
+            false,
+          );
+          // Here you can redirect to admin dashboard
+          return;
+        }
+
+        // Doctor
+        if (email === "doctor@medintel.com" && password === "doctor123") {
+          displayMessage(
+            "Login successful! Redirecting to Doctor Dashboard...",
+            false,
+          );
+          // Here you can redirect to doctor dashboard
+          return;
+        }
+
+        // Patient
+        if (email === "patient@example.com" && password === "patient123") {
+          displayMessage(
+            "Login successful! Redirecting to Patient Dashboard...",
+            false,
+          );
+          // Here you can redirect to patient dashboard
+          return;
+        }
+
+        // If no match found
+        displayMessage(
+          "Invalid credentials. Please check your email and password.",
+        );
+      }
+
+      // Handle Sign Up
+      function handleSignUp() {
+        // Get values from sign up fields
+        let name = document.getElementById("signupName").value;
+        let email = document.getElementById("signupEmail").value;
+        let password = document.getElementById("signupPassword").value;
+        let confirmPassword = document.getElementById(
+          "signupConfirmPassword",
+        ).value;
+
+        // Check if all fields are filled
+        if (
+          name === "" ||
+          email === "" ||
+          password === "" ||
+          confirmPassword === ""
+        ) {
+          displayMessage("Please fill in all fields");
+          return;
+        }
+
+        // Check if password matches
+        if (password !== confirmPassword) {
+          displayMessage("Passwords do not match!");
+          return;
+        }
+
+        // Check password length (basic validation)
+        if (password.length < 6) {
+          displayMessage("Password must be at least 6 characters long");
+          return;
+        }
+
+        // If all validations pass
+        displayMessage(
+          "Sign up successful! You can now login with your credentials.",
+          false,
+        );
+
+        // Clear the form
+        document.getElementById("signupName").value = "";
+        document.getElementById("signupEmail").value = "";
+        document.getElementById("signupPassword").value = "";
+        document.getElementById("signupConfirmPassword").value = "";
+
+        // Switch back to login form after 2 seconds
+        setTimeout(function () {
+          showLogin();
+          displayMessage("Please login with your new credentials", false);
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedIntel - Super Admin Control Center</title>
+  </head>
+  <body>
+    <!-- Header Section -->
+    <header>
+      <h1>Super Admin Control Center</h1>
+      <p>Medical Director - System Wide Access</p>
+      <p>System Online ✓</p>
+      <hr />
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div>
+      <button onclick="showAnalytics()">Analytics Dashboard</button>
+      <button onclick="showSystemControl()">System Control</button>
+      <button onclick="showAdminManagement()">Admin Management</button>
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <!-- ANALYTICS DASHBOARD SECTION -->
+    <div id="analyticsSection">
+      <h2>Analytics Dashboard</h2>
+
+      <!-- Stats Cards -->
+      <div>
+        <h3>Total Patients</h3>
+        <p><strong>1247</strong></p>
+        <p>+5.2% this month</p>
+      </div>
+
+      <div>
+        <h3>Medical Staff</h3>
+        <p><strong>134</strong></p>
+        <p>45 Doctors, 89 Nurses</p>
+      </div>
+
+      <div>
+        <h3>Total Appointments</h3>
+        <p><strong>324</strong></p>
+        <p>28 today</p>
+      </div>
+
+      <div>
+        <h3>Emergency Cases</h3>
+        <p><strong>3</strong></p>
+        <p>Active right now</p>
+      </div>
+
+      <div>
+        <h3>System Uptime</h3>
+        <p><strong>99.7%</strong></p>
+        <p>Last 30 days</p>
+      </div>
+
+      <div>
+        <h3>AI Triage Accuracy</h3>
+        <p><strong>94.3%</strong></p>
+        <p>Based on 1,247 cases</p>
+      </div>
+
+      <div>
+        <h3>Avg Wait Time</h3>
+        <p><strong>18 mins</strong></p>
+        <p>-12% from last month</p>
+      </div>
+
+      <!-- Growth Trends -->
+      <h3>Growth Trends (6 Months)</h3>
+      <p>Y-axis: 1400, 1050, 700, 350, 0</p>
+      <p>X-axis: Oct, Nov, Dec, Jan, Feb, Mar</p>
+      <p>Legend: 🔵 Patients | 🟠 Appointments</p>
+
+      <!-- Department Distribution -->
+      <h3>Department Distribution</h3>
+      <p>Y-axis: 320, 240, 160, 80, 0</p>
+      <p>X-axis: Pediatrics, Orthopedics, Other</p>
+      <p>Legend: 🔵 Patients | 🟠 Appointments</p>
+
+      <!-- Urgency Distribution -->
+      <h3>Urgency Distribution</h3>
+      <p>Low: 145</p>
+      <p>Medium: 112</p>
+      <p>High: 54</p>
+
+      <!-- Key Insights -->
+      <h3>Key Insights</h3>
+      <p>
+        <strong>Patient Growth:</strong> 13.4% increase in new patient
+        registrations this quarter
+      </p>
+      <p>
+        <strong>AI Performance:</strong> Triage system maintaining 94.3%
+        accuracy rate
+      </p>
+      <p>
+        <strong>Efficiency Improvement:</strong> Wait times reduced by 12%
+        through optimized scheduling
+      </p>
+      <p><strong>Peak Hours:</strong> Highest traffic: 9AM-12PM weekdays</p>
+    </div>
+
+    <!-- SYSTEM CONTROL SECTION -->
+    <div id="systemControlSection" style="display: none">
+      <h2>System Control</h2>
+
+      <h3>System Operations</h3>
+      <p>Manage system-wide operations</p>
+      <button onclick="restartSystem()">Restart System</button>
+      <button onclick="checkUpdates()">Check for Updates</button>
+      <button onclick="shutdownSystem()">Shutdown System</button>
+
+      <h3>System Information</h3>
+      <p><strong>Version:</strong> 2.1.5</p>
+      <p><strong>Database:</strong> PostgreSQL 14.2</p>
+      <p><strong>Uptime:</strong> 99.7%</p>
+      <p><strong>Last Backup:</strong> 2 hours ago</p>
+      <p><strong>Security:</strong> POPIA Compliant</p>
+
+      <h3>Audit Logs</h3>
+      <div>
+        <p>
+          <strong>14:32:15</strong> - Created new doctor account -
+          admin@medintel.com - success
+        </p>
+        <p>
+          <strong>14:15:42</strong> - Updated patient prescription -
+          doctor@medintel.com - success
+        </p>
+        <p>
+          <strong>13:58:30</strong> - Scheduled new appointment -
+          secretary@medintel.com - success
+        </p>
+        <p>
+          <strong>13:42:18</strong> - Automated backup completed - system -
+          success
+        </p>
+        <p>
+          <strong>12:55:03</strong> - Failed login attempt - patient@example.com
+          - warning
+        </p>
+      </div>
+    </div>
+
+    <!-- ADMIN MANAGEMENT SECTION -->
+    <div id="adminManagementSection" style="display: none">
+      <h2>Admin Management</h2>
+
+      <!-- Create New Admin Account -->
+      <h3>Create New Admin Account</h3>
+      <p>Create administrator accounts to manage hospital operations</p>
+
+      <label>Full Name:</label><br />
+      <input
+        type="text"
+        id="adminFullName"
+        placeholder="John Smith"
+      /><br /><br />
+
+      <label>Email:</label><br />
+      <input
+        type="email"
+        id="adminEmail"
+        placeholder="admin@medintel.com"
+      /><br /><br />
+
+      <label>Password:</label><br />
+      <input
+        type="password"
+        id="adminPassword"
+        placeholder="Password"
+      /><br /><br />
+
+      <button onclick="createAdminAccount()">Create Admin Account</button>
+
+      <!-- Existing Administrators -->
+      <h3>Existing Administrators</h3>
+      <div id="existingAdminsList">
+        <div>
+          <p><strong>John Smith</strong> - admin@medintel.com</p>
+          <p>Created: 2025-01-15 | Status: Active</p>
+          <button onclick="manageAdmin('john@medintel.com')">Manage</button>
+          <hr />
+        </div>
+        <div>
+          <p><strong>Sarah Johnson</strong> - sarah.admin@medintel.com</p>
+          <p>Created: 2025-02-20 | Status: Active</p>
+          <button onclick="manageAdmin('sarah.admin@medintel.com')">
+            Manage
+          </button>
+          <hr />
+        </div>
+      </div>
+
+      <!-- Create New Staff Account -->
+      <h3>Create New Staff Account</h3>
+      <p>Create staff accounts to manage hospital operations</p>
+
+      <label>Full Name:</label><br />
+      <input
+        type="text"
+        id="staffFullName"
+        placeholder="John Smith"
+      /><br /><br />
+
+      <label>Email:</label><br />
+      <input
+        type="email"
+        id="staffEmail"
+        placeholder="staff@medintel.com"
+      /><br /><br />
+
+      <label>Password:</label><br />
+      <input
+        type="password"
+        id="staffPassword"
+        placeholder="Password"
+      /><br /><br />
+
+      <label>Role:</label><br />
+      <select id="staffRole">
+        <option value="doctor">Doctor</option>
+        <option value="nurse">Nurse</option>
+        <option value="secretary">Secretary</option>
+        <option value="receptionist">Receptionist</option></select
+      ><br /><br />
+
+      <label>Department:</label><br />
+      <select id="staffDepartment">
+        <option value="">Select a department</option>
+        <option value="Cardiology">Cardiology</option>
+        <option value="Pediatrics">Pediatrics</option>
+        <option value="Orthopedics">Orthopedics</option>
+        <option value="Neurology">Neurology</option>
+        <option value="Radiology">Radiology</option></select
+      ><br /><br />
+
+      <label>Specialization (for doctors):</label><br />
+      <input
+        type="text"
+        id="staffSpecialization"
+        placeholder="Cardiology"
+      /><br /><br />
+
+      <button onclick="createStaffAccount()">Create Staff Account</button>
+
+      <!-- Existing Staff Members -->
+      <h3>Existing Staff Members</h3>
+      <div id="existingStaffList">
+        <div>
+          <p><strong>Dr. Michael Chen</strong> - doctor@medintel.com</p>
+          <p>
+            Role: Doctor | Department: Cardiology | Created: 2025-01-10 |
+            Status: Active
+          </p>
+          <button onclick="manageStaff('doctor@medintel.com')">Manage</button>
+          <hr />
+        </div>
+        <div>
+          <p><strong>Dr. Emily Rodriguez</strong> - doctor2@medintel.com</p>
+          <p>
+            Role: Doctor | Department: Pediatrics | Created: 2025-01-20 |
+            Status: Active
+          </p>
+          <button onclick="manageStaff('doctor2@medintel.com')">Manage</button>
+          <hr />
+        </div>
+        <div>
+          <p><strong>Alice Williams</strong> - nurse@medintel.com</p>
+          <p>
+            Role: Nurse | Department: Emergency | Created: 2025-02-01 | Status:
+            Active
+          </p>
+          <button onclick="manageStaff('nurse@medintel.com')">Manage</button>
+          <hr />
+        </div>
+        <div>
+          <p><strong>Tom Jackson</strong> - nurse2@medintel.com</p>
+          <p>
+            Role: Nurse | Department: ICU | Created: 2025-02-15 | Status: Active
+          </p>
+          <button onclick="manageStaff('nurse2@medintel.com')">Manage</button>
+          <hr />
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Display Area -->
+    <div id="message" style="margin-top: 20px"></div>
+
+    <script>
+      // Function to display messages
+      function displayMessage(text, isError = true) {
+        const messageDiv = document.getElementById("message");
+        messageDiv.innerHTML = text;
+        if (isError) {
+          messageDiv.style.color = "red";
+        } else {
+          messageDiv.style.color = "green";
+        }
+
+        // Clear message after 3 seconds
+        setTimeout(function () {
+          messageDiv.innerHTML = "";
+        }, 3000);
+      }
+
+      // Navigation functions
+      function showAnalytics() {
+        document.getElementById("analyticsSection").style.display = "block";
+        document.getElementById("systemControlSection").style.display = "none";
+        document.getElementById("adminManagementSection").style.display =
+          "none";
+        clearMessage();
+      }
+
+      function showSystemControl() {
+        document.getElementById("analyticsSection").style.display = "none";
+        document.getElementById("systemControlSection").style.display = "block";
+        document.getElementById("adminManagementSection").style.display =
+          "none";
+        clearMessage();
+      }
+
+      function showAdminManagement() {
+        document.getElementById("analyticsSection").style.display = "none";
+        document.getElementById("systemControlSection").style.display = "none";
+        document.getElementById("adminManagementSection").style.display =
+          "block";
+        clearMessage();
+      }
+
+      function clearMessage() {
+        document.getElementById("message").innerHTML = "";
+      }
+
+      function logout() {
+        displayMessage("Logging out... Redirecting to login page", false);
+        setTimeout(function () {
+          window.location.href = "login.html";
+        }, 1500);
+      }
+
+      // System Control functions
+      function restartSystem() {
+        if (
+          confirm(
+            "WARNING: Restarting the system will temporarily interrupt services. Continue?",
+          )
+        ) {
+          displayMessage(
+            "System restart initiated. System will be back online in 2 minutes.",
+            false,
+          );
+        }
+      }
+
+      function checkUpdates() {
+        displayMessage(
+          "Checking for updates... Current version: 2.1.5. No updates available.",
+          false,
+        );
+      }
+
+      function shutdownSystem() {
+        if (
+          confirm(
+            "WARNING: Shutting down the system will stop all services. This action requires confirmation. Continue?",
+          )
+        ) {
+          displayMessage("System shutdown initiated. Please wait...", false);
+          setTimeout(function () {
+            displayMessage(
+              "System is offline. Refresh page to restart.",
+              false,
+            );
+          }, 2000);
+        }
+      }
+
+      // Admin Management functions
+      function createAdminAccount() {
+        let name = document.getElementById("adminFullName").value;
+        let email = document.getElementById("adminEmail").value;
+        let password = document.getElementById("adminPassword").value;
+
+        if (name === "" || email === "" || password === "") {
+          displayMessage("Please fill in all fields");
+          return;
+        }
+
+        if (password.length < 6) {
+          displayMessage("Password must be at least 6 characters");
+          return;
+        }
+
+        // Add to existing admins list
+        let adminsList = document.getElementById("existingAdminsList");
+        let newAdmin = document.createElement("div");
+        newAdmin.innerHTML = `
+                <p><strong>${name}</strong> - ${email}</p>
+                <p>Created: ${new Date().toISOString().split("T")[0]} | Status: Active</p>
+                <button onclick="manageAdmin('${email}')">Manage</button>
+                <hr>
+            `;
+        adminsList.appendChild(newAdmin);
+
+        displayMessage(`Admin account created for ${name}`, false);
+
+        // Clear form
+        document.getElementById("adminFullName").value = "";
+        document.getElementById("adminEmail").value = "";
+        document.getElementById("adminPassword").value = "";
+      }
+
+      function createStaffAccount() {
+        let name = document.getElementById("staffFullName").value;
+        let email = document.getElementById("staffEmail").value;
+        let password = document.getElementById("staffPassword").value;
+        let role = document.getElementById("staffRole").value;
+        let department = document.getElementById("staffDepartment").value;
+        let specialization = document.getElementById(
+          "staffSpecialization",
+        ).value;
+
+        if (
+          name === "" ||
+          email === "" ||
+          password === "" ||
+          department === ""
+        ) {
+          displayMessage("Please fill in all required fields");
+          return;
+        }
+
+        if (password.length < 6) {
+          displayMessage("Password must be at least 6 characters");
+          return;
+        }
+
+        // Add to existing staff list
+        let staffList = document.getElementById("existingStaffList");
+        let newStaff = document.createElement("div");
+        let roleDisplay = role.charAt(0).toUpperCase() + role.slice(1);
+        let specializationText =
+          role === "doctor" && specialization
+            ? ` | Specialization: ${specialization}`
+            : "";
+
+        newStaff.innerHTML = `
+                <p><strong>${name}</strong> - ${email}</p>
+                <p>Role: ${roleDisplay} | Department: ${department}${specializationText} | Created: ${new Date().toISOString().split("T")[0]} | Status: Active</p>
+                <button onclick="manageStaff('${email}')">Manage</button>
+                <hr>
+            `;
+        staffList.appendChild(newStaff);
+
+        displayMessage(`Staff account created for ${name} (${role})`, false);
+
+        // Clear form
+        document.getElementById("staffFullName").value = "";
+        document.getElementById("staffEmail").value = "";
+        document.getElementById("staffPassword").value = "";
+        document.getElementById("staffRole").value = "doctor";
+        document.getElementById("staffDepartment").value = "";
+        document.getElementById("staffSpecialization").value = "";
+      }
+
+      function manageAdmin(email) {
+        displayMessage(`Managing admin: ${email}`, false);
+      }
+
+      function manageStaff(email) {
+        displayMessage(`Managing staff: ${email}`, false);
+      }
+    </script>
+  </body>
+</html>

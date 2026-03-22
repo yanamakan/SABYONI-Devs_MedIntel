@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin |Dashboard</title>
+  </head>
+  <body>
+    <!--This header is for the admin-->
+    <header class="head">
+      <div class="left">
+        <!--Every element that should go to the left-->
+        <div class="logo"></div>
+        <div class="title">
+          <h2>Admin Dashboard</h2>
+          <p>Hopsital System Administrator</p>
+        </div>
+      </div>
+      <button class="logout">Logout</button
+      ><!--logout button should be on the far rigth-->
+    </header>
+
+    <section class="stats">
+      <!--Total Doctors-->
+      <div>
+        <h3>Total Doctors</h3>
+        <h2 class="doctors">2</h2>
+        <!--this should also be automated-->
+        <small>Active medical staff</small>
+      </div>
+
+      <!--Total Nurses-->
+      <div>
+        <h3>Total Nurses</h3>
+        <h2 class="nurses">2</h2>
+        <!--this should also be automated-->
+        <small>Nursing Staff</small>
+      </div>
+
+      <!--Deaprtments-->
+      <div>
+        <h3>Departments</h3>
+        <h2 class="departments">10</h2>
+        <!--this should also be automated-->
+        <small>Hospital Departments</small>
+      </div>
+    </section>
+
+    <section class="staff-section">
+      <div class="top-bar">
+        <div class="tabs">
+          <span id="doctorsTab" class="active">Doctors</span>
+          <span id="nursesTab">Nurses</span>
+        </div>
+        <button class="add-btn">+ Add Staff Memmber</button>
+      </div>
+
+      <div class="card">
+        <h2>Doctor Management</h2>
+        <p class="sub">Manage doctor accounts and assignments</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Specialization</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="staff-body">
+            <!--Javascript will insert rows here-->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="modal" id="staffModal">
+      <div class="modal-content">
+        <!--Header-->
+        <div class="modal-header">
+          <h2>Add New Staff Member</h2>
+          <span class="close" id="closeModal">&times;</span>
+        </div>
+
+        <p class="subtitle">
+          Create a new doctor or nurse account with department assignment
+        </p>
+
+        <div class="form-grid">
+          <!--Role-->
+          <div>
+            <label for="role">Role*</label>
+            <select name="role" id="role">
+              <option value="Doctor">Doctor</option>
+              <option value="Nurse">Nurse</option>
+            </select>
+          </div>
+
+          <!--Department-->
+          <div>
+            <label for="department">Derpatment *</label>
+            <select name="role" id="department">
+              <option>Select Department</option>
+              <option>Cardiology</option>
+              <option>Pediatrics</option>
+              <option>Emergency</option>
+              <option>Radiology</option>
+            </select>
+            <small class="error" id="departmentError"></small>
+          </div>
+
+          <!-- Full Name -->
+          <label>Full Name *</label>
+          <input type="text" id="name" placeholder="Dr. John Smith" />
+          <small class="error" id="nameError"></small>
+
+          <!-- Specialization -->
+          <label>Specialization</label>
+          <input
+            type="text"
+            id="specialization"
+            placeholder="e.g., Cardiologist"
+          />
+
+          <!-- Email -->
+          <label>Email *</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="john.smith@medintel.com"
+          />
+          <small class="error" id="emailError"></small>
+
+          <!-- Password -->
+          <label>Initial Password *</label>
+          <input type="password" id="password" placeholder="••••••••" />
+          <small class="error" id="passwordError"></small>
+
+          <small class="note">
+            The staff member will receive these credentials via email
+          </small>
+
+          <!-- BUTTONS -->
+          <div class="modal-actions">
+            <button id="createStaff" disabled>Create Account</button>
+            <button id="cancelModal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="admin-dash.js"></script>
+  </body>
+</html>

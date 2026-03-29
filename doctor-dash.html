@@ -4,83 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedIntel|Doctor</title>
-    <link rel="stylesheet" href="doctor-style.css">
+    <!-- Link to doctor dashboard CSS -->
+    <link rel="stylesheet" href="doctor-dash.css">
 </head>
 <body>
-    <!--This header is for the doctor-->
+    <!-- HEADER SECTION: Doctor top bar -->
     <header class="head">
-        <div class="left"> <!--Every element that should go to the left-->
+        <div class="left"> 
+            <!-- Left side: logo and title -->
             <div class="logo"></div>
             <div class="title">
                 <h2>Doctor Dashboard</h2>
-                <p id="doctor-name"></p><!--this should be imported from the Javascript automatically for every account that sign in or the administrator created for this specific doctor-->
+                <p id="doctor-name"></p> 
+                <!-- Doctor name auto-filled via JS for each account -->
             </div>
         </div>
-        <button class="logout">Logout</button><!--logout button should be on the far rigth-->
+        <!-- Logout button on the right -->
+        <button class="logout">Logout</button>
     </header>
 
-    <section class="stats"><!--doctor stats section-->
-        <!--for the number of appointments the doctor has card-->
+    <!-- STATS SECTION: Doctor overview cards -->
+    <section class="stats">
+        <!-- Today's Appointments -->
         <div class="card blue">
             <p>Today's Appointment</p>
             <h2 id="appointments">0</h2>
         </div>
-        <!--Total number of patients-->
+
+        <!-- Total Patients -->
         <div class="card teal">
             <p>Total Patients</p>
             <h2 id="patients">0</h2>
         </div>
-        <!--Pending Cases-->
+
+        <!-- Pending Cases -->
         <div class="card yellow">
             <p>Pending Cases</p> 
             <h2 id="pending">0</h2>
         </div>
-        <!--Urgent cases-->
+
+        <!-- Urgent Cases -->
         <div class="card red">
             <p>Today's Appointment</p>
             <h2 id="urgent">0</h2>
         </div>
     </section>
 
+    <!-- SUB-NAVIGATION: Dashboard tabs -->
+    <nav class="sub-nav">
+        <span class="active">Patients & AI Triage</span>
+        <span>3D Anatomy Notes</span>
+        <span>Appointments</span>
+        <span>Clinic Map</span>
+        <span>Settings</span>
+    </nav>
+
+    <!-- DASHBOARD SECTION -->
     <section class="dashboard">
-        <!--LEFT: this is for the patient queue-->
+        <!-- LEFT: Patient Queue -->
         <div class="queue">
             <h3>Patient Queue</h3>
-            <p class="sub">AI-sorted by urgency</p><span class="tag"></span>
+            <p class="sub">AI-sorted by urgency</p>
+            <span class="tag"></span>
             <small>Last visit <p id="last-visit"></p></small>
 
+            <!-- Individual patient cards (auto-filled via JS) -->
             <div class="patient">
-            <h4 class="patient-name"></h4><span class="tag"></span>
-            <small>Last visit: <p id="last-visit"></p></small>
-            <p id="sickness">...</p>
+                <h4 class="patient-name"></h4><span class="tag"></span>
+                <small>Last visit: <p id="last-visit"></p></small>
+                <p id="sickness">...</p>
             </div>
 
-            
             <div class="patient">
-            <h4 class="patient-name"></h4><span class="tag"></span>
-            <small>Last visit: <p id="last-visit"></p></small>
-            <p id="sickness">...</p>
+                <h4 class="patient-name"></h4><span class="tag"></span>
+                <small>Last visit: <p id="last-visit"></p></small>
+                <p id="sickness">...</p>
             </div>
-            
+
             <div class="patient">
-            <h4 class="patient-name"></h4><span class="tag"></span>
-            <small>Last visit: <p id="last-visit"></p></small>
-            <p id="sickness">...</p>
+                <h4 class="patient-name"></h4><span class="tag"></span>
+                <small>Last visit: <p id="last-visit"></p></small>
+                <p id="sickness">...</p>
             </div>
-            
+
             <div class="patient">
-            <h4 class="patient-name"></h4><span class="tag"></span>
-            <small>Last visit: <p id="last-visit"></p></small>
-            <p id="sickness">...</p>
+                <h4 class="patient-name"></h4><span class="tag"></span>
+                <small>Last visit: <p id="last-visit"></p></small>
+                <p id="sickness">...</p>
             </div>
         </div>
 
-        <!--Right side: Patient Details-->
+        <!-- RIGHT: Patient Details -->
         <div class="details">
             <h2 class="patient-name"></h2>
-            <p  class="summary-text">No data yet</p>
+            <p class="summary-text">No data yet</p>
         </div>
 
+        <!-- INFO GRID: Contact & Appointment Info -->
         <div class="info-grid">
             <div>
                 <strong>Email</strong>
@@ -96,18 +116,17 @@
             </div>
         </div>
 
+        <!-- MEDICAL HISTORY -->
         <div class="history">
             <h3>Medical History</h3>
             <div class="history-list"></div>
         </div>
 
+        <!-- PRESCRIPTIONS SECTION -->
         <div class="prescriptions"></div>
-
-        
-
     </section>
 
-
+    <!-- Link to doctor dashboard JS -->
     <script src="doctor.js"></script>
 </body>
 </html>

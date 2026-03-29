@@ -4,8 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nurse Dashboard</title>
+
+    <!-- Link to nurse dashboard CSS -->
+    <link rel="stylesheet" href="nurse.css">
   </head>
   <body>
+    <!-- HEADER SECTION: Nurse info and logout -->
     <header class="header">
       <h2>MedIntel</h2>
       <div class="user">
@@ -15,10 +19,11 @@
       <button class="logout">Logout</button>
     </header>
 
-    <!--Main content-->
+    <!-- MAIN CONTENT -->
     <main>
       <h1>Nurse Dashboard</h1>
-      <!--STATS Card-->
+
+      <!-- STATS CARDS -->
       <div class="cards">
         <div class="card">
           <h3>Patients Today</h3>
@@ -41,6 +46,7 @@
         </div>
       </div>
 
+      <!-- RECORD VITAL SIGNS FORM -->
       <section class="form-section">
         <div class="form-header">
           <h2>Record Vital Signs</h2>
@@ -49,35 +55,32 @@
 
         <div id="formContainer">
           <input type="text" id="name" placeholder="Patient Name" />
-
           <input type="number" id="temp" placeholder="Temperature (°C)" />
-          <input
-            type="text"
-            id="bp"
-            placeholder="Blood Pressure (e.g. 120/80)"
-          />
+          <input type="text" id="bp" placeholder="Blood Pressure (e.g. 120/80)" />
           <input type="number" id="hr" placeholder="Heart Rate (bpm)" />
           <input type="number" id="spo2" placeholder="Oxygen Saturation (%)" />
-
           <button id="addBtn">Record Vitals</button>
         </div>
       </section>
 
+      <!-- RECENT VITAL SIGNS -->
       <section>
         <h2>Recent Vital Signs</h2>
         <div id="records"></div>
       </section>
 
+      <!-- TASKS SECTION -->
       <section class="tasks-section">
         <h2>Today's Tasks</h2>
         <p>Patients care checklist</p>
 
-        <!-- ADD TASK -->
+        <!-- Add new task -->
         <div class="add-task">
           <input type="text" id="newTask" placeholder="Add new task..." />
           <button id="addTaskBtn">+ Add</button>
         </div>
 
+        <!-- Task list -->
         <div id="taskList">
           <label for="task" class="task">
             <input type="checkbox" class="taskCheck" data-task="vitals" />
@@ -102,6 +105,7 @@
       </section>
     </main>
 
+    <!-- Link to nurse dashboard JS -->
     <script src="nurse.js"></script>
   </body>
 </html>

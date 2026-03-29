@@ -4,49 +4,52 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin |Dashboard</title>
+
+    <!-- Link to admin dashboard CSS -->
+    <link rel="stylesheet" href="admin-dash.css">
   </head>
   <body>
-    <!--This header is for the admin-->
+    <!-- HEADER SECTION: Admin top bar -->
     <header class="head">
       <div class="left">
-        <!--Every element that should go to the left-->
+        <!-- Left side: logo and title -->
         <div class="logo"></div>
         <div class="title">
           <h2>Admin Dashboard</h2>
           <p>Hopsital System Administrator</p>
         </div>
       </div>
-      <button class="logout">Logout</button
-      ><!--logout button should be on the far rigth-->
+      <!-- Logout button on the right -->
+      <button class="logout">Logout</button>
     </header>
 
+    <!-- STATS SECTION: Key hospital statistics -->
     <section class="stats">
-      <!--Total Doctors-->
+      <!-- Total Doctors -->
       <div>
         <h3>Total Doctors</h3>
         <h2 class="doctors">2</h2>
-        <!--this should also be automated-->
         <small>Active medical staff</small>
       </div>
 
-      <!--Total Nurses-->
+      <!-- Total Nurses -->
       <div>
         <h3>Total Nurses</h3>
         <h2 class="nurses">2</h2>
-        <!--this should also be automated-->
         <small>Nursing Staff</small>
       </div>
 
-      <!--Deaprtments-->
+      <!-- Departments -->
       <div>
         <h3>Departments</h3>
         <h2 class="departments">10</h2>
-        <!--this should also be automated-->
         <small>Hospital Departments</small>
       </div>
     </section>
 
+    <!-- STAFF MANAGEMENT SECTION -->
     <section class="staff-section">
+      <!-- Top bar: tabs and add staff button -->
       <div class="top-bar">
         <div class="tabs">
           <span id="doctorsTab" class="active">Doctors</span>
@@ -55,6 +58,7 @@
         <button class="add-btn">+ Add Staff Memmber</button>
       </div>
 
+      <!-- Card: Doctor management table -->
       <div class="card">
         <h2>Doctor Management</h2>
         <p class="sub">Manage doctor accounts and assignments</p>
@@ -70,17 +74,17 @@
               <th>Action</th>
             </tr>
           </thead>
-
           <tbody id="staff-body">
-            <!--Javascript will insert rows here-->
+            <!-- Rows inserted dynamically via JavaScript -->
           </tbody>
         </table>
       </div>
     </section>
 
+    <!-- MODAL SECTION: Add new staff member -->
     <div class="modal" id="staffModal">
       <div class="modal-content">
-        <!--Header-->
+        <!-- Modal header -->
         <div class="modal-header">
           <h2>Add New Staff Member</h2>
           <span class="close" id="closeModal">&times;</span>
@@ -90,8 +94,9 @@
           Create a new doctor or nurse account with department assignment
         </p>
 
+        <!-- Form grid: staff details -->
         <div class="form-grid">
-          <!--Role-->
+          <!-- Role -->
           <div>
             <label for="role">Role*</label>
             <select name="role" id="role">
@@ -100,7 +105,7 @@
             </select>
           </div>
 
-          <!--Department-->
+          <!-- Department -->
           <div>
             <label for="department">Derpatment *</label>
             <select name="role" id="department">
@@ -120,19 +125,11 @@
 
           <!-- Specialization -->
           <label>Specialization</label>
-          <input
-            type="text"
-            id="specialization"
-            placeholder="e.g., Cardiologist"
-          />
+          <input type="text" id="specialization" placeholder="e.g., Cardiologist" />
 
           <!-- Email -->
           <label>Email *</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="john.smith@medintel.com"
-          />
+          <input type="email" id="email" placeholder="john.smith@medintel.com" />
           <small class="error" id="emailError"></small>
 
           <!-- Password -->
@@ -144,7 +141,7 @@
             The staff member will receive these credentials via email
           </small>
 
-          <!-- BUTTONS -->
+          <!-- Modal buttons -->
           <div class="modal-actions">
             <button id="createStaff" disabled>Create Account</button>
             <button id="cancelModal">Cancel</button>
@@ -152,6 +149,8 @@
         </div>
       </div>
     </div>
+
+    <!-- Link to admin dashboard JS -->
     <script src="admin-dash.js"></script>
   </body>
 </html>

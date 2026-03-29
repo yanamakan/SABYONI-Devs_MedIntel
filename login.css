@@ -1,0 +1,180 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Root Variables */
+:root {
+    --primary-blue: #0095da;
+    --bg-page: #f0f7ff;
+    --text-dark: #1e293b;
+    --text-gray: #64748b;
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-page);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px;
+}
+
+/* Header Section */
+.login-header {
+    text-align: center;
+    max-width: 700px;
+    margin-bottom: 40px;
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.logo-box {
+    background: var(--primary-blue);
+    width: 55px;
+    height: 55px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-container h1 {
+    font-size: 2.8rem;
+    color: #1a56db;
+    font-weight: 700;
+}
+
+.tagline {
+    font-style: italic;
+    color: var(--text-gray);
+    margin-bottom: 15px;
+}
+
+.description {
+    color: #475569;
+    line-height: 1.6;
+}
+
+/* Features Grid */
+.features-grid { 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    max-width: 1100px;
+    margin-bottom: 50px;
+}
+
+.f-card { 
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,149,218,0.1);
+}
+
+.f-icon {
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+}
+
+/* Auth Container */
+.auth-container { 
+    background: white;
+    width: 480px;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+}
+
+.auth-header h3 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+.auth-header p {
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    margin-bottom: 25px;
+}
+
+/* Tab Switcher */
+.tab-switcher {
+    display: flex;
+    background: #f1f5f9;
+    padding: 5px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.tab-switcher button {
+    flex: 1;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    background: transparent;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.tab-switcher button.active {
+    background: white;
+    color: black;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Inputs & Buttons */
+label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: #f1f5f9;
+    margin-bottom: 18px;
+    outline: none;
+}
+
+input:focus {
+    background: white;
+    border-color: var(--primary-blue);
+}
+
+.submit-btn {
+    width: 100%;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Demo Credentials Box */
+.demo-creds {
+    margin-top: 30px;
+    background: #f0f7ff;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: #475569;
+    line-height: 1.7;
+}

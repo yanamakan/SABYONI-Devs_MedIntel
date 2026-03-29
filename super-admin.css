@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Root Variables */
+:root {
+    --bg-dark: #0f172a;
+    --card-dark: #1e293b;
+    --text-white: #f8fafc;
+    --text-dim: #94a3b8;
+    --neon-blue: #3b82f6;
+    --neon-cyan: #06b6d4;
+    --neon-purple: #a855f7;
+    --neon-red: #ef4444;
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body.dark-theme {
+    background-color: var(--bg-dark);
+    color: var(--text-white);
+    padding: 20px 40px;
+}
+
+/* Header & Status */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.shield-icon {
+    font-size: 2rem;
+    color: var(--neon-blue);
+}
+
+.brand h1 {
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+}
+
+.brand p {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.status-indicator {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #334155;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #22c55e;
+}
+
+/* Navigation */
+.admin-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.nav-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-dim);
+    padding: 10px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.nav-btn.active {
+    background: white;
+    color: black;
+    font-weight: 600;
+}
+
+/* Top Stat Boxes */
+.top-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.stat-box {
+    padding: 25px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-box.blue { background: var(--neon-blue); }
+.stat-box.cyan { background: var(--neon-cyan); }
+.stat-box.purple { background: var(--neon-purple); }
+.stat-box.red { background: var(--neon-red); }
+
+.stat-info small {
+    opacity: 0.8;
+    font-size: 0.85rem;
+}
+
+.stat-info h2 {
+    font-size: 2rem;
+    margin: 5px 0;
+}
+
+.stat-info .trend {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.3;
+}
+
+/* Metrics Row */
+.metrics-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    background: var(--card-dark);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.metric-card small {
+    color: var(--text-dim);
+    display: block;
+    margin-bottom: 15px;
+}
+
+.metric-card h3 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.metric-card .uptime { color: #10b981; }
+.metric-card .accuracy { color: #3b82f6; }
+.metric-card .wait-time { color: #06b6d4; }
+
+.metric-card p {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+/* Chart Container & Placeholders */
+.charts-container,
+.insights-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.chart-box {
+    background: var(--card-dark);
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-box h4 {
+    margin-bottom: 20px;
+    font-weight: 500;
+    color: var(--text-dim);
+}
+
+.chart-placeholder {
+    width: 100%;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+/* Insight List */
+.insight-list {
+    list-style: none;
+}
+
+.insight-list li {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.i-icon {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Chart Box Container */
+.chart-box {
+    background: #1e293b;
+    padding: 25px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.canvas-wrapper {
+    position: relative;
+    height: 250px; /* Fixed height for consistency */
+    width: 100%;
+}
+
+.pie-wrapper {
+    height: 220px; /* Pie charts look better slightly smaller */
+}
+
+/* Container for the side-by-side charts */
+.charts-row, .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* The height of the card */
+.chart-box {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+    
+    /* Set exactly how tall you want the card to be */
+    height: 350px !important; 
+    
+    /* This stops the "stretching downwards" loop */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+}
+
+/* This wrapper acts as the "anchor" for the graph */
+.canvas-wrapper {
+    position: relative;
+    flex-grow: 1; /* Tells the chart to take up the remaining space in the 350px box */
+    min-height: 0; /* Critical: prevents the div from expanding past its parent */
+    width: 100%;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+}

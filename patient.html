@@ -1,694 +1,149 @@
-<!doctype html>
+</html><!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MedIntel - Patient Portal</title>
-  </head>
-  <body>
-    <!-- Header Section -->
-    <header>
-      <h1>Patient Portal</h1>
-      <h2>James Wilson</h2>
-      <hr />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedIntel | Patient Portal</title>
+    <!-- Link to patient portal CSS -->
+    <link rel="stylesheet" href="patient.css">
+</head>
+<body>
+
+    <!-- HEADER SECTION: Patient info, notifications, logout -->
+    <header class="main-header">
+        <div class="header-left">
+            <!-- User avatar -->
+            <div class="user-avatar-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2
+                             c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>Patient Portal</h1>
+                <p>James Wilson</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <!-- Notifications -->
+            <div class="notifications">
+                <button class="notif-btn">
+                    <span>Notifications</span>
+                    <span class="badge">2</span>
+                </button>
+            </div>
+            <!-- Logout -->
+            <button class="logout-btn">Logout</button>
+        </div>
     </header>
 
-    <!-- Navigation Tabs -->
-    <div>
-      <button onclick="showUpcomingAppointments()">
-        Upcoming Appointments
-      </button>
-      <button onclick="showActivePrescriptions()">Active Prescriptions</button>
-      <button onclick="showMedicalRecords()">Medical Records</button>
-      <button onclick="showMessages()">Messages</button>
-      <button onclick="logout()">Logout</button>
-    </div>
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- STATS ROW: Summary cards -->
+        <section class="stats-row">
+            <div class="stat-card green">
+                <small>Upcoming Appointments</small>
+                <h2 class="txt-green">1</h2>
+            </div>
+            <div class="stat-card blue">
+                <small>Active Prescriptions</small>
+                <h2 class="txt-blue">1</h2>
+            </div>
+            <div class="stat-card purple">
+                <small>Medical Records</small>
+                <h2 class="txt-purple">2</h2>
+            </div>
+            <div class="stat-card yellow">
+                <small>Messages</small>
+                <h2 class="txt-yellow">2</h2>
+            </div>
+        </section>
 
-    <!-- Sidebar Navigation Links -->
-    <div>
-      <h3>Navigation</h3>
-      <ul>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showOverview();
-              return false;
-            "
-            >Overview</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showAIHealthAssistant();
-              return false;
-            "
-            >AI Health Assistant</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showAppointments();
-              return false;
-            "
-            >Appointments</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showPrescriptions();
-              return false;
-            "
-            >Prescriptions</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showMedicalRecords();
-              return false;
-            "
-            >Medical Records</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showClinicMap();
-              return false;
-            "
-            >Clinic Map</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showYouTubeVideos();
-              return false;
-            "
-            >YouTube Videos</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showSettings();
-              return false;
-            "
-            >Settings</a
-          >
-        </li>
-      </ul>
-    </div>
+        <!-- TAB NAVIGATION -->
+        <nav class="tab-nav">
+            <button class="tab active">Overview</button>
+            <button class="tab">AI Health Assistant</button>
+            <button class="tab">Appointments</button>
+            <button class="tab">Prescriptions</button>
+            <button class="tab">Medical Records</button>
+            <button class="tab">Clinic Map</button>
+            <button class="tab">YouTube Videos</button>
+            <button class="tab">Settings</button>
+        </nav>
 
-    <!--  OVERVIEW SECTION -->
-    <div id="overviewSection">
-      <h2>Overview</h2>
+        <!-- INFO GRID: Patient details and quick actions -->
+        <div class="info-grid">
+            <!-- PATIENT INFORMATION CARD -->
+            <section class="main-card info-card">
+                <h3>Patient Information</h3>
+                <div class="info-details">
+                    <div class="detail">
+                        <small>Full Name</small>
+                        <p>James Wilson</p>
+                    </div>
+                    <div class="detail">
+                        <small>Age</small>
+                        <p>41 years</p>
+                    </div>
+                    <div class="detail">
+                        <small>Gender</small>
+                        <p>Male</p>
+                    </div>
+                    <div class="detail">
+                        <small>Email</small>
+                        <p>james.wilson@example.com</p>
+                    </div>
+                    <div class="detail">
+                        <small>Phone</small>
+                        <p>+27 82 123 4567</p>
+                    </div>
+                    <div class="detail">
+                        <small>Last Visit</small>
+                        <p>2026-03-10</p>
+                    </div>
+                </div>
+            </section>
 
-      <!-- Patient Information -->
-      <h3>Patient Information</h3>
-      <p><strong>Full Name:</strong> James Wilson</p>
-      <p><strong>Age:</strong> 41 years</p>
-      <p><strong>Gender:</strong> Male</p>
-      <p><strong>Email:</strong> james.wilson@example.com</p>
-      <p><strong>Phone:</strong> +27 82 123 4567</p>
-      <p><strong>Last Visit:</strong> 2026-03-10</p>
-
-      <!-- Quick Actions -->
-      <h3>Quick Actions</h3>
-      <button onclick="bookAppointment()">Book New Appointment</button>
-      <button onclick="uploadDocument()">Upload Medical Document</button>
-      <button onclick="messageDoctor()">Message Your Doctor</button>
-      <button onclick="requestCertificate()">
-        Request Medical Certificate
-      </button>
-
-      <!-- Recent Activity -->
-      <h3>Recent Activity</h3>
-      <div>
-        <p>
-          <strong>Appointment scheduled with Dr. Michael Chen</strong> - 2 days
-          ago
-        </p>
-        <p>
-          <strong>New prescription added: Amlodipine 5mg</strong> - 5 days ago
-        </p>
-        <p><strong>Medical records updated</strong> - 1 week ago</p>
-        <p>
-          <strong>Appointment reminder: March 20, 9:00 AM</strong> - 1 week ago
-        </p>
-      </div>
-    </div>
-
-    <!-- UPCOMING APPOINTMENTS SECTION -->
-    <div id="upcomingAppointmentsSection" style="display: none">
-      <h2>Upcoming Appointments</h2>
-
-      <div id="appointmentsList">
-        <div>
-          <p><strong>Dr. Michael Chen</strong> - Cardiology</p>
-          <p>Date: March 20, 2026 | Time: 9:00 AM</p>
-          <p>Location: Room 304, Main Building</p>
-          <button onclick="cancelAppointment('Dr. Michael Chen')">
-            Cancel Appointment
-          </button>
-          <button onclick="rescheduleAppointment('Dr. Michael Chen')">
-            Reschedule
-          </button>
-          <hr />
+            <!-- QUICK ACTIONS SIDEBAR -->
+            <aside class="main-card actions-sidebar">
+                <h3>Quick Actions</h3>
+                <div class="action-list">
+                    <button class="action-item"><span>📅</span> Book New Appointment</button>
+                    <button class="action-item"><span>📤</span> Upload Medical Document</button>
+                    <button class="action-item"><span>💬</span> Message Your Doctor</button>
+                    <button class="action-item"><span>📄</span> Request Medical Certificate</button>
+                </div>
+            </aside>
         </div>
-        <div>
-          <p><strong>Dr. Emily Rodriguez</strong> - Follow-up</p>
-          <p>Date: April 5, 2026 | Time: 2:30 PM</p>
-          <p>Location: Room 112, East Wing</p>
-          <button onclick="cancelAppointment('Dr. Emily Rodriguez')">
-            Cancel Appointment
-          </button>
-          <button onclick="rescheduleAppointment('Dr. Emily Rodriguez')">
-            Reschedule
-          </button>
-          <hr />
-        </div>
-      </div>
 
-      <button onclick="showBookAppointmentForm()">
-        + Book New Appointment
-      </button>
-
-      <!-- Book Appointment Form -->
-      <div id="bookAppointmentForm" style="display: none; margin-top: 20px">
-        <h3>Book New Appointment</h3>
-        <label>Doctor:</label><br />
-        <select id="appointmentDoctor">
-          <option value="Dr. Michael Chen">
-            Dr. Michael Chen (Cardiology)
-          </option>
-          <option value="Dr. Emily Rodriguez">
-            Dr. Emily Rodriguez (Pediatrics)
-          </option>
-          <option value="Dr. Sarah Johnson">
-            Dr. Sarah Johnson (General Medicine)
-          </option></select
-        ><br /><br />
-
-        <label>Date:</label><br />
-        <input type="date" id="appointmentDate" /><br /><br />
-
-        <label>Time:</label><br />
-        <input type="time" id="appointmentTime" /><br /><br />
-
-        <label>Reason:</label><br />
-        <textarea
-          id="appointmentReason"
-          rows="3"
-          cols="30"
-          placeholder="Briefly describe your symptoms or reason for visit"
-        ></textarea
-        ><br /><br />
-
-        <button onclick="confirmBookAppointment()">Confirm Appointment</button>
-        <button onclick="hideBookAppointmentForm()">Cancel</button>
-      </div>
-    </div>
-
-    <!-- ACTIVE PRESCRIPTIONS SECTION -->
-    <div id="activePrescriptionsSection" style="display: none">
-      <h2>Active Prescriptions</h2>
-
-      <div>
-        <div>
-          <p><strong>Medication:</strong> Amlodipine 5mg</p>
-          <p><strong>Prescribed by:</strong> Dr. Michael Chen</p>
-          <p><strong>Dosage:</strong> Take 1 tablet daily</p>
-          <p><strong>Duration:</strong> 30 days</p>
-          <p><strong>Refills left:</strong> 2</p>
-          <button onclick="requestRefill('Amlodipine')">Request Refill</button>
-          <hr />
-        </div>
-        <div>
-          <p><strong>Medication:</strong> Lisinopril 10mg</p>
-          <p><strong>Prescribed by:</strong> Dr. Michael Chen</p>
-          <p><strong>Dosage:</strong> Take 1 tablet every morning</p>
-          <p><strong>Duration:</strong> 60 days</p>
-          <p><strong>Refills left:</strong> 1</p>
-          <button onclick="requestRefill('Lisinopril')">Request Refill</button>
-          <hr />
-        </div>
-      </div>
-    </div>
-
-    <!-- MEDICAL RECORDS SECTION -->
-    <div id="medicalRecordsSection" style="display: none">
-      <h2>Medical Records</h2>
-
-      <h3>Recent Records</h3>
-      <div>
-        <p><strong>Blood Test Results</strong> - March 10, 2026</p>
-        <p>Cholesterol: Normal | Blood Sugar: 95 mg/dL</p>
-        <button onclick="viewRecord('blood_test_0310')">View Details</button>
-        <button onclick="downloadRecord('blood_test_0310')">Download</button>
-        <hr />
-      </div>
-      <div>
-        <p><strong>ECG Report</strong> - February 15, 2026</p>
-        <p>Normal sinus rhythm. No abnormalities detected.</p>
-        <button onclick="viewRecord('ecg_0215')">View Details</button>
-        <button onclick="downloadRecord('ecg_0215')">Download</button>
-        <hr />
-      </div>
-      <div>
-        <p><strong>Annual Physical Exam</strong> - January 20, 2026</p>
-        <p>Blood pressure: 118/76 | Weight: 82kg | Height: 178cm</p>
-        <button onclick="viewRecord('physical_0120')">View Details</button>
-        <button onclick="downloadRecord('physical_0120')">Download</button>
-        <hr />
-      </div>
-    </div>
-
-    <!-- MESSAGES SECTION -->
-    <div id="messagesSection" style="display: none">
-      <h2>Messages</h2>
-
-      <button onclick="showNewMessageForm()">+ New Message</button>
-
-      <div id="messagesList">
-        <div>
-          <p><strong>Dr. Michael Chen</strong> - March 18, 2026</p>
-          <p>
-            Your test results are ready. Please schedule a follow-up to discuss
-            them.
-          </p>
-          <button onclick="replyToMessage('Dr. Michael Chen')">Reply</button>
-          <hr />
-        </div>
-        <div>
-          <p><strong>MedIntel Pharmacy</strong> - March 15, 2026</p>
-          <p>Your prescription for Amlodipine is ready for pickup.</p>
-          <button onclick="replyToMessage('MedIntel Pharmacy')">Reply</button>
-          <hr />
-        </div>
-        <div>
-          <p><strong>Appointment Reminder</strong> - March 14, 2026</p>
-          <p>
-            Reminder: You have an appointment with Dr. Michael Chen on March 20
-            at 9:00 AM.
-          </p>
-          <button onclick="replyToMessage('Appointment Reminder')">
-            Reply
-          </button>
-          <hr />
-        </div>
-      </div>
-
-      <!-- New Message Form -->
-      <div id="newMessageForm" style="display: none; margin-top: 20px">
-        <h3>New Message</h3>
-        <label>To:</label><br />
-        <select id="messageRecipient">
-          <option value="Dr. Michael Chen">
-            Dr. Michael Chen (Cardiology)
-          </option>
-          <option value="Dr. Emily Rodriguez">
-            Dr. Emily Rodriguez (Pediatrics)
-          </option>
-          <option value="Pharmacy">MedIntel Pharmacy</option>
-          <option value="Support">Patient Support</option></select
-        ><br /><br />
-
-        <label>Subject:</label><br />
-        <input
-          type="text"
-          id="messageSubject"
-          placeholder="Subject"
-        /><br /><br />
-
-        <label>Message:</label><br />
-        <textarea
-          id="messageContent"
-          rows="5"
-          cols="40"
-          placeholder="Type your message here..."
-        ></textarea
-        ><br /><br />
-
-        <button onclick="sendMessage()">Send Message</button>
-        <button onclick="hideNewMessageForm()">Cancel</button>
-      </div>
-    </div>
-
-    <!-- ADDITIONAL SECTIONS -->
-    <div id="aiHealthAssistantSection" style="display: none">
-      <h2>AI Health Assistant</h2>
-      <p>How can I help you today?</p>
-      <input
-        type="text"
-        id="aiQuestion"
-        placeholder="Ask me anything about your health..."
-        size="50"
-      />
-      <button onclick="askAI()">Ask</button>
-      <div id="aiResponse" style="margin-top: 10px"></div>
-    </div>
-
-    <div id="clinicMapSection" style="display: none">
-      <h2>Clinic Map</h2>
-      <p>
-        <strong>Main Building - Floor 1:</strong> Reception, Pharmacy, General
-        Medicine
-      </p>
-      <p>
-        <strong>Main Building - Floor 2:</strong> Cardiology, Radiology, Lab
-      </p>
-      <p>
-        <strong>Main Building - Floor 3:</strong> Pediatrics, Orthopedics,
-        Neurology
-      </p>
-      <p><strong>East Wing:</strong> Emergency Department, ICU</p>
-      <p><strong>West Wing:</strong> Administrative Offices, Staff Lounge</p>
-    </div>
-
-    <div id="youtubeVideosSection" style="display: none">
-      <h2>Health Education Videos</h2>
-      <p><strong>Understanding Blood Pressure</strong> - 5:23 min</p>
-      <p><strong>Heart Healthy Diet Tips</strong> - 8:45 min</p>
-      <p><strong>Managing Stress and Anxiety</strong> - 6:12 min</p>
-      <p><strong>Exercise for Beginners</strong> - 10:00 min</p>
-    </div>
-
-    <div id="settingsSection" style="display: none">
-      <h2>Settings</h2>
-      <h3>Profile Settings</h3>
-      <label>Email Notifications:</label>
-      <input type="checkbox" id="emailNotifications" checked /> Enable email
-      notifications<br /><br />
-
-      <label>SMS Reminders:</label>
-      <input type="checkbox" id="smsReminders" checked /> Receive appointment
-      reminders via SMS<br /><br />
-
-      <h3>Change Password</h3>
-      <label>Current Password:</label><br />
-      <input type="password" id="currentPassword" /><br /><br />
-
-      <label>New Password:</label><br />
-      <input type="password" id="newPassword" /><br /><br />
-
-      <label>Confirm New Password:</label><br />
-      <input type="password" id="confirmNewPassword" /><br /><br />
-
-      <button onclick="updateSettings()">Save Settings</button>
-    </div>
-
-    <!-- Message Display Area -->
-    <div id="message" style="margin-top: 20px"></div>
-
-    <script>
-      // Display message function
-      function displayMessage(text, isError = true) {
-        const messageDiv = document.getElementById("message");
-        messageDiv.innerHTML = text;
-        messageDiv.style.color = isError ? "red" : "green";
-        setTimeout(() => {
-          messageDiv.innerHTML = "";
-        }, 3000);
-      }
-
-      // Navigation functions
-      function showOverview() {
-        hideAllSections();
-        document.getElementById("overviewSection").style.display = "block";
-      }
-
-      function showUpcomingAppointments() {
-        hideAllSections();
-        document.getElementById("upcomingAppointmentsSection").style.display =
-          "block";
-      }
-
-      function showActivePrescriptions() {
-        hideAllSections();
-        document.getElementById("activePrescriptionsSection").style.display =
-          "block";
-      }
-
-      function showMedicalRecords() {
-        hideAllSections();
-        document.getElementById("medicalRecordsSection").style.display =
-          "block";
-      }
-
-      function showMessages() {
-        hideAllSections();
-        document.getElementById("messagesSection").style.display = "block";
-      }
-
-      function showAIHealthAssistant() {
-        hideAllSections();
-        document.getElementById("aiHealthAssistantSection").style.display =
-          "block";
-      }
-
-      function showAppointments() {
-        showUpcomingAppointments();
-      }
-
-      function showPrescriptions() {
-        showActivePrescriptions();
-      }
-
-      function showClinicMap() {
-        hideAllSections();
-        document.getElementById("clinicMapSection").style.display = "block";
-      }
-
-      function showYouTubeVideos() {
-        hideAllSections();
-        document.getElementById("youtubeVideosSection").style.display = "block";
-      }
-
-      function showSettings() {
-        hideAllSections();
-        document.getElementById("settingsSection").style.display = "block";
-      }
-
-      function hideAllSections() {
-        document.getElementById("overviewSection").style.display = "none";
-        document.getElementById("upcomingAppointmentsSection").style.display =
-          "none";
-        document.getElementById("activePrescriptionsSection").style.display =
-          "none";
-        document.getElementById("medicalRecordsSection").style.display = "none";
-        document.getElementById("messagesSection").style.display = "none";
-        document.getElementById("aiHealthAssistantSection").style.display =
-          "none";
-        document.getElementById("clinicMapSection").style.display = "none";
-        document.getElementById("youtubeVideosSection").style.display = "none";
-        document.getElementById("settingsSection").style.display = "none";
-      }
-
-      // Quick Actions
-      function bookAppointment() {
-        showUpcomingAppointments();
-        showBookAppointmentForm();
-      }
-
-      function uploadDocument() {
-        displayMessage(
-          "Upload document feature will be available soon. Please check with reception.",
-          false,
-        );
-      }
-
-      function messageDoctor() {
-        showMessages();
-        showNewMessageForm();
-      }
-
-      function requestCertificate() {
-        displayMessage(
-          "Your medical certificate request has been submitted. You will receive it within 24 hours.",
-          false,
-        );
-      }
-
-      // Appointment functions
-      function showBookAppointmentForm() {
-        document.getElementById("bookAppointmentForm").style.display = "block";
-      }
-
-      function hideBookAppointmentForm() {
-        document.getElementById("bookAppointmentForm").style.display = "none";
-      }
-
-      function confirmBookAppointment() {
-        let doctor = document.getElementById("appointmentDoctor").value;
-        let date = document.getElementById("appointmentDate").value;
-        let time = document.getElementById("appointmentTime").value;
-        let reason = document.getElementById("appointmentReason").value;
-
-        if (!date || !time) {
-          displayMessage("Please select date and time for your appointment");
-          return;
-        }
-
-        let appointmentsList = document.getElementById("appointmentsList");
-        let newAppointment = document.createElement("div");
-        newAppointment.innerHTML = `
-                <p><strong>${doctor}</strong></p>
-                <p>Date: ${date} | Time: ${time}</p>
-                <p>Reason: ${reason || "Not specified"}</p>
-                <button onclick="cancelAppointment('${doctor}')">Cancel Appointment</button>
-                <button onclick="rescheduleAppointment('${doctor}')">Reschedule</button>
-                <hr>
-            `;
-        appointmentsList.appendChild(newAppointment);
-
-        displayMessage(
-          `Appointment booked with ${doctor} on ${date} at ${time}`,
-          false,
-        );
-        hideBookAppointmentForm();
-
-        // Clear form
-        document.getElementById("appointmentDate").value = "";
-        document.getElementById("appointmentTime").value = "";
-        document.getElementById("appointmentReason").value = "";
-      }
-
-      function cancelAppointment(doctor) {
-        if (
-          confirm(
-            `Are you sure you want to cancel your appointment with ${doctor}?`,
-          )
-        ) {
-          displayMessage(
-            `Appointment with ${doctor} has been cancelled`,
-            false,
-          );
-        }
-      }
-
-      function rescheduleAppointment(doctor) {
-        displayMessage(
-          `Reschedule feature for ${doctor} will be available soon. Please call the clinic.`,
-          false,
-        );
-      }
-
-      // Prescription functions
-      function requestRefill(medication) {
-        displayMessage(
-          `Refill request for ${medication} has been submitted. Your pharmacy will contact you within 2 days.`,
-          false,
-        );
-      }
-
-      // Medical Records functions
-      function viewRecord(recordId) {
-        displayMessage(
-          `Viewing record ${recordId}... This feature will be available in the full version.`,
-          false,
-        );
-      }
-
-      function downloadRecord(recordId) {
-        displayMessage(`Downloading record ${recordId}...`, false);
-      }
-
-      // Message functions
-      function showNewMessageForm() {
-        document.getElementById("newMessageForm").style.display = "block";
-      }
-
-      function hideNewMessageForm() {
-        document.getElementById("newMessageForm").style.display = "none";
-      }
-
-      function sendMessage() {
-        let recipient = document.getElementById("messageRecipient").value;
-        let subject = document.getElementById("messageSubject").value;
-        let content = document.getElementById("messageContent").value;
-
-        if (!subject || !content) {
-          displayMessage("Please fill in subject and message");
-          return;
-        }
-
-        let messagesList = document.getElementById("messagesList");
-        let newMessage = document.createElement("div");
-        newMessage.innerHTML = `
-                <p><strong>You → ${recipient}</strong> - Just now</p>
-                <p><strong>Subject:</strong> ${subject}</p>
-                <p>${content}</p>
-                <hr>
-            `;
-        messagesList.insertBefore(newMessage, messagesList.firstChild);
-
-        displayMessage("Message sent successfully!", false);
-        hideNewMessageForm();
-
-        // Clear form
-        document.getElementById("messageSubject").value = "";
-        document.getElementById("messageContent").value = "";
-      }
-
-      function replyToMessage(sender) {
-        showNewMessageForm();
-        document.getElementById("messageSubject").value =
-          `Re: Message from ${sender}`;
-      }
-
-      // AI Health Assistant
-      function askAI() {
-        let question = document.getElementById("aiQuestion").value;
-        if (!question) {
-          displayMessage("Please enter a question");
-          return;
-        }
-
-        let response = document.getElementById("aiResponse");
-        response.innerHTML = `<p><strong>AI Assistant:</strong> Based on your medical history, I recommend consulting with Dr. Michael Chen for this concern. Would you like to book an appointment?</p>`;
-        document.getElementById("aiQuestion").value = "";
-      }
-
-      // Settings
-      function updateSettings() {
-        let newPassword = document.getElementById("newPassword").value;
-        let confirmPassword =
-          document.getElementById("confirmNewPassword").value;
-
-        if (newPassword && newPassword !== confirmPassword) {
-          displayMessage("New passwords do not match!");
-          return;
-        }
-
-        displayMessage("Settings saved successfully!", false);
-
-        // Clear password fields
-        document.getElementById("currentPassword").value = "";
-        document.getElementById("newPassword").value = "";
-        document.getElementById("confirmNewPassword").value = "";
-      }
-
-      function logout() {
-        displayMessage("Logging out... Redirecting to login page", false);
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 1500);
-      }
-
-      // Show overview by default
-      showOverview();
-    </script>
-  </body>
+        <!-- RECENT ACTIVITY SECTION -->
+        <section class="main-card activity-section">
+            <h3>Recent Activity</h3>
+            <div class="activity-list">
+                <div class="activity-item blue-icon">
+                    <span class="icon">📅</span>
+                    <div class="activity-text">
+                        <p>Appointment scheduled with Dr. Michael Chen</p>
+                        <small>2 days ago</small>
+                    </div>
+                </div>
+                <div class="activity-item green-icon">
+                    <span class="icon">💊</span>
+                    <div class="activity-text">
+                        <p>New prescription added: Amlodipine 5mg</p>
+                        <small>5 days ago</small>
+                    </div>
+                </div>
+                <div class="activity-item purple-icon">
+                    <span class="icon">📁</span>
+                    <div class="activity-text">
+                        <p>Medical records updated</p>
+                        <small>1 week ago</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+</body>
 </html>

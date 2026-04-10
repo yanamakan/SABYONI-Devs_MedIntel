@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Care – Nurse Dashboard</title>
+  <link rel="stylesheet" href="nurse.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M12 21C12 21 3 14.25 3 8.25C3 5.35 5.35 3 8.25 3C9.95 3 11.45 3.8 12 5C12.55 3.8 14.05 3 15.75 3C18.65 3 21 5.35 21 8.25C21 14.25 12 21 12 21Z"/></svg>
+    </div>
+    <div class="header-info">
+      <h1>Nurse Dashboard</h1>
+      <span>Alice Williams &bull; Emergency Department</span>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn">
+        &#128276; Notifications <span class="notif-dot">2</span>
+      </button>
+      <button class="header-btn">&#8594; Logout</button>
+    </div>
+  </header>
+
+    <!-- STATS -->
+  <div class="main">
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Patients Today</div>
+        <div class="stat-num">15</div>
+        <div class="stat-sub">+3 since morning</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending Diagnoses</div>
+        <div class="stat-num">3</div>
+        <div class="stat-sub">Awaiting approval</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Alerts</div>
+        <div class="stat-num alert-num">2</div>
+        <div class="stat-sub">Needs attention</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tasks Completed</div>
+        <div class="stat-num green-num">12</div>
+        <div class="stat-sub">Today</div>
+      </div>
+    </div>
+
+  <!-- NAV TABS -->
+  <nav class="tabs">
+    <a href="pending-diagnoses.html" class="tab">Pending Diagnoses</a>
+    <a href="patient-care.html"      class="tab active">Patient Care</a>
+    <a href="vital-signs.html"       class="tab">Vital Signs</a>
+    <a href="schedule.html"          class="tab">Schedule</a>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="main">
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Patient List</h2>
+          <p class="section-sub">View and manage patient information</p>
+        </div>
+      </div>
+
+      <table class="data-table" id="patientTable">
+        <thead>
+          <tr>
+            <th>Patient Name</th>
+            <th>Age</th>
+            <th>Condition</th>
+            <th>Urgency</th>
+            <th>Last Visit</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="patientBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="patient-care.js"></script>
+</body>
+</html>

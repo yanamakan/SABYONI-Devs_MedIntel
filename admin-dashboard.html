@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+      
+      </div>
+      <div class="header-info">
+        <h1>Admin Dashboard</h1>
+        <span>Hospital System Administrator &amp; Appointment Management</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn">
+        &#128276; Notifications <span class="notif-dot">2</span>
+      </button>
+      <button class="header-btn" id="logoutBtn">&#8594; Logout</button>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="main">
+    <div class="stats">
+      <div class="stat-card stat-blue">
+        <div class="stat-label">Total Doctors</div>
+        <div class="stat-num blue" id="statDoctors">2</div>
+        <div class="stat-sub">Active medical staff</div>
+      </div>
+      <div class="stat-card stat-teal">
+        <div class="stat-label">Total Nurses</div>
+        <div class="stat-num teal" id="statNurses">2</div>
+        <div class="stat-sub">Nursing staff</div>
+      </div>
+      <div class="stat-card stat-purple">
+        <div class="stat-label">Total Appointments</div>
+        <div class="stat-num purple" id="statAppointments">5</div>
+        <div class="stat-sub">Scheduled appointments</div>
+      </div>
+      <div class="stat-card stat-red">
+        <div class="stat-label">Urgent Cases</div>
+        <div class="stat-num red" id="statUrgent">1</div>
+        <div class="stat-sub">Require immediate attention</div>
+      </div>
+    </div>
+
+    <!-- TABS + ADD BUTTON -->
+    <div class="tabs-bar">
+      <nav class="tabs">
+        <a href="admin-doctors.html"      class="tab active">Doctors (2)</a>
+        <a href="admin-nurses.html"       class="tab">Nurses (2)</a>
+        <a href="admin-appointments.html" class="tab">Appointments (5)</a>
+        <a href="admin-queue.html"        class="tab">Patient Queue</a>
+      </nav>
+      <button class="btn btn-blue" onclick="window.location.href='admin-doctors.html'">
+        &#43; Add Staff Member
+      </button>
+    </div>
+
+  </div>
+
+  <script src="admin-dashboard.js"></script>
+</body>
+</html>

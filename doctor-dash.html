@@ -3,131 +3,476 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MedIntel|Doctor</title>
+    <title>MedIntel | Doctor</title>
     <link rel="stylesheet" href="doctor-style.css" />
   </head>
   <body>
-    <!--This header is for the doctor-->
+ 
+    <!-- ══════════════════════════════════════════════
+         HEADER
+    ══════════════════════════════════════════════ -->
     <header class="head">
       <div class="left">
-        <!--Every element that should go to the left-->
-        <div class="logo"></div>
+        <div class="logo">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect width="36" height="36" rx="8" fill="#0ea5e9"/>
+            <path d="M10 12c0-1.1.9-2 2-2h4a2 2 0 0 1 2 2v6a4 4 0 0 1-8 0v-6z" stroke="white" stroke-width="1.8" fill="none"/>
+            <path d="M18 15h2a4 4 0 0 1 4 4v1a3 3 0 1 1-2 0v-1a2 2 0 0 0-2-2h-2" stroke="white" stroke-width="1.8" fill="none"/>
+            <circle cx="24" cy="22" r="1.5" fill="white"/>
+          </svg>
+        </div>
         <div class="title">
           <h2>Doctor Dashboard</h2>
-          <p id="doctor-name"></p>
-          <!--this should be imported from the Javascript automatically for every account that sign in or the administrator created for this specific doctor-->
+          <p id="doctor-name">Dr. Michael Chen</p>
         </div>
       </div>
-      <button class="logout">Logout</button
-      ><!--logout button should be on the far rigth-->
+      <div class="header-right">
+        <button class="notif-btn" id="notif-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          Notifications
+          <span class="notif-badge" id="notif-count">2</span>
+        </button>
+        <button class="logout-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Logout
+        </button>
+      </div>
     </header>
-
+ 
+    <!-- ══════════════════════════════════════════════
+         STATS CARDS (always visible)
+    ══════════════════════════════════════════════ -->
     <section class="stats">
-      <!--doctor stats section-->
-      <!--for the number of appointments the doctor has card-->
-      <div class="card blue">
-        <p>Today's Appointment</p>
-        <h2 id="appointments">0</h2>
+      <div class="stat-card blue">
+        <p>Today's Appointments</p>
+        <h2 id="stat-appointments">3</h2>
       </div>
-      <!--Total number of patients-->
-      <div class="card teal">
+      <div class="stat-card teal">
         <p>Total Patients</p>
-        <h2 id="patients">0</h2>
+        <h2 id="stat-patients">4</h2>
       </div>
-      <!--Pending Cases-->
-      <div class="card yellow">
+      <div class="stat-card yellow">
         <p>Pending Cases</p>
-        <h2 id="pending">0</h2>
+        <h2 id="stat-pending">3</h2>
       </div>
-      <!--Urgent cases-->
-      <div class="card red">
-        <p>Today's Appointment</p>
-        <h2 id="urgent">0</h2>
+      <div class="stat-card red">
+        <p>Urgent Cases</p>
+        <h2 id="stat-urgent">1</h2>
       </div>
     </section>
-
-    <section class="dashboard">
-      <!--LEFT: this is for the patient queue-->
-      <div class="queue">
+ 
+    <!-- ══════════════════════════════════════════════
+         NAV TABS
+    ══════════════════════════════════════════════ -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="patients">Patients &amp; AI Triage</button>
+      <button class="tab" data-tab="anatomy">3D Anatomy Notes</button>
+      <button class="tab" data-tab="appointments">Appointments</button>
+      <button class="tab" data-tab="map">Clinic Map</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+ 
+    <!-- ══════════════════════════════════════════════
+         TAB: PATIENTS & AI TRIAGE
+    ══════════════════════════════════════════════ -->
+    <main class="dashboard" id="tab-patients">
+      <aside class="queue-panel">
         <h3>Patient Queue</h3>
         <p class="sub">AI-sorted by urgency</p>
-        <span class="tag"></span>
-        <small
-          >Last visit
-          <p id="last-visit"></p
-        ></small>
-
-        <div class="patient">
-          <h4 class="patient-name"></h4>
-          <span class="tag"></span>
-          <small
-            >Last visit:
-            <p id="last-visit"></p
-          ></small>
-          <p id="sickness">...</p>
+        <div class="queue" id="patient-queue"></div>
+      </aside>
+ 
+      <section class="detail-panel" id="detail-panel">
+        <div class="detail-header">
+          <div>
+            <h2 id="detail-name">Select a patient</h2>
+            <p id="detail-meta"></p>
+          </div>
+          <span class="priority-badge" id="detail-priority"></span>
         </div>
-
-        <div class="patient">
-          <h4 class="patient-name"></h4>
-          <span class="tag"></span>
-          <small
-            >Last visit:
-            <p id="last-visit"></p
-          ></small>
-          <p id="sickness">...</p>
+ 
+        <div class="ai-summary" id="ai-summary" style="display:none">
+          <div class="ai-summary-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            AI Clinical Summary
+          </div>
+          <p id="ai-summary-text"></p>
         </div>
-
-        <div class="patient">
-          <h4 class="patient-name"></h4>
-          <span class="tag"></span>
-          <small
-            >Last visit:
-            <p id="last-visit"></p
-          ></small>
-          <p id="sickness">...</p>
+ 
+        <div class="info-grid" id="info-grid" style="display:none">
+          <div><strong>Email</strong><p id="detail-email"></p></div>
+          <div><strong>Phone</strong><p id="detail-phone"></p></div>
+          <div><strong>Last Visit</strong><p id="detail-last-visit"></p></div>
+          <div><strong>Next Appointment</strong><p id="detail-next-appt"></p></div>
         </div>
-
-        <div class="patient">
-          <h4 class="patient-name"></h4>
-          <span class="tag"></span>
-          <small
-            >Last visit:
-            <p id="last-visit"></p
-          ></small>
-          <p id="sickness">...</p>
+ 
+        <div class="history-section" id="history-section" style="display:none">
+          <h3>Medical History</h3>
+          <div id="history-list"></div>
+        </div>
+ 
+        <div class="prescriptions-section" id="prescriptions-section" style="display:none">
+          <h3>Current Prescriptions</h3>
+          <div id="prescriptions-list"></div>
+        </div>
+ 
+        <div class="empty-state" id="empty-state">
+          <p>Select a patient from the queue to view their details.</p>
+        </div>
+      </section>
+    </main>
+ 
+    <!-- ══════════════════════════════════════════════
+         TAB: 3D ANATOMY NOTES
+    ══════════════════════════════════════════════ -->
+    <div id="tab-anatomy" class="tab-page" style="display:none">
+      <div class="tab-content-header">
+        <h2>3D Anatomy Medical Notes</h2>
+        <p class="sub">Click on the body to add location-specific medical notes for <span id="anatomy-patient-name">the selected patient</span></p>
+      </div>
+ 
+      <div class="anatomy-layout">
+        <!-- LEFT: viewer -->
+        <div class="anatomy-viewer-card">
+          <div class="anatomy-viewer-toolbar">
+            <h4>3D Anatomy Viewer - <span id="anatomy-viewer-name">James Wilson</span></h4>
+            <div class="anatomy-controls">
+              <select id="anatomy-view-select" class="anatomy-select">
+                <option value="front">Front View</option>
+                <option value="back">Back View</option>
+                <option value="left">Left Side</option>
+                <option value="right">Right Side</option>
+              </select>
+              <button class="anatomy-btn" id="anatomy-reset" title="Reset">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.4"/></svg>
+              </button>
+              <button class="anatomy-btn" id="anatomy-zoomin" title="Zoom In">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              </button>
+              <button class="anatomy-btn" id="anatomy-zoomout" title="Zoom Out">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              </button>
+            </div>
+          </div>
+ 
+          <!-- SVG body diagram -->
+          <div class="anatomy-canvas-wrap">
+            <svg id="body-svg" viewBox="0 0 300 520" xmlns="http://www.w3.org/2000/svg" class="body-svg">
+              <!-- Head -->
+              <ellipse cx="150" cy="60" rx="38" ry="42" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Head"/>
+              <circle cx="137" cy="55" r="4" fill="#1e3a5f"/>
+              <circle cx="163" cy="55" r="4" fill="#1e3a5f"/>
+              <text x="200" y="65" fill="#3b82f6" font-size="13" font-family="sans-serif">Head</text>
+ 
+              <!-- Neck -->
+              <rect x="138" y="100" width="24" height="20" rx="4" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Neck"/>
+ 
+              <!-- Torso -->
+              <ellipse cx="150" cy="200" rx="55" ry="75" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Chest"/>
+              <text x="210" y="175" fill="#3b82f6" font-size="13" font-family="sans-serif">Chest</text>
+ 
+              <!-- Abdomen label area -->
+              <text x="210" y="230" fill="#3b82f6" font-size="13" font-family="sans-serif">Abdomen</text>
+ 
+              <!-- Arms -->
+              <rect x="75" y="125" width="22" height="100" rx="11" fill="#bfdbfe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Left Arm"/>
+              <rect x="203" y="125" width="22" height="100" rx="11" fill="#bfdbfe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Right Arm"/>
+ 
+              <!-- Pelvis -->
+              <ellipse cx="150" cy="290" rx="42" ry="22" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Pelvis"/>
+              <text x="200" y="295" fill="#3b82f6" font-size="13" font-family="sans-serif">Pelvis</text>
+ 
+              <!-- Legs -->
+              <rect x="115" y="310" width="26" height="130" rx="12" fill="#bfdbfe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Left Leg"/>
+              <rect x="159" y="310" width="26" height="130" rx="12" fill="#bfdbfe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Right Leg"/>
+ 
+              <!-- Feet -->
+              <ellipse cx="128" cy="450" rx="20" ry="12" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Left Foot"/>
+              <ellipse cx="172" cy="450" rx="20" ry="12" fill="#dbeafe" stroke="#3b82f6" stroke-width="2" class="body-part" data-part="Right Foot"/>
+ 
+              <!-- Click marker (hidden by default) -->
+              <circle id="anatomy-marker" cx="-100" cy="-100" r="8" fill="#ef4444" style="pointer-events:none"/>
+            </svg>
+            <p class="anatomy-hint">Click anywhere on the body to add a medical note</p>
+          </div>
+        </div>
+ 
+        <!-- RIGHT: note form + existing notes -->
+        <div class="anatomy-notes-panel">
+          <div class="anatomy-note-form-card">
+            <h4>Add Medical Note</h4>
+            <p class="anatomy-body-part-label">Body Part: <span id="selected-body-part">—</span></p>
+            <p class="anatomy-selected-confirm" id="anatomy-selected-confirm" style="display:none">✓ Point selected on anatomy</p>
+            <label class="anatomy-label">Medical Note</label>
+            <textarea id="anatomy-note-text" class="anatomy-textarea" placeholder="Describe the patient's complaint or observation for this area..."></textarea>
+            <button class="anatomy-save-btn" id="anatomy-save-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Note to Patient Record
+            </button>
+          </div>
+ 
+          <div class="anatomy-existing-card">
+            <h4>Existing Notes (<span id="anatomy-note-count">0</span>)</h4>
+            <div id="anatomy-notes-list">
+              <p class="anatomy-no-notes">No notes recorded yet</p>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!--Right side: Patient Details-->
-      <div class="details">
-        <h2 class="patient-name"></h2>
-        <p class="summary-text">No data yet</p>
+    </div>
+ 
+    <!-- ══════════════════════════════════════════════
+         TAB: APPOINTMENTS
+    ══════════════════════════════════════════════ -->
+    <div id="tab-appointments" class="tab-page" style="display:none">
+      <div class="tab-content-header">
+        <h2>Appointments</h2>
+        <p class="sub">Manage and view your scheduled appointments</p>
       </div>
-
-      <div class="info-grid">
-        <div>
-          <strong>Email</strong>
-          <p class="email"></p>
+      <div class="appointments-card">
+        <table class="appt-table">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="appointments-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+ 
+    <!-- ══════════════════════════════════════════════
+         TAB: CLINIC MAP
+    ══════════════════════════════════════════════ -->
+    <div id="tab-map" class="tab-page" style="display:none">
+      <div class="tab-content-header">
+        <h2>Clinic Map</h2>
+        <p class="sub">View the clinic layout and patient locations</p>
+      </div>
+ 
+      <div class="map-section">
+        <div class="map-section-header">
+          <div>
+            <h3>Recommend Clinic or Pharmacy</h3>
+            <p class="sub" id="facility-count">6 facilities found near you</p>
+          </div>
+          <div class="map-filter-btns">
+            <button class="map-filter-btn active" data-filter="nearest">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Nearest
+            </button>
+            <button class="map-filter-btn" data-filter="toprated">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Top Rated
+            </button>
+          </div>
         </div>
-        <div>
-          <strong>Phone</strong>
-          <p class="last-visit"></p>
+ 
+        <!-- Simple illustrated map -->
+        <div class="map-visual">
+          <div class="map-marker red" style="top:38%;left:10%">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#ef4444"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <div class="map-marker blue" style="top:55%;left:50%;transform:translate(-50%,-50%)">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#2563eb"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <div class="map-marker blue" style="top:45%;left:88%">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#2563eb"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <div class="map-center-label">
+            <p>Interactive Map View</p>
+            <p class="map-sub-label">Map integration ready for deployment. Shows clinic locations with interactive markers and navigation.</p>
+            <button class="map-location-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Enable Location Services
+            </button>
+          </div>
         </div>
-        <div>
-          <strong>Next Appointment</strong>
-          <p class="next-appointment"></p>
+ 
+        <!-- Facility cards -->
+        <div class="facility-grid" id="facility-grid">
+          <!-- Populated by JS -->
         </div>
       </div>
-
-      <div class="history">
-        <h3>Medical History</h3>
-        <div class="history-list"></div>
+    </div>
+ 
+    <!-- ══════════════════════════════════════════════
+         TAB: SETTINGS
+    ══════════════════════════════════════════════ -->
+    <div id="tab-settings" class="tab-page" style="display:none">
+      <div class="tab-content-header">
+        <h2>User Settings</h2>
+        <p class="sub">Manage your account settings and preferences</p>
       </div>
-
-      <div class="prescriptions"></div>
-    </section>
-
-    <!-- Branch test -->
+ 
+      <div class="settings-card">
+        <div class="settings-title-row">
+          <div class="settings-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </div>
+          <div>
+            <h3>Settings</h3>
+            <p class="sub">Manage your account and preferences</p>
+          </div>
+        </div>
+ 
+        <!-- Settings sub-tabs -->
+        <div class="settings-subtabs">
+          <button class="settings-subtab active" data-stab="profile">Profile</button>
+          <button class="settings-subtab" data-stab="preferences">Preferences</button>
+          <button class="settings-subtab" data-stab="notifications">Notifications</button>
+          <button class="settings-subtab" data-stab="security">Security</button>
+        </div>
+ 
+        <!-- PROFILE -->
+        <div class="settings-panel" id="stab-profile">
+          <div class="settings-section">
+            <h4>Personal Information</h4>
+            <p class="sub">Update your personal details</p>
+            <label class="settings-label">Full Name
+              <div class="settings-input-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" class="settings-input" value="Dr. Michael Chen" id="profile-name"/>
+              </div>
+            </label>
+            <label class="settings-label">Email
+              <div class="settings-input-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+                <input type="email" class="settings-input" value="doctor@medintel.com" id="profile-email"/>
+              </div>
+            </label>
+            <label class="settings-label">Phone Number
+              <div class="settings-input-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.02-1.02a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <input type="tel" class="settings-input" placeholder="" id="profile-phone"/>
+              </div>
+            </label>
+            <button class="settings-save-btn" onclick="alert('Changes saved!')">Save Changes</button>
+          </div>
+        </div>
+ 
+        <!-- PREFERENCES -->
+        <div class="settings-panel" id="stab-preferences" style="display:none">
+          <div class="settings-section">
+            <h4>Display &amp; Language</h4>
+            <p class="sub">Customize your app experience</p>
+ 
+            <div class="settings-toggle-row">
+              <div>
+                <div class="settings-toggle-label">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                  Dark Mode
+                </div>
+                <p class="sub">Enable dark theme</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" id="dark-mode-toggle"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+ 
+            <label class="settings-label">Language
+              <select class="settings-select">
+                <option>English</option>
+                <option>Afrikaans</option>
+                <option>Zulu</option>
+              </select>
+            </label>
+            <label class="settings-label">Time Zone
+              <select class="settings-select">
+                <option>Johannesburg (SAST)</option>
+                <option>UTC</option>
+                <option>London (GMT)</option>
+              </select>
+            </label>
+          </div>
+        </div>
+ 
+        <!-- NOTIFICATIONS -->
+        <div class="settings-panel" id="stab-notifications" style="display:none">
+          <div class="settings-section">
+            <h4>Notification Preferences</h4>
+            <p class="sub">Choose how you want to be notified</p>
+ 
+            <div class="settings-toggle-row">
+              <div>
+                <div class="settings-toggle-label">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  Email Notifications
+                </div>
+                <p class="sub">Receive updates via email</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" checked/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+ 
+            <div class="settings-toggle-row">
+              <div>
+                <div class="settings-toggle-label">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.12.96.34 1.9.65 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.02-1.02a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.65A2 2 0 0 1 22 16.92z"/></svg>
+                  SMS Notifications
+                </div>
+                <p class="sub">Receive alerts via text message</p>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox"/>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+ 
+        <!-- SECURITY -->
+        <div class="settings-panel" id="stab-security" style="display:none">
+          <div class="settings-section">
+            <h4>Security Settings</h4>
+            <p class="sub">Manage your account security</p>
+ 
+            <div class="security-item">
+              <strong>Password</strong>
+              <p class="sub">Last changed: 30 days ago</p>
+              <button class="security-btn" onclick="alert('Change Password flow coming soon.')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Change Password
+              </button>
+            </div>
+ 
+            <div class="security-item">
+              <strong>Two-Factor Authentication</strong>
+              <p class="sub">Add an extra layer of security</p>
+              <button class="security-btn" onclick="alert('2FA setup coming soon.')">Enable 2FA</button>
+            </div>
+ 
+            <div class="security-item">
+              <strong>Active Sessions</strong>
+              <p class="sub">Manage devices where you're logged in</p>
+              <button class="security-btn" onclick="alert('1 active session: Chrome on Windows')">View Active Sessions</button>
+            </div>
+          </div>
+        </div>
+ 
+      </div><!-- end settings-card -->
+    </div>
+ 
     <script src="doctor.js"></script>
   </body>
 </html>

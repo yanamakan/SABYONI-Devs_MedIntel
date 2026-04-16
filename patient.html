@@ -8,110 +8,40 @@
   <body>
     <!-- Header Section -->
     <header>
-      <h1>Patient Portal</h1>
-      <h2>James Wilson</h2>
+      <h1>MedIntel-Prototype</h1>
+      <button onclick="alert('Sign up with email')">Sign up with email</button>
+      <button onclick="alert('Continue with Google')">G Continue with Google</button>
+      <h2>Patient Portal</h2>
+      <button onclick="alert('Notifications')">🔔 Notifications</button>
+      <button onclick="alert('Logout')">🚪 Logout</button>
+      <h3>James Wilson</h3>
       <hr />
     </header>
 
-    <!-- Navigation Tabs -->
+    <!-- Top Stats Navigation Tabs -->
     <div>
-      <button onclick="showUpcomingAppointments()">
-        Upcoming Appointments
-      </button>
-      <button onclick="showActivePrescriptions()">Active Prescriptions</button>
-      <button onclick="showMedicalRecords()">Medical Records</button>
-      <button onclick="showMessages()">Messages</button>
-      <button onclick="logout()">Logout</button>
+      <button onclick="showUpcomingAppointments()">Upcoming Appointments (1)</button>
+      <button onclick="showActivePrescriptions()">Active Prescriptions (1)</button>
+      <button onclick="showMedicalRecords()">Medical Records (2)</button>
+      <button onclick="showMessages()">Messages (2)</button>
     </div>
 
     <!-- Sidebar Navigation Links -->
     <div>
       <h3>Navigation</h3>
       <ul>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showOverview();
-              return false;
-            "
-            >Overview</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showAIHealthAssistant();
-              return false;
-            "
-            >AI Health Assistant</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showAppointments();
-              return false;
-            "
-            >Appointments</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showPrescriptions();
-              return false;
-            "
-            >Prescriptions</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showMedicalRecords();
-              return false;
-            "
-            >Medical Records</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showClinicMap();
-              return false;
-            "
-            >Clinic Map</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showYouTubeVideos();
-              return false;
-            "
-            >YouTube Videos</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            onclick="
-              showSettings();
-              return false;
-            "
-            >Settings</a
-          >
-        </li>
+        <li><a href="#" onclick="showOverview(); return false;">Overview</a></li>
+        <li><a href="#" onclick="showAIHealthAssistant(); return false;">AI Health Assistant</a></li>
+        <li><a href="#" onclick="showAppointments(); return false;">Appointments</a></li>
+        <li><a href="#" onclick="showPrescriptions(); return false;">Prescriptions</a></li>
+        <li><a href="#" onclick="showMedicalRecords(); return false;">Medical Records</a></li>
+        <li><a href="#" onclick="showClinicMap(); return false;">Clinic Map</a></li>
+        <li><a href="#" onclick="showYouTubeVideos(); return false;">YouTube Videos</a></li>
+        <li><a href="#" onclick="showSettings(); return false;">Settings</a></li>
       </ul>
     </div>
 
-    <!--  OVERVIEW SECTION -->
+    <!-- ========== OVERVIEW SECTION ========== -->
     <div id="overviewSection">
       <h2>Overview</h2>
 
@@ -129,165 +59,114 @@
       <button onclick="bookAppointment()">Book New Appointment</button>
       <button onclick="uploadDocument()">Upload Medical Document</button>
       <button onclick="messageDoctor()">Message Your Doctor</button>
-      <button onclick="requestCertificate()">
-        Request Medical Certificate
-      </button>
+      <button onclick="requestCertificate()">Request Medical Certificate</button>
 
       <!-- Recent Activity -->
       <h3>Recent Activity</h3>
       <div>
-        <p>
-          <strong>Appointment scheduled with Dr. Michael Chen</strong> - 2 days
-          ago
-        </p>
-        <p>
-          <strong>New prescription added: Amlodipine 5mg</strong> - 5 days ago
-        </p>
+        <p><strong>Appointment scheduled with Dr. Michael Chen</strong> - 2 days ago</p>
+        <p><strong>New prescription added: Amlodipine 5mg</strong> - 5 days ago</p>
         <p><strong>Medical records updated</strong> - 1 week ago</p>
-        <p>
-          <strong>Appointment reminder: March 20, 9:00 AM</strong> - 1 week ago
-        </p>
+        <p><strong>Appointment reminder: March 20, 9:00 AM</strong> - 1 week ago</p>
       </div>
     </div>
 
-    <!-- UPCOMING APPOINTMENTS SECTION -->
+    <!-- ========== APPOINTMENTS SECTION ========== -->
     <div id="upcomingAppointmentsSection" style="display: none">
-      <h2>Upcoming Appointments</h2>
+      <h2>Your Appointments</h2>
+      <p>View and manage your scheduled appointments</p>
 
       <div id="appointmentsList">
         <div>
-          <p><strong>Dr. Michael Chen</strong> - Cardiology</p>
+          <p><strong>Dr. Michael Chen</strong> - Scheduled</p>
           <p>Date: March 20, 2026 | Time: 9:00 AM</p>
-          <p>Location: Room 304, Main Building</p>
-          <button onclick="cancelAppointment('Dr. Michael Chen')">
-            Cancel Appointment
-          </button>
-          <button onclick="rescheduleAppointment('Dr. Michael Chen')">
-            Reschedule
-          </button>
+          <button onclick="cancelAppointment('Dr. Michael Chen')">Cancel</button>
+          <button onclick="rescheduleAppointment('Dr. Michael Chen')">Reschedule</button>
           <hr />
         </div>
         <div>
-          <p><strong>Dr. Emily Rodriguez</strong> - Follow-up</p>
+          <p><strong>Dr. Emily Rodriguez</strong> - Scheduled</p>
           <p>Date: April 5, 2026 | Time: 2:30 PM</p>
-          <p>Location: Room 112, East Wing</p>
-          <button onclick="cancelAppointment('Dr. Emily Rodriguez')">
-            Cancel Appointment
-          </button>
-          <button onclick="rescheduleAppointment('Dr. Emily Rodriguez')">
-            Reschedule
-          </button>
+          <button onclick="cancelAppointment('Dr. Emily Rodriguez')">Cancel</button>
+          <button onclick="rescheduleAppointment('Dr. Emily Rodriguez')">Reschedule</button>
           <hr />
         </div>
       </div>
 
-      <button onclick="showBookAppointmentForm()">
-        + Book New Appointment
-      </button>
+      <button onclick="showBookAppointmentForm()">+ Book New Appointment</button>
 
-      <!-- Book Appointment Form -->
       <div id="bookAppointmentForm" style="display: none; margin-top: 20px">
         <h3>Book New Appointment</h3>
         <label>Doctor:</label><br />
         <select id="appointmentDoctor">
-          <option value="Dr. Michael Chen">
-            Dr. Michael Chen (Cardiology)
-          </option>
-          <option value="Dr. Emily Rodriguez">
-            Dr. Emily Rodriguez (Pediatrics)
-          </option>
-          <option value="Dr. Sarah Johnson">
-            Dr. Sarah Johnson (General Medicine)
-          </option></select
-        ><br /><br />
-
+          <option value="Dr. Michael Chen">Dr. Michael Chen (Cardiology)</option>
+          <option value="Dr. Emily Rodriguez">Dr. Emily Rodriguez (Pediatrics)</option>
+          <option value="Dr. Sarah Johnson">Dr. Sarah Johnson (General Medicine)</option>
+        </select><br /><br />
         <label>Date:</label><br />
         <input type="date" id="appointmentDate" /><br /><br />
-
         <label>Time:</label><br />
         <input type="time" id="appointmentTime" /><br /><br />
-
         <label>Reason:</label><br />
-        <textarea
-          id="appointmentReason"
-          rows="3"
-          cols="30"
-          placeholder="Briefly describe your symptoms or reason for visit"
-        ></textarea
-        ><br /><br />
-
+        <textarea id="appointmentReason" rows="3" cols="30" placeholder="Briefly describe your symptoms"></textarea><br /><br />
         <button onclick="confirmBookAppointment()">Confirm Appointment</button>
         <button onclick="hideBookAppointmentForm()">Cancel</button>
       </div>
     </div>
 
-    <!-- ACTIVE PRESCRIPTIONS SECTION -->
+    <!-- ========== PRESCRIPTIONS SECTION ========== -->
     <div id="activePrescriptionsSection" style="display: none">
       <h2>Active Prescriptions</h2>
+      <p>Your current medications and dosage information</p>
 
       <div>
         <div>
           <p><strong>Medication:</strong> Amlodipine 5mg</p>
-          <p><strong>Prescribed by:</strong> Dr. Michael Chen</p>
-          <p><strong>Dosage:</strong> Take 1 tablet daily</p>
-          <p><strong>Duration:</strong> 30 days</p>
-          <p><strong>Refills left:</strong> 2</p>
+          <p><strong>Dosage:</strong> 5mg - Once daily</p>
+          <p><strong>Prescribed by:</strong> Dr. Michael Chen on 2026-02-15</p>
           <button onclick="requestRefill('Amlodipine')">Request Refill</button>
           <hr />
         </div>
         <div>
           <p><strong>Medication:</strong> Lisinopril 10mg</p>
-          <p><strong>Prescribed by:</strong> Dr. Michael Chen</p>
-          <p><strong>Dosage:</strong> Take 1 tablet every morning</p>
-          <p><strong>Duration:</strong> 60 days</p>
-          <p><strong>Refills left:</strong> 1</p>
+          <p><strong>Dosage:</strong> 10mg - Once daily</p>
+          <p><strong>Prescribed by:</strong> Dr. Michael Chen on 2026-02-15</p>
           <button onclick="requestRefill('Lisinopril')">Request Refill</button>
           <hr />
         </div>
       </div>
     </div>
 
-    <!-- MEDICAL RECORDS SECTION -->
+    <!-- ========== MEDICAL RECORDS SECTION ========== -->
     <div id="medicalRecordsSection" style="display: none">
-      <h2>Medical Records</h2>
+      <h2>Medical History</h2>
+      <p>Your complete medical records and visit history</p>
 
-      <h3>Recent Records</h3>
       <div>
-        <p><strong>Blood Test Results</strong> - March 10, 2026</p>
-        <p>Cholesterol: Normal | Blood Sugar: 95 mg/dL</p>
-        <button onclick="viewRecord('blood_test_0310')">View Details</button>
-        <button onclick="downloadRecord('blood_test_0310')">Download</button>
-        <hr />
-      </div>
-      <div>
-        <p><strong>ECG Report</strong> - February 15, 2026</p>
-        <p>Normal sinus rhythm. No abnormalities detected.</p>
-        <button onclick="viewRecord('ecg_0215')">View Details</button>
-        <button onclick="downloadRecord('ecg_0215')">Download</button>
-        <hr />
-      </div>
-      <div>
-        <p><strong>Annual Physical Exam</strong> - January 20, 2026</p>
-        <p>Blood pressure: 118/76 | Weight: 82kg | Height: 178cm</p>
-        <button onclick="viewRecord('physical_0120')">View Details</button>
-        <button onclick="downloadRecord('physical_0120')">Download</button>
-        <hr />
+        <div>
+          <p><strong>Hypertension</strong> - 2026-02-15</p>
+          <p>Dr. Michael Chen - Blood pressure: 145/95. Prescribed Amlodipine 5mg.</p>
+          <button onclick="viewRecord('hypertension')">View Full Report</button>
+          <hr />
+        </div>
+        <div>
+          <p><strong>Annual Checkup</strong> - 2026-01-10</p>
+          <p>Dr. Emily Rodriguez - General health good. Continue current medications.</p>
+          <button onclick="viewRecord('checkup')">View Full Report</button>
+          <hr />
+        </div>
       </div>
     </div>
 
-    <!-- MESSAGES SECTION -->
+    <!-- ========== MESSAGES SECTION ========== -->
     <div id="messagesSection" style="display: none">
       <h2>Messages</h2>
-
       <button onclick="showNewMessageForm()">+ New Message</button>
 
       <div id="messagesList">
         <div>
           <p><strong>Dr. Michael Chen</strong> - March 18, 2026</p>
-          <p>
-            Your test results are ready. Please schedule a follow-up to discuss
-            them.
-          </p>
+          <p>Your test results are ready. Please schedule a follow-up to discuss them.</p>
           <button onclick="replyToMessage('Dr. Michael Chen')">Reply</button>
           <hr />
         </div>
@@ -297,116 +176,173 @@
           <button onclick="replyToMessage('MedIntel Pharmacy')">Reply</button>
           <hr />
         </div>
-        <div>
-          <p><strong>Appointment Reminder</strong> - March 14, 2026</p>
-          <p>
-            Reminder: You have an appointment with Dr. Michael Chen on March 20
-            at 9:00 AM.
-          </p>
-          <button onclick="replyToMessage('Appointment Reminder')">
-            Reply
-          </button>
-          <hr />
-        </div>
       </div>
 
-      <!-- New Message Form -->
       <div id="newMessageForm" style="display: none; margin-top: 20px">
         <h3>New Message</h3>
         <label>To:</label><br />
         <select id="messageRecipient">
-          <option value="Dr. Michael Chen">
-            Dr. Michael Chen (Cardiology)
-          </option>
-          <option value="Dr. Emily Rodriguez">
-            Dr. Emily Rodriguez (Pediatrics)
-          </option>
+          <option value="Dr. Michael Chen">Dr. Michael Chen (Cardiology)</option>
+          <option value="Dr. Emily Rodriguez">Dr. Emily Rodriguez (Pediatrics)</option>
           <option value="Pharmacy">MedIntel Pharmacy</option>
-          <option value="Support">Patient Support</option></select
-        ><br /><br />
-
+        </select><br /><br />
         <label>Subject:</label><br />
-        <input
-          type="text"
-          id="messageSubject"
-          placeholder="Subject"
-        /><br /><br />
-
+        <input type="text" id="messageSubject" placeholder="Subject" /><br /><br />
         <label>Message:</label><br />
-        <textarea
-          id="messageContent"
-          rows="5"
-          cols="40"
-          placeholder="Type your message here..."
-        ></textarea
-        ><br /><br />
-
+        <textarea id="messageContent" rows="5" cols="40" placeholder="Type your message here..."></textarea><br /><br />
         <button onclick="sendMessage()">Send Message</button>
         <button onclick="hideNewMessageForm()">Cancel</button>
       </div>
     </div>
 
-    <!-- ADDITIONAL SECTIONS -->
+    <!-- ========== AI HEALTH ASSISTANT SECTION ========== -->
     <div id="aiHealthAssistantSection" style="display: none">
       <h2>AI Health Assistant</h2>
-      <p>How can I help you today?</p>
-      <input
-        type="text"
-        id="aiQuestion"
-        placeholder="Ask me anything about your health..."
-        size="50"
-      />
-      <button onclick="askAI()">Ask</button>
+      <p>Describe your symptoms for instant AI-powered health assessment</p>
+      <textarea id="symptomsInput" rows="4" cols="60" placeholder="E.g., I've been experiencing headaches and mild fever for 2 days.."></textarea><br />
+      <button onclick="getAIAnalysis()">Get AI Analysis</button>
       <div id="aiResponse" style="margin-top: 10px"></div>
+      <p><i>AI assistance is for informational purposes only. Always consult with a healthcare professional.</i></p>
     </div>
 
+    <!-- ========== CLINIC MAP SECTION ========== -->
     <div id="clinicMapSection" style="display: none">
       <h2>Clinic Map</h2>
-      <p>
-        <strong>Main Building - Floor 1:</strong> Reception, Pharmacy, General
-        Medicine
-      </p>
-      <p>
-        <strong>Main Building - Floor 2:</strong> Cardiology, Radiology, Lab
-      </p>
-      <p>
-        <strong>Main Building - Floor 3:</strong> Pediatrics, Orthopedics,
-        Neurology
-      </p>
-      <p><strong>East Wing:</strong> Emergency Department, ICU</p>
-      <p><strong>West Wing:</strong> Administrative Offices, Staff Lounge</p>
+      <p>Find your way to the clinic</p>
+      <h3>Find Nearby Clinics & Pharmacies</h3>
+      <p><strong>6 facilities found near you</strong></p>
+      <p><i>Interactive Map View - Shows clinic locations with interactive markers and navigation.</i></p>
+      <input type="checkbox" /> Enable Location Services
+      <br /><br />
+
+      <div>
+        <div>
+          <p><strong>⭐ 4.8 - 1.2 km away</strong></p>
+          <p><strong>City Medical Center</strong></p>
+          <p>123 Main Street, Johannesburg</p>
+          <p>+27 11 123 4567 | Mon-Fri: 8AM-6PM</p>
+          <p>General Practice | Pharmacy | Emergency</p>
+          <hr />
+        </div>
+        <div>
+          <p><strong>⭐ 4.6 - 2.5 km away</strong></p>
+          <p><strong>Sandton Health Clinic</strong></p>
+          <p>45 Rivonia Road, Sandton</p>
+          <p>+27 11 234 5678 | Mon-Sat: 7AM-8PM</p>
+          <p>Specialists | Pharmacy | Lab Tests</p>
+          <hr />
+        </div>
+        <div>
+          <p><strong>⭐ 4.7 - 3.2 km away</strong></p>
+          <p><strong>Melrose Arch Medical Centre</strong></p>
+          <p>Melrose Arch, Johannesburg</p>
+          <p>+27 11 678 9012 | Mon-Sat: 8AM-7PM</p>
+          <p>Specialists | Dentistry | Optometry | Pharmacy</p>
+          <hr />
+        </div>
+        <div>
+          <p><strong>⭐ 4.7 - 3.8 km away</strong></p>
+          <p><strong>Rosebank Medical Plaza</strong></p>
+          <p>78 Oxford Road, Rosebank</p>
+          <p>+27 11 345 6789 | Mon-Fri: 9AM-5PM</p>
+          <p>General Practice | Pharmacy | Radiology</p>
+          <hr />
+        </div>
+        <div>
+          <p><strong>⭐ 4.5 - 4.1 km away</strong></p>
+          <p><strong>Greenside Family Clinic</strong></p>
+          <p>Gleneagles Road, Greenside</p>
+          <p>+27 11 567 8901 | Mon-Fri: 8AM-5PM</p>
+          <p>General Practice | Pediatrics | Vaccinations</p>
+          <hr />
+        </div>
+        <div>
+          <p><strong>⭐ 4.9 - 5.2 km away</strong></p>
+          <p><strong>Fourways Life Hospital</strong></p>
+          <p>Cedar Road, Fourways</p>
+          <p>+27 11 456 7890 | 24/7 Emergency</p>
+          <p>Hospital | Emergency | Pharmacy | Surgery</p>
+          <hr />
+        </div>
+      </div>
     </div>
 
+    <!-- ========== YOUTUBE VIDEOS SECTION ========== -->
     <div id="youtubeVideosSection" style="display: none">
-      <h2>Health Education Videos</h2>
-      <p><strong>Understanding Blood Pressure</strong> - 5:23 min</p>
-      <p><strong>Heart Healthy Diet Tips</strong> - 8:45 min</p>
-      <p><strong>Managing Stress and Anxiety</strong> - 6:12 min</p>
-      <p><strong>Exercise for Beginners</strong> - 10:00 min</p>
+      <h2>YouTube Videos</h2>
+      <p>Watch educational videos about health and wellness</p>
+      <input type="text" size="40" placeholder="Search videos.." /> <button onclick="alert('Search')">Q Search</button>
+      <br /><br />
+      <button onclick="alert('All Videos')">All Videos</button>
+      <button onclick="alert('Exercise')">Exercise</button>
+      <button onclick="alert('Relaxation')">Relaxation</button>
+      <button onclick="alert('Meditation')">Meditation</button>
+      <br /><br />
+
+      <div>
+        <p><strong>10:24</strong> - 10 Minute Full Body Workout - No Equipment - FitnessBlender</p>
+        <p><strong>15:32</strong> - Morning Yoga for Beginners - 15 Minutes - Yoga With Adriene</p>
+        <p><strong>20:15</strong> - Guided Meditation for Deep Relaxation - Calm Meditation</p>
+        <p><strong>5:48</strong> - 5 Minute Breathing Exercise for Stress Relief - Mindful Movement</p>
+        <p><strong>12:20</strong> - Cardio HIIT Workout - Burn Calories Fast - POPSUGAR Fitness</p>
+        <p><strong>15:00</strong> - Gentle Stretching Routine for Flexibility</p>
+        <p><strong>10:00</strong> - Mindfulness Meditation for Anxiety - Headspace</p>
+      </div>
     </div>
 
+    <!-- ========== SETTINGS SECTION ========== -->
     <div id="settingsSection" style="display: none">
       <h2>Settings</h2>
-      <h3>Profile Settings</h3>
-      <label>Email Notifications:</label>
-      <input type="checkbox" id="emailNotifications" checked /> Enable email
-      notifications<br /><br />
+      <p>Manage your account and preferences</p>
 
-      <label>SMS Reminders:</label>
-      <input type="checkbox" id="smsReminders" checked /> Receive appointment
-      reminders via SMS<br /><br />
+      <!-- Settings Sub-Tabs -->
+      <div>
+        <button onclick="showSettingsProfile()">Profile</button>
+        <button onclick="showSettingsPreferences()">Preferences</button>
+        <button onclick="showSettingsNotifications()">Notifications</button>
+        <button onclick="showSettingsSecurity()">Security</button>
+      </div>
+      <br />
 
-      <h3>Change Password</h3>
-      <label>Current Password:</label><br />
-      <input type="password" id="currentPassword" /><br /><br />
+      <!-- Profile Settings (default visible) -->
+      <div id="settingsProfile">
+        <h3>Personal Information</h3>
+        <p>Update your personal details</p>
+        <p><strong>Full Name:</strong> James Wilson</p>
+        <p><strong>Email:</strong> james.wilson@example.com</p>
+        <p><strong>Phone Number:</strong> +27821234567</p>
+        <p><strong>Date of Birth:</strong> <input type="text" value="1985/03/15" /></p>
+        <button onclick="alert('Changes saved')">Save Changes</button>
+        <br /><br />
+        <h3>Danger Zone</h3>
+        <button onclick="if(confirm('Permanently delete account?')) alert('Account deleted')">Delete My Account</button>
+      </div>
 
-      <label>New Password:</label><br />
-      <input type="password" id="newPassword" /><br /><br />
+      <!-- Preferences Settings (hidden) -->
+      <div id="settingsPreferences" style="display: none">
+        <h3>Display & Language</h3>
+        <p>Customize your app experience</p>
+        <p><strong>Dark Mode:</strong> <input type="checkbox" /> Enable dark theme</p>
+        <p><strong>Language:</strong> English <button onclick="alert('Change Language')">Change</button></p>
+        <p><strong>Time Zone:</strong> Johannesburg (SAST) <button onclick="alert('Change Timezone')">Change</button></p>
+      </div>
 
-      <label>Confirm New Password:</label><br />
-      <input type="password" id="confirmNewPassword" /><br /><br />
+      <!-- Notifications Settings (hidden) -->
+      <div id="settingsNotifications" style="display: none">
+        <h3>Notification Preferences</h3>
+        <p>Choose how you want to be notified</p>
+        <p><strong>Email Notifications:</strong> <input type="checkbox" checked /> Receive updates via email</p>
+        <p><strong>SMS Notifications:</strong> <input type="checkbox" checked /> Receive alerts via text message</p>
+      </div>
 
-      <button onclick="updateSettings()">Save Settings</button>
+      <!-- Security Settings (hidden) -->
+      <div id="settingsSecurity" style="display: none">
+        <h3>Security Settings</h3>
+        <p>Manage your account security</p>
+        <p><strong>Password:</strong> Last changed: 30 days ago <button onclick="alert('Change Password')">Change Password</button></p>
+        <p><strong>Two-Factor Authentication:</strong> <button onclick="alert('Enable 2FA')">Enable 2FA</button></p>
+        <p><strong>Active Sessions:</strong> <button onclick="alert('View Sessions')">View Active Sessions</button></p>
+      </div>
     </div>
 
     <!-- Message Display Area -->
@@ -423,7 +359,19 @@
         }, 3000);
       }
 
-      // Navigation functions
+      // ========== MAIN NAVIGATION FUNCTIONS ==========
+      function hideAllSections() {
+        document.getElementById("overviewSection").style.display = "none";
+        document.getElementById("upcomingAppointmentsSection").style.display = "none";
+        document.getElementById("activePrescriptionsSection").style.display = "none";
+        document.getElementById("medicalRecordsSection").style.display = "none";
+        document.getElementById("messagesSection").style.display = "none";
+        document.getElementById("aiHealthAssistantSection").style.display = "none";
+        document.getElementById("clinicMapSection").style.display = "none";
+        document.getElementById("youtubeVideosSection").style.display = "none";
+        document.getElementById("settingsSection").style.display = "none";
+      }
+
       function showOverview() {
         hideAllSections();
         document.getElementById("overviewSection").style.display = "block";
@@ -431,20 +379,17 @@
 
       function showUpcomingAppointments() {
         hideAllSections();
-        document.getElementById("upcomingAppointmentsSection").style.display =
-          "block";
+        document.getElementById("upcomingAppointmentsSection").style.display = "block";
       }
 
       function showActivePrescriptions() {
         hideAllSections();
-        document.getElementById("activePrescriptionsSection").style.display =
-          "block";
+        document.getElementById("activePrescriptionsSection").style.display = "block";
       }
 
       function showMedicalRecords() {
         hideAllSections();
-        document.getElementById("medicalRecordsSection").style.display =
-          "block";
+        document.getElementById("medicalRecordsSection").style.display = "block";
       }
 
       function showMessages() {
@@ -454,8 +399,7 @@
 
       function showAIHealthAssistant() {
         hideAllSections();
-        document.getElementById("aiHealthAssistantSection").style.display =
-          "block";
+        document.getElementById("aiHealthAssistantSection").style.display = "block";
       }
 
       function showAppointments() {
@@ -479,34 +423,47 @@
       function showSettings() {
         hideAllSections();
         document.getElementById("settingsSection").style.display = "block";
+        // Reset settings to show Profile first
+        showSettingsProfile();
       }
 
-      function hideAllSections() {
-        document.getElementById("overviewSection").style.display = "none";
-        document.getElementById("upcomingAppointmentsSection").style.display =
-          "none";
-        document.getElementById("activePrescriptionsSection").style.display =
-          "none";
-        document.getElementById("medicalRecordsSection").style.display = "none";
-        document.getElementById("messagesSection").style.display = "none";
-        document.getElementById("aiHealthAssistantSection").style.display =
-          "none";
-        document.getElementById("clinicMapSection").style.display = "none";
-        document.getElementById("youtubeVideosSection").style.display = "none";
-        document.getElementById("settingsSection").style.display = "none";
+      // ========== SETTINGS SUB-NAVIGATION ==========
+      function showSettingsProfile() {
+        document.getElementById("settingsProfile").style.display = "block";
+        document.getElementById("settingsPreferences").style.display = "none";
+        document.getElementById("settingsNotifications").style.display = "none";
+        document.getElementById("settingsSecurity").style.display = "none";
       }
 
-      // Quick Actions
+      function showSettingsPreferences() {
+        document.getElementById("settingsProfile").style.display = "none";
+        document.getElementById("settingsPreferences").style.display = "block";
+        document.getElementById("settingsNotifications").style.display = "none";
+        document.getElementById("settingsSecurity").style.display = "none";
+      }
+
+      function showSettingsNotifications() {
+        document.getElementById("settingsProfile").style.display = "none";
+        document.getElementById("settingsPreferences").style.display = "none";
+        document.getElementById("settingsNotifications").style.display = "block";
+        document.getElementById("settingsSecurity").style.display = "none";
+      }
+
+      function showSettingsSecurity() {
+        document.getElementById("settingsProfile").style.display = "none";
+        document.getElementById("settingsPreferences").style.display = "none";
+        document.getElementById("settingsNotifications").style.display = "none";
+        document.getElementById("settingsSecurity").style.display = "block";
+      }
+
+      // ========== QUICK ACTIONS ==========
       function bookAppointment() {
         showUpcomingAppointments();
         showBookAppointmentForm();
       }
 
       function uploadDocument() {
-        displayMessage(
-          "Upload document feature will be available soon. Please check with reception.",
-          false,
-        );
+        displayMessage("Upload document feature will be available soon. Please check with reception.", false);
       }
 
       function messageDoctor() {
@@ -515,13 +472,10 @@
       }
 
       function requestCertificate() {
-        displayMessage(
-          "Your medical certificate request has been submitted. You will receive it within 24 hours.",
-          false,
-        );
+        displayMessage("Your medical certificate request has been submitted. You will receive it within 24 hours.", false);
       }
 
-      // Appointment functions
+      // ========== APPOINTMENT FUNCTIONS ==========
       function showBookAppointmentForm() {
         document.getElementById("bookAppointmentForm").style.display = "block";
       }
@@ -544,68 +498,42 @@
         let appointmentsList = document.getElementById("appointmentsList");
         let newAppointment = document.createElement("div");
         newAppointment.innerHTML = `
-                <p><strong>${doctor}</strong></p>
-                <p>Date: ${date} | Time: ${time}</p>
-                <p>Reason: ${reason || "Not specified"}</p>
-                <button onclick="cancelAppointment('${doctor}')">Cancel Appointment</button>
-                <button onclick="rescheduleAppointment('${doctor}')">Reschedule</button>
-                <hr>
-            `;
+          <p><strong>${doctor}</strong> - Scheduled</p>
+          <p>Date: ${date} | Time: ${time}</p>
+          <p>Reason: ${reason || "Not specified"}</p>
+          <button onclick="cancelAppointment('${doctor}')">Cancel</button>
+          <button onclick="rescheduleAppointment('${doctor}')">Reschedule</button>
+          <hr />
+        `;
         appointmentsList.appendChild(newAppointment);
-
-        displayMessage(
-          `Appointment booked with ${doctor} on ${date} at ${time}`,
-          false,
-        );
+        displayMessage(`Appointment booked with ${doctor} on ${date} at ${time}`, false);
         hideBookAppointmentForm();
-
-        // Clear form
         document.getElementById("appointmentDate").value = "";
         document.getElementById("appointmentTime").value = "";
         document.getElementById("appointmentReason").value = "";
       }
 
       function cancelAppointment(doctor) {
-        if (
-          confirm(
-            `Are you sure you want to cancel your appointment with ${doctor}?`,
-          )
-        ) {
-          displayMessage(
-            `Appointment with ${doctor} has been cancelled`,
-            false,
-          );
+        if (confirm(`Are you sure you want to cancel your appointment with ${doctor}?`)) {
+          displayMessage(`Appointment with ${doctor} has been cancelled`, false);
         }
       }
 
       function rescheduleAppointment(doctor) {
-        displayMessage(
-          `Reschedule feature for ${doctor} will be available soon. Please call the clinic.`,
-          false,
-        );
+        displayMessage(`Reschedule feature for ${doctor} will be available soon. Please call the clinic.`, false);
       }
 
-      // Prescription functions
+      // ========== PRESCRIPTION FUNCTIONS ==========
       function requestRefill(medication) {
-        displayMessage(
-          `Refill request for ${medication} has been submitted. Your pharmacy will contact you within 2 days.`,
-          false,
-        );
+        displayMessage(`Refill request for ${medication} has been submitted. Your pharmacy will contact you within 2 days.`, false);
       }
 
-      // Medical Records functions
+      // ========== MEDICAL RECORDS FUNCTIONS ==========
       function viewRecord(recordId) {
-        displayMessage(
-          `Viewing record ${recordId}... This feature will be available in the full version.`,
-          false,
-        );
+        displayMessage(`Viewing record... This feature will be available in the full version.`, false);
       }
 
-      function downloadRecord(recordId) {
-        displayMessage(`Downloading record ${recordId}...`, false);
-      }
-
-      // Message functions
+      // ========== MESSAGE FUNCTIONS ==========
       function showNewMessageForm() {
         document.getElementById("newMessageForm").style.display = "block";
       }
@@ -627,64 +555,32 @@
         let messagesList = document.getElementById("messagesList");
         let newMessage = document.createElement("div");
         newMessage.innerHTML = `
-                <p><strong>You → ${recipient}</strong> - Just now</p>
-                <p><strong>Subject:</strong> ${subject}</p>
-                <p>${content}</p>
-                <hr>
-            `;
+          <p><strong>You → ${recipient}</strong> - Just now</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p>${content}</p>
+          <hr />
+        `;
         messagesList.insertBefore(newMessage, messagesList.firstChild);
-
         displayMessage("Message sent successfully!", false);
         hideNewMessageForm();
-
-        // Clear form
         document.getElementById("messageSubject").value = "";
         document.getElementById("messageContent").value = "";
       }
 
       function replyToMessage(sender) {
         showNewMessageForm();
-        document.getElementById("messageSubject").value =
-          `Re: Message from ${sender}`;
+        document.getElementById("messageSubject").value = `Re: Message from ${sender}`;
       }
 
-      // AI Health Assistant
-      function askAI() {
-        let question = document.getElementById("aiQuestion").value;
-        if (!question) {
-          displayMessage("Please enter a question");
-          return;
-        }
-
+      // ========== AI HEALTH ASSISTANT ==========
+      function getAIAnalysis() {
+        let symptoms = document.getElementById("symptomsInput").value;
         let response = document.getElementById("aiResponse");
-        response.innerHTML = `<p><strong>AI Assistant:</strong> Based on your medical history, I recommend consulting with Dr. Michael Chen for this concern. Would you like to book an appointment?</p>`;
-        document.getElementById("aiQuestion").value = "";
-      }
-
-      // Settings
-      function updateSettings() {
-        let newPassword = document.getElementById("newPassword").value;
-        let confirmPassword =
-          document.getElementById("confirmNewPassword").value;
-
-        if (newPassword && newPassword !== confirmPassword) {
-          displayMessage("New passwords do not match!");
+        if (!symptoms) {
+          displayMessage("Please describe your symptoms first");
           return;
         }
-
-        displayMessage("Settings saved successfully!", false);
-
-        // Clear password fields
-        document.getElementById("currentPassword").value = "";
-        document.getElementById("newPassword").value = "";
-        document.getElementById("confirmNewPassword").value = "";
-      }
-
-      function logout() {
-        displayMessage("Logging out... Redirecting to login page", false);
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 1500);
+        response.innerHTML = `<p><strong>AI Analysis:</strong> Based on your symptoms, we recommend scheduling an appointment with Dr. Michael Chen. This is for informational purposes only. Please consult a healthcare professional.</p>`;
       }
 
       // Show overview by default

@@ -4,6 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MedIntel - Patient Portal</title>
+    <style>
+      /* Notification popup styles */
+      #notificationPopup {
+        position: fixed;
+        top: 70px;
+        right: 20px;
+        background: white;
+        border: 2px solid #007bff;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        padding: 15px;
+        z-index: 1000;
+        min-width: 260px;
+        max-width: 320px;
+        display: none;
+        background-color: #f0f7ff;
+      }
+      .show-notification {
+        display: block !important;
+        animation: slideIn 0.3s ease;
+      }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateX(50px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      .notification-badge {
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 11px;
+        margin-left: 5px;
+      }
+    </style>
   </head>
   <body>
     <!-- Header Section -->
@@ -12,11 +46,18 @@
       <button onclick="alert('Sign up with email')">Sign up with email</button>
       <button onclick="alert('Continue with Google')">G Continue with Google</button>
       <h2>Patient Portal</h2>
-      <button onclick="alert('Notifications')">🔔 Notifications</button>
+      <button id="notificationsBtn" onclick="toggleNotificationPopup()">🔔 Notifications <span id="notificationCount" class="notification-badge" style="display:none;">0</span></button>
       <button onclick="alert('Logout')">🚪 Logout</button>
       <h3>James Wilson</h3>
       <hr />
     </header>
+
+    <!-- Notification Popup -->
+    <div id="notificationPopup">
+      <strong>🔔 Notifications</strong>
+      <div id="notificationList" style="margin-top: 8px; font-size: 13px; max-height: 200px; overflow-y: auto;"></div>
+      <button onclick="clearAllNotifications()" style="margin-top: 8px; font-size: 11px;">Clear All</button>
+    </div>
 
     <!-- Top Stats Navigation Tabs -->
     <div>
@@ -349,6 +390,72 @@
     <div id="message" style="margin-top: 20px"></div>
 
     <script>
+      // ========== NOTIFICATION SYSTEM (FIXED - NOW WORKING) ==========
+      let notifications = [
+        "📅 Reminder: You have an appointment with Dr. Michael Chen tomorrow at 9:00 AM",
+        "💊 Your prescription refill for Amlodipine is ready for pickup",
+        "📝 New medical report has been added to your records"
+      ];
+
+      function updateNotificationUI() {
+        const listDiv = document.getElementById("notificationList");
+        const countSpan = document.getElementById("notificationCount");
+        if (listDiv) {
+          if (notifications.length === 0) {
+            listDiv.innerHTML = "<i>No new notifications</i>";
+            if (countSpan) countSpan.style.display = "none";
+          } else {
+            listDiv.innerHTML = notifications.map(n => `<div style="border-bottom:1px solid #ddd; padding:6px 0;">${n}</div>`).join('');
+            if (countSpan) {
+              countSpan.innerText = notifications.length;
+              countSpan.style.display = "inline-block";
+            }
+          }
+        }
+      }
+
+      function toggleNotificationPopup() {
+        const popup = document.getElementById("notificationPopup");
+        if (popup.style.display === "block") {
+          popup.style.display = "none";
+        } else {
+          popup.style.display = "block";
+          updateNotificationUI();
+          // Auto-hide after 5 seconds
+          setTimeout(() => {
+            if (popup.style.display === "block") popup.style.display = "none";
+          }, 5000);
+        }
+      }
+
+      function clearAllNotifications() {
+        notifications = [];
+        updateNotificationUI();
+        const popup = document.getElementById("notificationPopup");
+        popup.style.display = "none";
+        displayMessage("All notifications cleared", false);
+      }
+
+      function addNotification(message) {
+        notifications.unshift(message);
+        updateNotificationUI();
+        // Also show a brief popup alert
+        const popup = document.getElementById("notificationPopup");
+        if (popup.style.display !== "block") {
+          popup.style.display = "block";
+          setTimeout(() => {
+            if (popup.style.display === "block") popup.style.display = "none";
+          }, 4000);
+        }
+        updateNotificationUI();
+        // Flash the bell button
+        const bellBtn = document.getElementById("notificationsBtn");
+        if (bellBtn) {
+          bellBtn.style.backgroundColor = "#ffcc00";
+          setTimeout(() => { bellBtn.style.backgroundColor = ""; }, 500);
+        }
+      }
+
       // Display message function
       function displayMessage(text, isError = true) {
         const messageDiv = document.getElementById("message");
@@ -423,7 +530,6 @@
       function showSettings() {
         hideAllSections();
         document.getElementById("settingsSection").style.display = "block";
-        // Reset settings to show Profile first
         showSettingsProfile();
       }
 
@@ -464,6 +570,7 @@
 
       function uploadDocument() {
         displayMessage("Upload document feature will be available soon. Please check with reception.", false);
+        addNotification("📄 Document upload feature coming soon");
       }
 
       function messageDoctor() {
@@ -473,6 +580,7 @@
 
       function requestCertificate() {
         displayMessage("Your medical certificate request has been submitted. You will receive it within 24 hours.", false);
+        addNotification("📋 Medical certificate request submitted");
       }
 
       // ========== APPOINTMENT FUNCTIONS ==========
@@ -507,6 +615,7 @@
         `;
         appointmentsList.appendChild(newAppointment);
         displayMessage(`Appointment booked with ${doctor} on ${date} at ${time}`, false);
+        addNotification(`✅ New appointment booked with ${doctor} on ${date} at ${time}`);
         hideBookAppointmentForm();
         document.getElementById("appointmentDate").value = "";
         document.getElementById("appointmentTime").value = "";
@@ -516,21 +625,25 @@
       function cancelAppointment(doctor) {
         if (confirm(`Are you sure you want to cancel your appointment with ${doctor}?`)) {
           displayMessage(`Appointment with ${doctor} has been cancelled`, false);
+          addNotification(`❌ Appointment with ${doctor} has been cancelled`);
         }
       }
 
       function rescheduleAppointment(doctor) {
         displayMessage(`Reschedule feature for ${doctor} will be available soon. Please call the clinic.`, false);
+        addNotification(`📅 Reschedule requested for ${doctor}`);
       }
 
       // ========== PRESCRIPTION FUNCTIONS ==========
       function requestRefill(medication) {
         displayMessage(`Refill request for ${medication} has been submitted. Your pharmacy will contact you within 2 days.`, false);
+        addNotification(`💊 Refill request submitted for ${medication}`);
       }
 
       // ========== MEDICAL RECORDS FUNCTIONS ==========
       function viewRecord(recordId) {
         displayMessage(`Viewing record... This feature will be available in the full version.`, false);
+        addNotification(`📑 Viewing medical record`);
       }
 
       // ========== MESSAGE FUNCTIONS ==========
@@ -562,6 +675,7 @@
         `;
         messagesList.insertBefore(newMessage, messagesList.firstChild);
         displayMessage("Message sent successfully!", false);
+        addNotification(`✉️ Message sent to ${recipient}`);
         hideNewMessageForm();
         document.getElementById("messageSubject").value = "";
         document.getElementById("messageContent").value = "";
@@ -581,10 +695,16 @@
           return;
         }
         response.innerHTML = `<p><strong>AI Analysis:</strong> Based on your symptoms, we recommend scheduling an appointment with Dr. Michael Chen. This is for informational purposes only. Please consult a healthcare professional.</p>`;
+        addNotification("🤖 AI health analysis completed for your symptoms");
       }
 
-      // Show overview by default
+      // Initialize - show overview and load notifications
       showOverview();
+      updateNotificationUI();
+      // Add a welcome notification
+      setTimeout(() => {
+        addNotification("👋 Welcome back, James! You have 2 unread messages.");
+      }, 1000);
     </script>
   </body>
 </html>

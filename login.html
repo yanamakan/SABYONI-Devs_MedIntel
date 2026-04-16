@@ -61,23 +61,21 @@
         placeholder="Password"
       /><br /><br />
 
-
       <button onclick="handleLogin()">Login</button>
     </div>
 
-    <!-- Sign Up Form  -->
+    <!-- Sign Up Form (FIXED - now works properly) -->
     <div id="signupForm" style="display: none">
       <h3>Sign Up</h3>
 
       <label>Full Name:</label><br />
-      <input type="text" id="signupName" placeholder="Full Name" value="John Doe"><br><br>
+      <input type="text" id="signupName" placeholder="Full Name" value=""><br><br>
 
-
-       <label>Email:</label><br>
-        <input type="email" id="signupEmail" placeholder="Email" value="john.doe@example.com"><br><br>
+      <label>Email:</label><br>
+      <input type="email" id="signupEmail" placeholder="Email" value=""><br><br>
 
       <label>Phone Number:</label><br>
-        <input type="tel" id="signupPhone" placeholder="Phone Number" value="+27 82 123 4567"><br><br>
+      <input type="tel" id="signupPhone" placeholder="Phone Number" value=""><br><br>
 
       <label>Password:</label><br />
       <input
@@ -95,7 +93,7 @@
 
       <button onclick="handleSignUp()">Sign Up</button>
 
-       <p><small>Note: Only patients can self-register. Staff accounts are created by administrators.</small></p>
+      <p><small>Note: Only patients can self-register. Staff accounts are created by administrators.</small></p>
     </div>
 
     <!-- Message Display Area -->
@@ -132,7 +130,7 @@
         }
       }
 
-      // Handle Login
+      // Handle Login (FIXED - now works with newly registered patients)
       function handleLogin() {
         // Get values from input fields
         let email = document.getElementById("loginEmail").value;
@@ -151,8 +149,6 @@
             "Login successful! Redirecting to Super Admin Dashboard...",
             false,
           );
-          // Here you can redirect to super admin dashboard
-          // window.location.href = "superadmin.html";
           return;
         }
 
@@ -162,7 +158,6 @@
             "Login successful! Redirecting to Admin Dashboard...",
             false,
           );
-          // Here you can redirect to admin dashboard
           return;
         }
 
@@ -172,17 +167,27 @@
             "Login successful! Redirecting to Doctor Dashboard...",
             false,
           );
-          // Here you can redirect to doctor dashboard
           return;
         }
 
-        // Patient
+        // Patient (demo account)
         if (email === "patient@example.com" && password === "patient123") {
           displayMessage(
             "Login successful! Redirecting to Patient Dashboard...",
             false,
           );
-          // Here you can redirect to patient dashboard
+          return;
+        }
+
+        // Check for registered patients in localStorage
+        let storedPatients = JSON.parse(localStorage.getItem("medintel_patients") || "[]");
+        let foundPatient = storedPatients.find(p => p.email === email && p.password === password);
+        
+        if (foundPatient) {
+          displayMessage(
+            "Login successful! Redirecting to Patient Dashboard...",
+            false,
+          );
           return;
         }
 
@@ -192,11 +197,12 @@
         );
       }
 
-      // Handle Sign Up
+      // Handle Sign Up (FIXED - now works properly)
       function handleSignUp() {
         // Get values from sign up fields
-        let name = document.getElementById("signupName").value;
-        let email = document.getElementById("signupEmail").value;
+        let name = document.getElementById("signupName").value.trim();
+        let email = document.getElementById("signupEmail").value.trim();
+        let phone = document.getElementById("signupPhone").value.trim();
         let password = document.getElementById("signupPassword").value;
         let confirmPassword = document.getElementById(
           "signupConfirmPassword",
@@ -225,6 +231,25 @@
           return;
         }
 
+        // Basic email validation
+        if (!email.includes("@") || !email.includes(".")) {
+          displayMessage("Please enter a valid email address");
+          return;
+        }
+
+        // Check if email already registered
+        let storedPatients = JSON.parse(localStorage.getItem("medintel_patients") || "[]");
+        let existing = storedPatients.find(p => p.email === email);
+        if (existing) {
+          displayMessage("Email already registered. Please login instead.");
+          return;
+        }
+
+        // Save new patient to localStorage
+        let newPatient = { name, email, phone, password };
+        storedPatients.push(newPatient);
+        localStorage.setItem("medintel_patients", JSON.stringify(storedPatients));
+
         // If all validations pass
         displayMessage(
           "Sign up successful! You can now login with your credentials.",
@@ -234,6 +259,7 @@
         // Clear the form
         document.getElementById("signupName").value = "";
         document.getElementById("signupEmail").value = "";
+        document.getElementById("signupPhone").value = "";
         document.getElementById("signupPassword").value = "";
         document.getElementById("signupConfirmPassword").value = "";
 

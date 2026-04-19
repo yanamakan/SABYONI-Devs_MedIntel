@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="header">
     <div class="header-left">
       <div class="logo">&#9881;</div>
@@ -23,8 +22,33 @@
     </div>
   </header>
 
-  <!-- TABS -->
   <div class="main">
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-card stat-blue">
+        <div class="stat-label">Total Doctors</div>
+        <div class="stat-num blue">2</div>
+        <div class="stat-sub">Active medical staff</div>
+      </div>
+      <div class="stat-card stat-teal">
+        <div class="stat-label">Total Nurses</div>
+        <div class="stat-num teal">2</div>
+        <div class="stat-sub">Nursing staff</div>
+      </div>
+      <div class="stat-card stat-purple">
+        <div class="stat-label">Total Appointments</div>
+        <div class="stat-num purple">5</div>
+        <div class="stat-sub">Scheduled appointments</div>
+      </div>
+      <div class="stat-card stat-red">
+        <div class="stat-label">Urgent Cases</div>
+        <div class="stat-num red">1</div>
+        <div class="stat-sub">Require immediate attention</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
     <div class="tabs-bar">
       <nav class="tabs">
         <a href="admin-doctors.html"      class="tab active">Doctors (2)</a>
@@ -67,7 +91,6 @@
         <button class="modal-close" onclick="closeModal()">&times;</button>
       </div>
       <p class="section-sub">Create a new doctor or nurse account with department assignment</p>
-
       <div class="form-grid">
         <div>
           <label>Role *</label>
@@ -110,7 +133,7 @@
       </div>
       <small class="form-note">The staff member will receive these credentials via email</small>
       <div class="modal-actions">
-        <button class="btn btn-blue" id="createBtn" onclick="createStaff()">Create Account</button>
+        <button class="btn btn-blue" onclick="createStaff()">Create Account</button>
         <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
       </div>
     </div>

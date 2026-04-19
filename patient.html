@@ -624,6 +624,232 @@
 
 </main>
 
-<script src="patient.js"></script>
 </body>
+<script src="patient.js"></script>
+<script>
+      function showActivePrescriptions() {
+        hideAllSections();
+        document.getElementById("activePrescriptionsSection").style.display = "block";
+      }
+
+      function showMedicalRecords() {
+        hideAllSections();
+        document.getElementById("medicalRecordsSection").style.display = "block";
+      }
+
+      function showMessages() {
+        hideAllSections();
+        document.getElementById("messagesSection").style.display = "block";
+      }
+
+      function showAIHealthAssistant() {
+        hideAllSections();
+        document.getElementById("aiHealthAssistantSection").style.display = "block";
+      }
+
+      function showAppointments() {
+        showUpcomingAppointments();
+      }
+
+      function showPrescriptions() {
+        showActivePrescriptions();
+      }
+
+      function showClinicMap() {
+        hideAllSections();
+        document.getElementById("clinicMapSection").style.display = "block";
+      }
+
+      function showYouTubeVideos() {
+        hideAllSections();
+        document.getElementById("youtubeVideosSection").style.display = "block";
+      }
+
+      function showSettings() {
+        hideAllSections();
+        document.getElementById("settingsSection").style.display = "block";
+        showSettingsProfile();
+      }
+
+      // ========== SETTINGS SUB-NAVIGATION ==========
+      function showSettingsProfile() {
+        document.getElementById("settingsProfile").style.display = "block";
+        document.getElementById("settingsPreferences").style.display = "none";
+        document.getElementById("settingsNotifications").style.display = "none";
+        document.getElementById("settingsSecurity").style.display = "none";
+      }
+
+      function showSettingsPreferences() {
+        document.getElementById("settingsProfile").style.display = "none";
+        document.getElementById("settingsPreferences").style.display = "block";
+        document.getElementById("settingsNotifications").style.display = "none";
+        document.getElementById("settingsSecurity").style.display = "none";
+      }
+
+      function showSettingsNotifications() {
+        document.getElementById("settingsProfile").style.display = "none";
+        document.getElementById("settingsPreferences").style.display = "none";
+        document.getElementById("settingsNotifications").style.display = "block";
+        document.getElementById("settingsSecurity").style.display = "none";
+      }
+
+      function showSettingsSecurity() {
+        document.getElementById("settingsProfile").style.display = "none";
+        document.getElementById("settingsPreferences").style.display = "none";
+        document.getElementById("settingsNotifications").style.display = "none";
+        document.getElementById("settingsSecurity").style.display = "block";
+      }
+
+      // ========== QUICK ACTIONS ==========
+      function bookAppointment() {
+        showUpcomingAppointments();
+        showBookAppointmentForm();
+      }
+
+      function uploadDocument() {
+        displayMessage("Upload document feature will be available soon. Please check with reception.", false);
+        addNotification("📄 Document upload feature coming soon");
+      }
+
+      function messageDoctor() {
+        showMessages();
+        showNewMessageForm();
+      }
+
+      function requestCertificate() {
+        displayMessage("Your medical certificate request has been submitted. You will receive it within 24 hours.", false);
+        addNotification("📋 Medical certificate request submitted");
+      }
+
+      // ========== APPOINTMENT FUNCTIONS ==========
+      function showBookAppointmentForm() {
+        document.getElementById("bookAppointmentForm").style.display = "block";
+      }
+
+      function hideBookAppointmentForm() {
+        document.getElementById("bookAppointmentForm").style.display = "none";
+      }
+
+      function confirmBookAppointment() {
+        let doctor = document.getElementById("appointmentDoctor").value;
+        let date = document.getElementById("appointmentDate").value;
+        let time = document.getElementById("appointmentTime").value;
+        let reason = document.getElementById("appointmentReason").value;
+
+        if (!date || !time) {
+          displayMessage("Please select date and time for your appointment");
+          return;
+        }
+
+        let appointmentsList = document.getElementById("appointmentsList");
+        let newAppointment = document.createElement("div");
+        newAppointment.innerHTML = `
+          <p><strong>${doctor}</strong> - Scheduled</p>
+          <p>Date: ${date} | Time: ${time}</p>
+          <p>Reason: ${reason || "Not specified"}</p>
+          <button onclick="cancelAppointment('${doctor}')">Cancel</button>
+          <button onclick="rescheduleAppointment('${doctor}')">Reschedule</button>
+          <hr />
+        `;
+        appointmentsList.appendChild(newAppointment);
+        displayMessage(`Appointment booked with ${doctor} on ${date} at ${time}`, false);
+        addNotification(`✅ New appointment booked with ${doctor} on ${date} at ${time}`);
+        hideBookAppointmentForm();
+        document.getElementById("appointmentDate").value = "";
+        document.getElementById("appointmentTime").value = "";
+        document.getElementById("appointmentReason").value = "";
+      }
+
+      function cancelAppointment(doctor) {
+        if (confirm(`Are you sure you want to cancel your appointment with ${doctor}?`)) {
+          displayMessage(`Appointment with ${doctor} has been cancelled`, false);
+          addNotification(`❌ Appointment with ${doctor} has been cancelled`);
+        }
+      }
+
+      function rescheduleAppointment(doctor) {
+        displayMessage(`Reschedule feature for ${doctor} will be available soon. Please call the clinic.`, false);
+        addNotification(`📅 Reschedule requested for ${doctor}`);
+      }
+
+      // ========== PRESCRIPTION FUNCTIONS ==========
+      function requestRefill(medication) {
+        displayMessage(`Refill request for ${medication} has been submitted. Your pharmacy will contact you within 2 days.`, false);
+        addNotification(`💊 Refill request submitted for ${medication}`);
+      }
+
+      // ========== MEDICAL RECORDS FUNCTIONS ==========
+      function viewRecord(recordId) {
+        displayMessage(`Viewing record... This feature will be available in the full version.`, false);
+        addNotification(`📑 Viewing medical record`);
+      }
+
+      // ========== MESSAGE FUNCTIONS ==========
+      function showNewMessageForm() {
+        document.getElementById("newMessageForm").style.display = "block";
+      }
+
+      function hideNewMessageForm() {
+        document.getElementById("newMessageForm").style.display = "none";
+      }
+
+      function sendMessage() {
+        let recipient = document.getElementById("messageRecipient").value;
+        let subject = document.getElementById("messageSubject").value;
+        let content = document.getElementById("messageContent").value;
+
+        if (!subject || !content) {
+          displayMessage("Please fill in subject and message");
+          return;
+        }
+
+        let messagesList = document.getElementById("messagesList");
+        let newMessage = document.createElement("div");
+        newMessage.innerHTML = `
+          <p><strong>You → ${recipient}</strong> - Just now</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p>${content}</p>
+          <hr />
+        `;
+        messagesList.insertBefore(newMessage, messagesList.firstChild);
+        displayMessage("Message sent successfully!", false);
+        addNotification(`✉️ Message sent to ${recipient}`);
+        hideNewMessageForm();
+        document.getElementById("messageSubject").value = "";
+        document.getElementById("messageContent").value = "";
+      }
+
+      function replyToMessage(sender) {
+        showNewMessageForm();
+        document.getElementById("messageSubject").value = `Re: Message from ${sender}`;
+      }
+
+      // ========== AI HEALTH ASSISTANT ==========
+      function getAIAnalysis() {
+        let symptoms = document.getElementById("symptomsInput").value;
+        let response = document.getElementById("aiResponse");
+        if (!symptoms) {
+          displayMessage("Please describe your symptoms first");
+          return;
+        }
+        response.innerHTML = `<p><strong>AI Analysis:</strong> Based on your symptoms, we recommend scheduling an appointment with Dr. Michael Chen. This is for informational purposes only. Please consult a healthcare professional.</p>`;
+        addNotification("🤖 AI health analysis completed for your symptoms");
+      }
+
+      // Initialize - show overview and load notifications
+      showOverview();
+      updateNotificationUI();
+      // Add a welcome notification
+      setTimeout(() => {
+        addNotification("👋 Welcome back, James! You have 2 unread messages.");
+      }, 1000);
+
+      function logout() {
+  if (confirm("Are you sure you want to logout?")) {
+    alert("You have been logged out successfully.");
+    window.location.href = "login.html"; // change to your login page
+  }
+}
+    </script>
+  </body>
 </html>

@@ -1,482 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MedIntel - Super Admin Control Center</title>
-  </head>
-  <body>
-    <!-- Header Section -->
-    <header>
-      <h1>Super Admin Control Center</h1>
-      <p>Medical Director - System Wide Access</p>
-      <p>System Online ✓</p>
-      <hr />
-    </header>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedIntel | Super Admin Control Center</title>
 
-    <!-- Navigation Tabs -->
-    <div>
-      <button onclick="showAnalytics()">Analytics Dashboard</button>
-      <button onclick="showSystemControl()">System Control</button>
-      <button onclick="showAdminManagement()">Admin Management</button>
-      <button onclick="logout()">Logout</button>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="super-admin.css">
+</head>
+
+<body class="super-admin-body">
+
+<!-- HEADER -->
+<header class="admin-header">
+    <div class="header-left">
+        <div class="shield-box">🛡️</div>
+        <div class="brand-text">
+            <h1>Super Admin Control Center</h1>
+            <p>Medical Director - System Wide Access</p>
+        </div>
     </div>
 
-    <!-- ANALYTICS DASHBOARD SECTION -->
-    <div id="analyticsSection">
-      <h2>Analytics Dashboard</h2>
+    <div class="header-right">
+        <div class="system-status-pill">
+            <span class="status-dot-glow"></span>
+            <span class="status-text">System Online</span>
+        </div>
 
-      <!-- Stats Cards -->
-      <div>
-        <h3>Total Patients</h3>
-        <p><strong>1247</strong></p>
-        <p>+5.2% this month</p>
-      </div>
+        <button class="notif-pill">
+            <span class="notif-icon">🔔</span>
+            Notifications <span class="notif-badge">2</span>
+        </button>
 
-      <div>
-        <h3>Medical Staff</h3>
-        <p><strong>134</strong></p>
-        <p>45 Doctors, 89 Nurses</p>
-      </div>
+        <div class="far-right-box"></div>
+    </div>
+</header>
 
-      <div>
-        <h3>Total Appointments</h3>
-        <p><strong>324</strong></p>
-        <p>28 today</p>
-      </div>
+<!-- NAV -->
+<nav class="admin-nav">
+    <button class="nav-btn active" onclick="switchTab(event,'analyticsSection')">Analytics Dashboard</button>
+    <button class="nav-btn" onclick="switchTab(event,'systemControlSection')">System Control</button>
+    <button class="nav-btn" onclick="switchTab(event,'adminManagementSection')">Admin Management</button>
+</nav>
 
-      <div>
-        <h3>Emergency Cases</h3>
-        <p><strong>3</strong></p>
-        <p>Active right now</p>
-      </div>
+<!-- ================= ANALYTICS ================= -->
+<main id="analyticsSection" class="tab-content">
 
-      <div>
-        <h3>System Uptime</h3>
-        <p><strong>99.7%</strong></p>
-        <p>Last 30 days</p>
-      </div>
+<section class="stats-grid">
+    <div class="stat-card bg-blue"><small>Total Patients</small><h2>1247</h2><p class="trend">+5.2% this month</p><div class="card-icon">👥</div></div>
+    <div class="stat-card bg-cyan"><small>Medical Staff</small><h2>134</h2><p class="trend">45 Doctors, 89 Nurses</p><div class="card-icon">🩺</div></div>
+    <div class="stat-card bg-purple"><small>Total Appointments</small><h2>324</h2><p class="trend">28 today</p><div class="card-icon">📅</div></div>
+    <div class="stat-card bg-red"><small>Emergency Cases</small><h2>3</h2><p class="trend">Active right now</p><div class="card-icon">❗</div></div>
+</section>
 
-      <div>
-        <h3>AI Triage Accuracy</h3>
-        <p><strong>94.3%</strong></p>
-        <p>Based on 1,247 cases</p>
-      </div>
+<section class="metrics-grid">
+    <div class="metric-card"><small>System Uptime</small><h2 class="text-green">99.7%</h2><p>Last 30 days</p></div>
+    <div class="metric-card"><small>AI Triage Accuracy</small><h2 class="text-blue">94.3%</h2><p>Based on 1,247 cases</p></div>
+    <div class="metric-card"><small>Avg Wait Time</small><h2 class="text-cyan">18 mins</h2><p>-12% from last month</p></div>
+</section>
 
-      <div>
-        <h3>Avg Wait Time</h3>
-        <p><strong>18 mins</strong></p>
-        <p>-12% from last month</p>
-      </div>
-
-      <!-- Growth Trends -->
-      <h3>Growth Trends (6 Months)</h3>
-      <p>Y-axis: 1400, 1050, 700, 350, 0</p>
-      <p>X-axis: Oct, Nov, Dec, Jan, Feb, Mar</p>
-      <p>Legend: 🔵 Patients | 🟠 Appointments</p>
-
-      <!-- Department Distribution -->
-      <h3>Department Distribution</h3>
-      <p>Y-axis: 320, 240, 160, 80, 0</p>
-      <p>X-axis: Pediatrics, Orthopedics, Other</p>
-      <p>Legend: 🔵 Patients | 🟠 Appointments</p>
-
-      <!-- Urgency Distribution -->
-      <h3>Urgency Distribution</h3>
-      <p>Low: 145</p>
-      <p>Medium: 112</p>
-      <p>High: 54</p>
-
-      <!-- Key Insights -->
-      <h3>Key Insights</h3>
-      <p>
-        <strong>Patient Growth:</strong> 13.4% increase in new patient
-        registrations this quarter
-      </p>
-      <p>
-        <strong>AI Performance:</strong> Triage system maintaining 94.3%
-        accuracy rate
-      </p>
-      <p>
-        <strong>Efficiency Improvement:</strong> Wait times reduced by 12%
-        through optimized scheduling
-      </p>
-      <p><strong>Peak Hours:</strong> Highest traffic: 9AM-12PM weekdays</p>
+<section class="charts-row">
+    <div class="chart-box">
+        <h3>Growth Trends (6 Months)</h3>
+        <div class="canvas-wrapper"><canvas id="growthChart"></canvas></div>
     </div>
 
-    <!-- SYSTEM CONTROL SECTION -->
-    <div id="systemControlSection" style="display: none">
-      <h2>System Control</h2>
+    <div class="chart-box">
+        <h3>Department Distribution</h3>
+        <div class="canvas-wrapper"><canvas id="deptChart"></canvas></div>
+    </div>
+</section>
 
-      <h3>System Operations</h3>
-      <p>Manage system-wide operations</p>
-      <button onclick="restartSystem()">Restart System</button>
-      <button onclick="checkUpdates()">Check for Updates</button>
-      <button onclick="shutdownSystem()">Shutdown System</button>
-
-      <h3>System Information</h3>
-      <p><strong>Version:</strong> 2.1.5</p>
-      <p><strong>Database:</strong> PostgreSQL 14.2</p>
-      <p><strong>Uptime:</strong> 99.7%</p>
-      <p><strong>Last Backup:</strong> 2 hours ago</p>
-      <p><strong>Security:</strong> POPIA Compliant</p>
-
-      <h3>Audit Logs</h3>
-      <div>
-        <p>
-          <strong>14:32:15</strong> - Created new doctor account -
-          admin@medintel.com - success
-        </p>
-        <p>
-          <strong>14:15:42</strong> - Updated patient prescription -
-          doctor@medintel.com - success
-        </p>
-        <p>
-          <strong>13:58:30</strong> - Scheduled new appointment -
-          secretary@medintel.com - success
-        </p>
-        <p>
-          <strong>13:42:18</strong> - Automated backup completed - system -
-          success
-        </p>
-        <p>
-          <strong>12:55:03</strong> - Failed login attempt - patient@example.com
-          - warning
-        </p>
-      </div>
+<section class="charts-row">
+    <div class="chart-box">
+        <h3>Urgency Distribution</h3>
+        <div class="canvas-wrapper"><canvas id="urgencyChart"></canvas></div>
     </div>
 
-    <!-- ADMIN MANAGEMENT SECTION -->
-    <div id="adminManagementSection" style="display: none">
-      <h2>Admin Management</h2>
+    <div class="chart-box insights-box">
+        <h3>Key Insights</h3>
+        <ul class="insight-list">
+            <li><span class="i-bullet green">📈</span> <strong>Patient Growth:</strong> +13.4% registrations</li>
+            <li><span class="i-bullet blue">⚡</span> <strong>AI Performance:</strong> 94.3% accuracy rate</li>
+            <li><span class="i-bullet cyan">⌛</span> <strong>Efficiency:</strong> Wait times reduced by 12%</li>
+            <li><span class="i-bullet yellow">🔥</span> <strong>Peak Hours:</strong> 9AM–12PM Weekdays</li>
+        </ul>
+    </div>
+</section>
 
-      <!-- Create New Admin Account -->
-      <h3>Create New Admin Account</h3>
-      <p>Create administrator accounts to manage hospital operations</p>
+</main>
 
-      <label>Full Name:</label><br />
-      <input
-        type="text"
-        id="adminFullName"
-        placeholder="John Smith"
-      /><br /><br />
+<!-- ================= SYSTEM CONTROL ================= -->
+<main id="systemControlSection" class="tab-content" style="display:none;">
 
-      <label>Email:</label><br />
-      <input
-        type="email"
-        id="adminEmail"
-        placeholder="admin@medintel.com"
-      /><br /><br />
+<div class="charts-row">
+    <div class="chart-box">
+        <h3>System Operations</h3>
+        <p class="sub-text">Manage system-wide operations</p>
 
-      <label>Password:</label><br />
-      <input
-        type="password"
-        id="adminPassword"
-        placeholder="Password"
-      /><br /><br />
-
-      <button onclick="createAdminAccount()">Create Admin Account</button>
-
-      <!-- Existing Administrators -->
-      <h3>Existing Administrators</h3>
-      <div id="existingAdminsList">
-        <div>
-          <p><strong>John Smith</strong> - admin@medintel.com</p>
-          <p>Created: 2025-01-15 | Status: Active</p>
-          <button onclick="manageAdmin('john@medintel.com')">Manage</button>
-          <hr />
+        <div class="button-stack">
+            <button class="btn-action bg-blue" onclick="restartSystem()">🔄 Restart System</button>
+            <button class="btn-action bg-cyan" onclick="checkUpdates()">📥 Check for Updates</button>
+            <button class="btn-action bg-red" onclick="shutdownSystem()">⭕ Shutdown System</button>
         </div>
-        <div>
-          <p><strong>Sarah Johnson</strong> - sarah.admin@medintel.com</p>
-          <p>Created: 2025-02-20 | Status: Active</p>
-          <button onclick="manageAdmin('sarah.admin@medintel.com')">
-            Manage
-          </button>
-          <hr />
-        </div>
-      </div>
-
-      <!-- Create New Staff Account -->
-      <h3>Create New Staff Account</h3>
-      <p>Create staff accounts to manage hospital operations</p>
-
-      <label>Full Name:</label><br />
-      <input
-        type="text"
-        id="staffFullName"
-        placeholder="John Smith"
-      /><br /><br />
-
-      <label>Email:</label><br />
-      <input
-        type="email"
-        id="staffEmail"
-        placeholder="staff@medintel.com"
-      /><br /><br />
-
-      <label>Password:</label><br />
-      <input
-        type="password"
-        id="staffPassword"
-        placeholder="Password"
-      /><br /><br />
-
-      <label>Role:</label><br />
-      <select id="staffRole">
-        <option value="doctor">Doctor</option>
-        <option value="nurse">Nurse</option>
-        <option value="secretary">Secretary</option>
-        <option value="receptionist">Receptionist</option></select
-      ><br /><br />
-
-      <label>Department:</label><br />
-      <select id="staffDepartment">
-        <option value="">Select a department</option>
-        <option value="Cardiology">Cardiology</option>
-        <option value="Pediatrics">Pediatrics</option>
-        <option value="Orthopedics">Orthopedics</option>
-        <option value="Neurology">Neurology</option>
-        <option value="Radiology">Radiology</option></select
-      ><br /><br />
-
-      <label>Specialization (for doctors):</label><br />
-      <input
-        type="text"
-        id="staffSpecialization"
-        placeholder="Cardiology"
-      /><br /><br />
-
-      <button onclick="createStaffAccount()">Create Staff Account</button>
-
-      <!-- Existing Staff Members -->
-      <h3>Existing Staff Members</h3>
-      <div id="existingStaffList">
-        <div>
-          <p><strong>Dr. Michael Chen</strong> - doctor@medintel.com</p>
-          <p>
-            Role: Doctor | Department: Cardiology | Created: 2025-01-10 |
-            Status: Active
-          </p>
-          <button onclick="manageStaff('doctor@medintel.com')">Manage</button>
-          <hr />
-        </div>
-        <div>
-          <p><strong>Dr. Emily Rodriguez</strong> - doctor2@medintel.com</p>
-          <p>
-            Role: Doctor | Department: Pediatrics | Created: 2025-01-20 |
-            Status: Active
-          </p>
-          <button onclick="manageStaff('doctor2@medintel.com')">Manage</button>
-          <hr />
-        </div>
-        <div>
-          <p><strong>Alice Williams</strong> - nurse@medintel.com</p>
-          <p>
-            Role: Nurse | Department: Emergency | Created: 2025-02-01 | Status:
-            Active
-          </p>
-          <button onclick="manageStaff('nurse@medintel.com')">Manage</button>
-          <hr />
-        </div>
-        <div>
-          <p><strong>Tom Jackson</strong> - nurse2@medintel.com</p>
-          <p>
-            Role: Nurse | Department: ICU | Created: 2025-02-15 | Status: Active
-          </p>
-          <button onclick="manageStaff('nurse2@medintel.com')">Manage</button>
-          <hr />
-        </div>
-      </div>
     </div>
 
-    <!-- Message Display Area -->
-    <div id="message" style="margin-top: 20px"></div>
+    <div class="chart-box">
+        <h3>System Information</h3>
+        <div class="info-table">
+            <div class="info-row"><span>Version</span><strong>2.1.5</strong></div>
+            <div class="info-row"><span>Database</span><strong>🗄️ PostgreSQL 14.2</strong></div>
+            <div class="info-row"><span>Uptime</span><strong>99.7%</strong></div>
+            <div class="info-row"><span>Last Backup</span><strong>2 hours ago</strong></div>
+            <div class="info-row"><span>Security</span><span class="badge-green">POPIA Compliant</span></div>
+        </div>
+    </div>
+</div>
 
-    <script>
-      // Function to display messages
-      function displayMessage(text, isError = true) {
-        const messageDiv = document.getElementById("message");
-        messageDiv.innerHTML = text;
-        if (isError) {
-          messageDiv.style.color = "red";
-        } else {
-          messageDiv.style.color = "green";
-        }
+<div class="chart-box log-card">
+    <h3>Audit Logs</h3>
+    <div class="log-list">
+        <div class="log-item"><span class="log-time">14:32:15</span><span class="log-msg">Created new doctor account</span><span class="log-user">admin@medintel.com</span><span class="status-tag success">success</span></div>
+        <div class="log-item"><span class="log-time">14:15:42</span><span class="log-msg">Updated patient prescription</span><span class="log-user">doctor@medintel.com</span><span class="status-tag success">success</span></div>
+        <div class="log-item"><span class="log-time">13:58:30</span><span class="log-msg">Scheduled new appointment</span><span class="log-user">secretary@medintel.com</span><span class="status-tag success">success</span></div>
+        <div class="log-item"><span class="log-time">13:42:18</span><span class="log-msg">Automated backup completed</span><span class="log-user">system</span><span class="status-tag success">success</span></div>
+        <div class="log-item"><span class="log-time">12:55:03</span><span class="log-msg">Failed login attempt</span><span class="log-user">patient@example.com</span><span class="status-tag warning">warning</span></div>
+    </div>
+</div>
 
-        // Clear message after 3 seconds
-        setTimeout(function () {
-          messageDiv.innerHTML = "";
-        }, 3000);
-      }
+</main>
 
-      // Navigation functions
-      function showAnalytics() {
-        document.getElementById("analyticsSection").style.display = "block";
-        document.getElementById("systemControlSection").style.display = "none";
-        document.getElementById("adminManagementSection").style.display =
-          "none";
-        clearMessage();
-      }
+<!-- ================= ADMIN MANAGEMENT ================= -->
+<main id="adminManagementSection" class="tab-content" style="display:none;">
 
-      function showSystemControl() {
-        document.getElementById("analyticsSection").style.display = "none";
-        document.getElementById("systemControlSection").style.display = "block";
-        document.getElementById("adminManagementSection").style.display =
-          "none";
-        clearMessage();
-      }
+<!-- CREATE ADMIN -->
+<div class="chart-box management-card">
+    <h3>Create New Admin Account</h3>
+    <p class="sub-text">Create administrator accounts to manage hospital operations</p>
 
-      function showAdminManagement() {
-        document.getElementById("analyticsSection").style.display = "none";
-        document.getElementById("systemControlSection").style.display = "none";
-        document.getElementById("adminManagementSection").style.display =
-          "block";
-        clearMessage();
-      }
+    <div class="form-row">
+        <div class="input-group"><label>Full Name</label><input type="text" id="adminFullName"></div>
+        <div class="input-group"><label>Email</label><input type="email" id="adminEmail"></div>
+        <div class="input-group"><label>Password</label><input type="password" id="adminPassword"></div>
+    </div>
 
-      function clearMessage() {
-        document.getElementById("message").innerHTML = "";
-      }
+    <button class="btn-create" onclick="createAdminAccount()">👤+ Create Admin</button>
+</div>
 
-      function logout() {
-        displayMessage("Logging out... Redirecting to login page", false);
-        setTimeout(function () {
-          window.location.href = "login.html";
-        }, 1500);
-      }
+<!-- EXISTING ADMINS -->
+<div class="chart-box management-card">
+    <h3>Existing Administrators</h3>
+    <div class="user-list">
+        <div class="user-item"><div class="user-info"><strong>John Smith</strong><span>admin@medintel.com</span></div><div class="user-meta"><small>2025-01-15</small><span class="status-tag active">Active</span><button class="btn-manage">Manage</button></div></div>
+        <div class="user-item"><div class="user-info"><strong>Sarah Johnson</strong><span>sarah.admin@medintel.com</span></div><div class="user-meta"><small>2025-02-20</small><span class="status-tag active">Active</span><button class="btn-manage">Manage</button></div></div>
+    </div>
+</div>
 
-      // System Control functions
-      function restartSystem() {
-        if (
-          confirm(
-            "WARNING: Restarting the system will temporarily interrupt services. Continue?",
-          )
-        ) {
-          displayMessage(
-            "System restart initiated. System will be back online in 2 minutes.",
-            false,
-          );
-        }
-      }
+<!-- CREATE STAFF -->
+<div class="chart-box management-card">
+    <h3>Create New Staff Account</h3>
 
-      function checkUpdates() {
-        displayMessage(
-          "Checking for updates... Current version: 2.1.5. No updates available.",
-          false,
-        );
-      }
+    <div class="form-grid">
+        <div class="input-group"><label>Full Name</label><input id="staffFullName"></div>
+        <div class="input-group"><label>Email</label><input id="staffEmail"></div>
+        <div class="input-group"><label>Password</label><input type="password" id="staffPassword"></div>
+        <div class="input-group"><label>Role</label><select id="staffRole"><option>doctor</option><option>nurse</option><option>secretary</option></select></div>
+        <div class="input-group"><label>Department</label><select id="staffDept"><option>Cardiology</option><option>Pediatrics</option></select></div>
+        <div class="input-group"><label>Specialization</label><input id="staffSpec"></div>
+    </div>
 
-      function shutdownSystem() {
-        if (
-          confirm(
-            "WARNING: Shutting down the system will stop all services. This action requires confirmation. Continue?",
-          )
-        ) {
-          displayMessage("System shutdown initiated. Please wait...", false);
-          setTimeout(function () {
-            displayMessage(
-              "System is offline. Refresh page to restart.",
-              false,
-            );
-          }, 2000);
-        }
-      }
+    <button class="btn-create" onclick="createStaffAccount()">👤+ Create Staff</button>
+</div>
 
-      // Admin Management functions
-      function createAdminAccount() {
-        let name = document.getElementById("adminFullName").value;
-        let email = document.getElementById("adminEmail").value;
-        let password = document.getElementById("adminPassword").value;
+</main>
 
-        if (name === "" || email === "" || password === "") {
-          displayMessage("Please fill in all fields");
-          return;
-        }
+<script src="super-admin-charts.js"></script>
 
-        if (password.length < 6) {
-          displayMessage("Password must be at least 6 characters");
-          return;
-        }
+<script>
+function switchTab(e,id){
+    document.querySelectorAll(".tab-content").forEach(s=>s.style.display="none");
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+    document.getElementById(id).style.display="block";
+    e.currentTarget.classList.add("active");
+}
+</script>
 
-        // Add to existing admins list
-        let adminsList = document.getElementById("existingAdminsList");
-        let newAdmin = document.createElement("div");
-        newAdmin.innerHTML = `
-                <p><strong>${name}</strong> - ${email}</p>
-                <p>Created: ${new Date().toISOString().split("T")[0]} | Status: Active</p>
-                <button onclick="manageAdmin('${email}')">Manage</button>
-                <hr>
-            `;
-        adminsList.appendChild(newAdmin);
-
-        displayMessage(`Admin account created for ${name}`, false);
-
-        // Clear form
-        document.getElementById("adminFullName").value = "";
-        document.getElementById("adminEmail").value = "";
-        document.getElementById("adminPassword").value = "";
-      }
-
-      function createStaffAccount() {
-        let name = document.getElementById("staffFullName").value;
-        let email = document.getElementById("staffEmail").value;
-        let password = document.getElementById("staffPassword").value;
-        let role = document.getElementById("staffRole").value;
-        let department = document.getElementById("staffDepartment").value;
-        let specialization = document.getElementById(
-          "staffSpecialization",
-        ).value;
-
-        if (
-          name === "" ||
-          email === "" ||
-          password === "" ||
-          department === ""
-        ) {
-          displayMessage("Please fill in all required fields");
-          return;
-        }
-
-        if (password.length < 6) {
-          displayMessage("Password must be at least 6 characters");
-          return;
-        }
-
-        // Add to existing staff list
-        let staffList = document.getElementById("existingStaffList");
-        let newStaff = document.createElement("div");
-        let roleDisplay = role.charAt(0).toUpperCase() + role.slice(1);
-        let specializationText =
-          role === "doctor" && specialization
-            ? ` | Specialization: ${specialization}`
-            : "";
-
-        newStaff.innerHTML = `
-                <p><strong>${name}</strong> - ${email}</p>
-                <p>Role: ${roleDisplay} | Department: ${department}${specializationText} | Created: ${new Date().toISOString().split("T")[0]} | Status: Active</p>
-                <button onclick="manageStaff('${email}')">Manage</button>
-                <hr>
-            `;
-        staffList.appendChild(newStaff);
-
-        displayMessage(`Staff account created for ${name} (${role})`, false);
-
-        // Clear form
-        document.getElementById("staffFullName").value = "";
-        document.getElementById("staffEmail").value = "";
-        document.getElementById("staffPassword").value = "";
-        document.getElementById("staffRole").value = "doctor";
-        document.getElementById("staffDepartment").value = "";
-        document.getElementById("staffSpecialization").value = "";
-      }
-
-      function manageAdmin(email) {
-        displayMessage(`Managing admin: ${email}`, false);
-      }
-
-      function manageStaff(email) {
-        displayMessage(`Managing staff: ${email}`, false);
-      }
-    </script>
-  </body>
+</body>
 </html>

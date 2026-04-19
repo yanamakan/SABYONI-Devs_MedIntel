@@ -1,0 +1,553 @@
+/* ============================================================
+   nurse.css — MedIntel Nurse Dashboard
+   Covers: nurse-dashboard, pending-diagnoses, patient-care,
+           vital-signs, schedule
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+:root {
+  --blue:    #0ea5e9;
+  --teal:    #14b8a6;
+  --purple:  #7c3aed;
+  --red:     #dc2626;
+  --green:   #16a34a;
+  --gray-50: #f9fafb;
+  --gray-100:#f3f4f6;
+  --gray-200:#e5e7eb;
+  --gray-300:#d1d5db;
+  --gray-400:#9ca3af;
+  --gray-500:#6b7280;
+  --gray-600:#4b5563;
+  --gray-700:#374151;
+  --gray-800:#1f2937;
+  --white:   #ffffff;
+}
+ 
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--gray-50);
+  color: var(--gray-800);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+ 
+/* ── HEADER ─────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  gap: 12px;
+}
+ 
+/* Heart icon — teal/blue gradient pill */
+.logo {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, #0ea5e9, #14b8a6);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: white; font-size: 1.2rem;
+}
+.logo svg { width: 22px; height: 22px; fill: white; }
+ 
+.header-info h1 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 1px;
+}
+.header-info span { font-size: .8rem; color: var(--gray-500); }
+ 
+.header-actions { display: flex; align-items: center; gap: 10px; }
+ 
+.header-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: var(--gray-600);
+  font-size: .84rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: .15s;
+}
+.header-btn:hover { background: var(--gray-50); }
+.header-btn:last-child:hover {
+  background: #fef2f2;
+  color: var(--red);
+  border-color: #fecaca;
+}
+ 
+.notif-dot {
+  background: var(--red);
+  color: white;
+  font-size: .7rem;
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 1px 6px;
+}
+ 
+/* ── MAIN WRAPPER ────────────────────────────────── */
+.main { padding: 0 28px 28px; }
+ 
+/* ── STATS CARDS ─────────────────────────────────── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 20px 0;
+}
+ 
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+ 
+.stat-label { font-size: .84rem; color: var(--gray-500); margin-bottom: 8px; }
+.stat-num   { font-size: 2rem; font-weight: 700; color: var(--gray-800); margin-bottom: 4px; }
+.stat-sub   { font-size: .78rem; color: var(--gray-400); }
+ 
+/* Coloured numbers */
+.alert-num { color: var(--red); }
+.green-num { color: var(--green); }
+ 
+/* ── NAV TABS ────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 0 18px;
+  flex-wrap: wrap;
+}
+ 
+.tab {
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  background: none;
+  font-size: .85rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  transition: .15s;
+  display: inline-block;
+}
+.tab:hover { background: var(--gray-100); color: var(--gray-800); }
+.tab.active {
+  background: var(--gray-100);
+  border-color: var(--gray-200);
+  color: var(--gray-800);
+  font-weight: 600;
+}
+ 
+/* ── SECTION CARD ────────────────────────────────── */
+.section-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+ 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 24px 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+ 
+.section-title { font-size: 1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 3px; }
+.section-sub   { font-size: .83rem; color: var(--gray-400); }
+ 
+/* ── DATA TABLE ──────────────────────────────────── */
+.data-table { width: 100%; border-collapse: collapse; }
+ 
+.data-table thead { border-bottom: 1px solid var(--gray-200); }
+ 
+.data-table th {
+  padding: 11px 20px;
+  text-align: left;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+ 
+.data-table td {
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: .87rem;
+  color: var(--gray-700);
+  vertical-align: middle;
+}
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--gray-50); }
+ 
+/* Greyed out past rows in schedule */
+.row-past td { color: var(--gray-400); }
+.row-past strong { color: var(--gray-400); font-weight: 400; }
+ 
+/* ── BADGES ──────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  font-size: .75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+ 
+.badge-high      { background: #fee2e2; color: #b91c1c; }
+.badge-medium    { background: #fef3c7; color: #92400e; }
+.badge-low       { background: var(--gray-100); color: var(--gray-500); border: 1px solid var(--gray-200); }
+.badge-confirmed { background: var(--gray-800); color: white; border-radius: 8px; padding: 5px 12px; }
+.badge-pending   { border: 1px solid var(--gray-300); color: var(--gray-600); }
+.badge-scheduled { border: 1px solid var(--gray-300); color: var(--gray-600); }
+ 
+/* Dark priority badge — "MEDIUM PRIORITY" / "HIGH PRIORITY" */
+.badge-dark {
+  background: var(--gray-800);
+  color: white;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  display: inline-block;
+}
+/* Red variant for HIGH */
+.badge-high-pill {
+  background: var(--red);
+  color: white;
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  display: inline-block;
+}
+ 
+/* ── BUTTONS ─────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: .85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: .15s;
+  white-space: nowrap;
+}
+.btn-green   { background: var(--green);  color: white; }
+.btn-green:hover { background: #15803d; }
+.btn-red     { background: var(--red);    color: white; }
+.btn-red:hover { background: #b91c1c; }
+.btn-teal    { background: var(--teal);   color: white; }
+.btn-teal:hover { background: #0d9488; }
+.btn-blue    { background: var(--blue);   color: white; }
+.btn-blue:hover { background: #0284c7; }
+.btn-outline {
+  background: none;
+  border: 1px solid var(--gray-200);
+  color: var(--gray-600);
+}
+.btn-outline:hover { background: var(--gray-100); }
+ 
+/* ── PENDING DIAGNOSES ───────────────────────────── */
+/* Each diagnosis = white card with light border */
+.diag-card {
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 12px 20px;
+  background: var(--white);
+}
+ 
+.diag-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+ 
+.diag-name { font-size: 1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 3px; }
+.diag-date { font-size: .8rem; color: var(--gray-400); }
+ 
+/* "Patient Symptoms" label */
+.symptoms-label {
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 7px;
+  display: block;
+}
+ 
+/* Symptoms box — light gray inset */
+.symptoms-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: .86rem;
+  color: var(--gray-600);
+  margin-bottom: 16px;
+  line-height: 1.65;
+}
+ 
+/* ── AI ANALYSIS BOX ─────────────────────────────── */
+/* Light blue/purple gradient — matches screenshot */
+.ai-analysis {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border: 1px solid #ddd6fe;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 16px;
+}
+ 
+/* "AI Analysis" title row */
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--purple);
+  font-size: .92rem;
+  margin-bottom: 16px;
+}
+ 
+/* Each field inside AI analysis */
+.ai-field { margin-bottom: 14px; }
+.ai-field:last-child { margin-bottom: 0; }
+ 
+.ai-field strong {
+  font-size: .83rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  display: block;
+  margin-bottom: 4px;
+}
+ 
+.ai-field p  { font-size: .84rem; color: var(--gray-700); }
+.ai-field ul { padding-left: 18px; margin-top: 2px; }
+.ai-field li { font-size: .84rem; color: var(--gray-700); margin-bottom: 3px; }
+ 
+/* AI Confidence bar */
+.conf-row { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+.conf-bar {
+  flex: 1;
+  height: 10px;
+  background: var(--gray-200);
+  border-radius: 99px;
+  overflow: hidden;
+}
+/* Black fill — matches prototype */
+.conf-fill {
+  height: 100%;
+  background: var(--gray-800);
+  border-radius: 99px;
+}
+.conf-pct { font-size: .84rem; font-weight: 600; color: var(--gray-800); min-width: 36px; }
+ 
+/* ── NURSE NOTES ─────────────────────────────────── */
+/* "Nurse Notes (Optional)" — outside the AI box, plain white bg */
+.notes-label {
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  display: block;
+  margin-bottom: 7px;
+}
+ 
+.nurse-notes {
+  width: 100%;
+  min-height: 78px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: .86rem;
+  font-family: inherit;
+  color: var(--gray-700);
+  background: var(--gray-50);
+  resize: vertical;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border .15s;
+  line-height: 1.6;
+}
+.nurse-notes:focus { border-color: var(--blue); background: var(--white); }
+.nurse-notes::placeholder { color: var(--gray-400); }
+ 
+/* ── ACTION BUTTONS (Approve / Reject) ───────────── */
+/* Two full-width buttons side by side — matches prototype exactly */
+.action-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.action-btns .btn {
+  justify-content: center;
+  padding: 14px;
+  font-size: .9rem;
+  border-radius: 10px;
+  width: 100%;
+}
+ 
+.empty { text-align: center; padding: 32px; color: var(--gray-400); font-size: .87rem; }
+ 
+/* ── VITAL SIGNS ─────────────────────────────────── */
+.vital-patient-card {
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 12px;
+  background: var(--white);
+}
+.vital-patient-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+ 
+.vpc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+ 
+.vpc-name      { font-size: .95rem; font-weight: 700; color: var(--gray-800); margin-bottom: 3px; }
+.vpc-condition { font-size: .82rem; color: var(--gray-500); }
+.vpc-actions   { display: flex; gap: 8px; flex-wrap: wrap; }
+ 
+.vpc-divider { height: 1px; background: var(--gray-100); margin-bottom: 14px; }
+ 
+/* 4-column vital stats grid */
+.vpc-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+ 
+.vpc-stat {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-100);
+  border-radius: 8px;
+  padding: 12px 14px;
+  text-align: center;
+}
+ 
+.vpc-stat-label {
+  font-size: .72rem;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 6px;
+}
+.vpc-stat-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+ 
+/* ── MODAL (Record Vitals) ───────────────────────── */
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(4px);
+}
+.modal.hidden { display: none; }
+ 
+.modal-box {
+  background: var(--white);
+  border-radius: 16px;
+  width: 480px;
+  max-width: 95%;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+}
+ 
+.modal-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 20px;
+}
+ 
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  margin-bottom: 22px;
+}
+.form-grid > div { display: flex; flex-direction: column; }
+ 
+label {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  display: block;
+  margin-bottom: 5px;
+}
+ 
+input, select, textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  font-size: .87rem;
+  font-family: inherit;
+  color: var(--gray-800);
+  background: var(--gray-50);
+  outline: none;
+  transition: border .15s;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--blue);
+  background: var(--white);
+}
+input::placeholder, textarea::placeholder { color: var(--gray-400); }
+ 
+.modal-actions { display: flex; gap: 10px; }
+.modal-actions .btn { flex: 1; justify-content: center; padding: 11px; }
+ 
+/* ── SCROLLBAR ───────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 99px; }
+ 
+/* ── RESPONSIVE ──────────────────────────────────── */
+@media (max-width: 1024px) {
+  .stats     { grid-template-columns: repeat(2, 1fr); }
+  .vpc-stats { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .main      { padding: 0 16px 24px; }
+}
+@media (max-width: 640px) {
+  .header    { padding: 12px 16px; flex-wrap: wrap; }
+  .stats     { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .action-btns { grid-template-columns: 1fr; }
+  .vpc-stats { grid-template-columns: 1fr 1fr; }
+  .data-table th,
+  .data-table td { padding: 10px 12px; font-size: .8rem; }
+}

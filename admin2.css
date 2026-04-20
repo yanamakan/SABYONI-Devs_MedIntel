@@ -5,10 +5,11 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  background: #eef2f8;
+  /* CORRECTED: from-blue-50 via-white to-cyan-50 */
+  background: #ffffff;
   background-image:
-    radial-gradient(ellipse at 0% 0%, rgba(219,234,254,0.7) 0%, transparent 50%),
-    radial-gradient(ellipse at 100% 100%, rgba(204,251,241,0.5) 0%, transparent 50%);
+    radial-gradient(ellipse at 0% 0%,    rgba(219, 234, 254, 0.7) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(207, 250, 254, 0.5) 0%, transparent 50%);
   color: #111827;
   font-size: 14px;
   line-height: 1.5;
@@ -41,16 +42,18 @@ body {
   flex-shrink: 0;
 }
 
+/* CORRECTED: Main heading text-gray-900, font text-2xl */
 .header-info h1 {
-  font-size: 1.25rem;
+  font-size: 1.5rem;       /* text-2xl */
   font-weight: 800;
-  color: #111827;
+  color: #111827;          /* text-gray-900 */
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
+/* CORRECTED: Subtext text-gray-600, text-sm */
 .header-info p {
-  font-size: 0.78rem;
-  color: #9ca3af;
+  font-size: 0.875rem;     /* text-sm */
+  color: #4b5563;          /* text-gray-600 */
   font-weight: 400;
 }
 
@@ -104,30 +107,45 @@ body {
   padding: 22px 24px 20px;
 }
 
-.stat-blue   { background: #f0f7ff; border-color: #bfdbfe; }
-.stat-teal   { background: #f0fdfa; border-color: #99f6e4; }
-.stat-purple { background: #faf5ff; border-color: #e9d5ff; }
-.stat-red    { background: #fff1f2; border-color: #fecdd3; }
+/* CORRECTED: Stat cards use gradient backgrounds matching accent colors */
+.stat-blue   {
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+  border-color: #bfdbfe;
+}
+.stat-teal   {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
+  border-color: #99f6e4;
+}
+.stat-purple {
+  background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%);
+  border-color: #e9d5ff;
+}
+.stat-red    {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffffff 100%);
+  border-color: #fecdd3;
+}
 
+/* CORRECTED: Card title text-sm text-gray-600 */
 .stat-label {
-  font-size: 0.95rem;
-  color: #111827;
-  font-weight: 700;
+  font-size: 0.875rem;     /* text-sm */
+  color: #4b5563;          /* text-gray-600 */
+  font-weight: 600;
   margin-bottom: 20px;
   line-height: 1.3;
 }
 
+/* CORRECTED: Stat numbers text-3xl */
 .stat-num {
-  font-size: 3.2rem;
+  font-size: 1.875rem;     /* text-3xl */
   font-weight: 800;
   line-height: 1;
   margin-bottom: 10px;
   letter-spacing: -0.02em;
 }
-.stat-num.blue   { color: #3b82f6; }
-.stat-num.teal   { color: #14b8a6; }
-.stat-num.purple { color: #8b5cf6; }
-.stat-num.red    { color: #ef4444; }
+.stat-num.blue   { color: #2563eb; }   /* text-blue-600 */
+.stat-num.teal   { color: #0d9488; }   /* text-teal-600 */
+.stat-num.purple { color: #7c3aed; }   /* text-purple-600 */
+.stat-num.red    { color: #dc2626; }   /* text-red-600 */
 
 .stat-sub { font-size: 0.8rem; color: #9ca3af; }
 
@@ -224,15 +242,17 @@ body {
   gap: 16px;
 }
 
+/* CORRECTED: Section titles text-gray-900 */
 .section-title {
   font-size: 1rem;
   font-weight: 700;
-  color: #111827;
+  color: #111827;          /* text-gray-900 */
   margin-bottom: 4px;
 }
+/* CORRECTED: Subheadings text-gray-600 */
 .section-sub {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: #4b5563;          /* text-gray-600 */
 }
 
 /* ── DATA TABLE ── */

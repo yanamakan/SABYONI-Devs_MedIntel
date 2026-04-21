@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCTAVIA — Patient Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="patient-history.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" onclick="window.location.href='nurse.html'">
+        &#8592; Back
+      </button>
+      <div>
+        <div class="page-title">OCTAVIA — Patient Analysis</div>
+        <div class="patient-name" id="patientName">Loading patient...</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="sim-controls">
+        <button class="sim-btn" id="startBtn" onclick="startSimulator()">
+          <span class="btn-dot"></span> Start
+        </button>
+        <button class="sim-btn" id="stopBtn" onclick="stopSimulator()">
+          <span class="btn-dot"></span> Stop
+        </button>
+        <button class="sim-btn" id="analyzeBtn" onclick="runAnalysis()">
+          <span class="btn-dot"></span> Analyse
+        </button>
+        <span id="sim-status" class="running">● LIVE</span>
+      </div>
+      <div class="live-badge">
+        <span class="live-dot"></span> OCTAVIA ACTIVE
+      </div>
+    </div>
+  </div>
+
+  <!-- VITAL CARDS -->
+  <div class="vitals-grid">
+    <div class="vital-card" style="--accent: #E05C6A">
+      <div class="vital-label">Heart Rate</div>
+      <div class="vital-value" id="vHR">--</div>
+      <div class="vital-unit">bpm</div>
+      <div class="vital-status" id="sHR"></div>
+    </div>
+    <div class="vital-card" style="--accent: #4A9FD4">
+      <div class="vital-label">Blood Pressure</div>
+      <div class="vital-value" id="vBP">--</div>
+      <div class="vital-unit">mmHg</div>
+      <div class="vital-status" id="sBP"></div>
+    </div>
+    <div class="vital-card" style="--accent: #F0A500">
+      <div class="vital-label">Temperature</div>
+      <div class="vital-value" id="vTemp">--</div>
+      <div class="vital-unit">°C</div>
+      <div class="vital-status" id="sTemp"></div>
+    </div>
+    <div class="vital-card" style="--accent: #48C9A9">
+      <div class="vital-label">O2 Saturation</div>
+      <div class="vital-value" id="vSPO2">--</div>
+      <div class="vital-unit">%</div>
+      <div class="vital-status" id="sSPO2"></div>
+    </div>
+  </div>
+
+  <!-- OCTAVIA ANALYSIS BOX -->
+  <div id="octavia-summary"></div>
+
+  <!-- CHART -->
+  <div class="chart-panel">
+    <div class="chart-panel-title">Vitals Over Time</div>
+    <canvas id="vitalsChart"></canvas>
+  </div>
+
+  <!-- ALERT HISTORY -->
+  <div class="history-panel">
+    <div class="history-panel-title">Alert History</div>
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Severity</th>
+          <th>OCTAVIA Assessment</th>
+        </tr>
+      </thead>
+      <tbody id="alertHistory">
+        <tr><td colspan="3" class="empty-row">Loading alerts...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CRITICAL MODAL -->
+  <div id="critical-overlay">
+    <div id="critical-modal">
+      <div class="modal-header">
+        <div class="modal-icon">⚠</div>
+        <div>
+          <div class="modal-title">Critical Alert — OCTAVIA</div>
+          <div class="modal-subtitle" id="modalPatientName"></div>
+        </div>
+      </div>
+      <div class="modal-summary" id="modalSummary"></div>
+      <div class="modal-recommendation" id="modalRecommendation"></div>
+      <div class="modal-disclaimer">
+        ⚠ This is an AI-generated assessment by OCTAVIA and may contain errors.
+        Emergency intervention has NOT been called. This alert is a recommendation only.
+        The final clinical decision rests entirely with the hospital staff and medical professionals.
+      </div>
+      <div class="modal-actions">
+        <button class="btn-dismiss" onclick="dismissModal()">Acknowledge & Review Patient</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../Scripts/patient-history.js"></script>
+</body>
+</html>

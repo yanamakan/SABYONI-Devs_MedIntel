@@ -18,8 +18,8 @@ body {
     bottom: -150px;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 35%,
-        rgba(180, 215, 245, 0.55),
-        rgba(130, 185, 230, 0.2));
+            rgba(180, 215, 245, 0.55),
+            rgba(130, 185, 230, 0.2));
     border: 1px solid rgba(160, 205, 240, 0.35);
     animation: floatUp linear infinite;
     pointer-events: none;
@@ -29,10 +29,23 @@ body {
 }
 
 @keyframes floatUp {
-    0%   { transform: translateY(0);      opacity: 0;   }
-    10%  {                                opacity: 0.9; }
-    90%  {                                opacity: 0.4; }
-    100% { transform: translateY(-110vh); opacity: 0;   }
+    0% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.9;
+    }
+
+    90% {
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: translateY(-110vh);
+        opacity: 0;
+    }
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
@@ -133,11 +146,22 @@ header .subtitle {
     justify-content: center;
 }
 
-.feature-icon svg { width: 44px; height: 44px; }
+.feature-icon svg {
+    width: 44px;
+    height: 44px;
+}
 
-.feature-icon.blue svg { color: #2563eb; }
-.feature-icon.cyan svg { color: #0891b2; }
-.feature-icon.navy svg { color: #3730a3; }
+.feature-icon.blue svg {
+    color: #2563eb;
+}
+
+.feature-icon.cyan svg {
+    color: #0891b2;
+}
+
+.feature-icon.navy svg {
+    color: #3730a3;
+}
 
 .feature-card h3 {
     font-size: 1rem;
@@ -239,7 +263,9 @@ header .subtitle {
     font-family: inherit;
 }
 
-.input-group input::placeholder { color: #94a3b8; }
+.input-group input::placeholder {
+    color: #94a3b8;
+}
 
 .input-group input:focus {
     border-color: #3b82f6;
@@ -271,7 +297,10 @@ header .subtitle {
     box-shadow: 0 6px 22px rgba(14, 165, 233, 0.5);
 }
 
-.btn-primary:active { transform: translateY(0); opacity: 1; }
+.btn-primary:active {
+    transform: translateY(0);
+    opacity: 1;
+}
 
 /* ── Demo Box ────────────────────────────────────────────────── */
 .demo-box {
@@ -317,8 +346,194 @@ header .subtitle {
 
 /* ── Responsive ──────────────────────────────────────────────── */
 @media (max-width: 720px) {
-    .features-grid { grid-template-columns: 1fr; max-width: 420px; }
-    .logo-text h1  { font-size: 2rem; }
-    .logo-icon     { width: 58px; height: 58px; border-radius: 16px; }
-    .access-card   { margin: 0 16px 60px; padding: 28px 22px; }
+    .features-grid {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+    }
+
+    .logo-text h1 {
+        font-size: 2rem;
+    }
+
+    .logo-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+    }
+
+    .access-card {
+        margin: 0 16px 60px;
+        padding: 28px 22px;
+    }
+}
+
+/* ── RESPONSIVE: nurse-style.css ── */
+@media (max-width: 1024px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .vitals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 0 16px;
+        height: auto;
+        min-height: 70px;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .header-text p {
+        display: none;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .notif-btn span,
+    .logout-btn span {
+        display: none;
+    }
+
+    .notif-btn,
+    .logout-btn {
+        padding: 8px 10px;
+    }
+
+    .main {
+        padding: 18px 16px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        padding: 18px 16px;
+    }
+
+    .stat-num {
+        font-size: 28px;
+    }
+
+    .tabs {
+        display: flex;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        padding: 4px;
+    }
+
+    .tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab {
+        flex-shrink: 0;
+    }
+
+    .panel {
+        padding: 18px 16px;
+    }
+
+    .diag-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .diag-actions {
+        flex-direction: column;
+    }
+
+    .btn-approve,
+    .btn-reject {
+        width: 100%;
+    }
+
+    .patient-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .vital-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .vital-btns {
+        width: 100%;
+    }
+
+    .btn-record,
+    .btn-history {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .vitals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .schedule-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 14px 12px;
+    }
+
+    .stat-num {
+        font-size: 24px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .vitals-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .vital-stat-val {
+        font-size: 13px;
+    }
+
+    .panel-title {
+        font-size: 15px;
+    }
+
+    .ai-analysis-box {
+        padding: 14px;
+    }
+
+    .toast {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        text-align: center;
+    }
 }

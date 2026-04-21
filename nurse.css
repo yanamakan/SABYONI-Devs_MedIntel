@@ -211,3 +211,206 @@
     z-index: 999; pointer-events: none;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE: nurse-style.css ── */
+@media (max-width: 1024px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .vitals-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .header { padding: 0 16px; height: auto; min-height: 70px; flex-wrap: wrap; gap: 10px; padding-top: 12px; padding-bottom: 12px; }
+  .header-text p { display: none; }
+  .header-actions { gap: 8px; }
+  .notif-btn span, .logout-btn span { display: none; }
+  .notif-btn, .logout-btn { padding: 8px 10px; }
+
+  .main { padding: 18px 16px; }
+
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { padding: 18px 16px; }
+  .stat-num { font-size: 28px; }
+
+  .tabs {
+    display: flex; overflow-x: auto; flex-wrap: nowrap;
+    scrollbar-width: none; padding: 4px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; }
+
+  .panel { padding: 18px 16px; }
+
+  .diag-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .diag-actions { flex-direction: column; }
+  .btn-approve, .btn-reject { width: 100%; }
+
+  .patient-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  .vital-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .vital-btns { width: 100%; }
+  .btn-record, .btn-history { flex: 1; justify-content: center; }
+  .vitals-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .schedule-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+@media (max-width: 480px) {
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 14px 12px; }
+  .stat-num { font-size: 24px; }
+  .stat-label { font-size: 12px; margin-bottom: 8px; }
+
+  .vitals-grid { grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px; }
+  .vital-stat-val { font-size: 13px; }
+
+  .panel-title { font-size: 15px; }
+  .ai-analysis-box { padding: 14px; }
+
+  .toast { bottom: 16px; right: 16px; left: 16px; text-align: center; }
+}
+
+@media (max-width: 640px) {
+
+  /* ── HEADER ── */
+  .header {
+    padding: 10px 12px;
+    height: auto;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .header-text {
+    min-width: 0;
+    overflow: hidden;
+    flex-shrink: 1;
+  }
+
+  .header-text h1 {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-text p { display: none; }
+
+  .logo-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .logo-wrap svg { width: 18px; height: 18px; }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Nuclear: hide all button text, keep icons */
+  .notif-btn,
+  .logout-btn {
+    padding: 7px 9px;
+    gap: 0;
+    font-size: 0;
+    white-space: nowrap;
+  }
+
+  .notif-btn svg,
+  .logout-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .notif-badge { font-size: 0.7rem; }
+
+  /* ── STATS ── */
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card   { padding: 14px 12px; }
+  .stat-label  { font-size: 12px; margin-bottom: 8px; }
+  .stat-num    { font-size: 26px; }
+
+  /* ── TABS: scrollable, never clips ── */
+  .tabs {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    padding: 4px;
+    gap: 2px;
+    background: #e9ecef;
+    border-radius: 24px;
+    width: 100%;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 7px 14px;
+    font-size: 0.8rem;
+  }
+
+  /* ── MAIN ── */
+  .main { padding: 16px 12px; }
+
+  /* ── PANEL ── */
+  .panel { padding: 16px 14px; }
+  .panel-title { font-size: 15px; }
+  .panel-sub   { font-size: 12px; }
+
+  /* ── DIAGNOSIS CARD ── */
+  .diag-card   { padding: 16px 14px; }
+  .diag-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .diag-patient-name { font-size: 15px; }
+
+  .diag-actions      { flex-direction: column; gap: 10px; }
+  .btn-approve,
+  .btn-reject        { flex: none; width: 100%; font-size: 14px; padding: 12px; }
+
+  /* ── PATIENT TABLE: scroll instead of clip ── */
+  .panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .patient-table { min-width: 500px; }
+  .patient-table thead tr th,
+  .patient-table tbody tr td { padding: 10px 10px; font-size: 12px; }
+
+  /* ── VITALS ── */
+  .vital-card   { padding: 16px 14px; }
+  .vital-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .vital-btns   { display: flex; width: 100%; gap: 8px; }
+  .btn-record,
+  .btn-history  { flex: 1; justify-content: center; font-size: 12px; padding: 8px 10px; }
+
+  .vitals-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+  .vital-stat-label { font-size: 11px; }
+  .vital-stat-val   { font-size: 13px; }
+
+  /* ── SCHEDULE TABLE ── */
+  .schedule-table { min-width: 460px; }
+  .schedule-table thead tr th,
+  .schedule-table tbody tr td { padding: 10px 10px; font-size: 12px; }
+
+  /* ── TOAST ── */
+  .toast { right: 12px; left: 12px; bottom: 12px; text-align: center; }
+}
+
+/* ── 400px absolute minimum ── */
+@media (max-width: 400px) {
+  .header-text h1 { font-size: 0.8rem; }
+  .stat-num       { font-size: 22px; }
+  .tab            { padding: 6px 10px; font-size: 0.76rem; }
+}

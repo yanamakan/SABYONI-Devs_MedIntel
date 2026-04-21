@@ -764,17 +764,354 @@ body.dark-mode .history-item, body.dark-mode .rx-item { background: #0f172a; bor
 ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 99px; }
 
 /* ── RESPONSIVE ──────────────────────────────── */
+
+/* ── 1024px ── */
 @media (max-width: 1024px) {
-  .stats      { grid-template-columns: repeat(2, 1fr); }
-  .dashboard  { grid-template-columns: 1fr; }
+  .stats   { grid-template-columns: repeat(2, 1fr); }
+  .dashboard { grid-template-columns: 1fr; }
   .anatomy-layout { grid-template-columns: 1fr; }
   .facility-grid  { grid-template-columns: 1fr; }
   .settings-subtabs { grid-template-columns: repeat(2, 1fr); }
+
+  /* Queue panel becomes horizontal strip, not sidebar */
+  .queue-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--gray-200);
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .detail-panel { padding: 20px; }
 }
-@media (max-width: 640px) {
-  .head    { padding: 10px 14px; }
-  .stats   { padding: 14px; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .tabs    { padding: 10px 14px; flex-wrap: wrap; }
-  .tab-page { padding: 14px; }
+
+/* ── 768px ── */
+@media (max-width: 768px) {
+  .head { padding: 10px 16px; }
+  .title p { display: none; }
+
+  /* Icon-only header buttons */
+  .notif-btn span,
+  .logout-btn span { display: none; }
+  .notif-btn,
+  .logout-btn { padding: 7px 10px; }
+
+  /* Stats */
+  .stats { padding: 14px 16px; gap: 10px; }
+  .stat-card { padding: 14px 16px; }
+  .stat-card h2 { font-size: 1.6rem; }
+
+  /* Tabs: horizontal scroll */
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    padding: 10px 16px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; }
+
+  /* Detail header stacks */
+  .detail-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  /* Info grid single column */
   .info-grid { grid-template-columns: 1fr; }
+
+  /* Appointments table scrollable */
+  .appointments-card { overflow-x: auto; }
+  .appt-table        { min-width: 520px; }
+
+  /* Map */
+  .map-section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .map-filter-btns    { flex-wrap: wrap; }
+  .facility-grid      { grid-template-columns: 1fr; }
+
+  /* Settings */
+  .settings-panel { padding: 16px; }
+  .settings-section { padding: 16px; }
+
+  /* Anatomy */
+  .anatomy-viewer-toolbar { flex-direction: column; align-items: flex-start; }
+  .anatomy-controls       { flex-wrap: wrap; }
+}
+
+/* ── 480px ── */
+@media (max-width: 480px) {
+  .head { gap: 8px; }
+
+  .stats { grid-template-columns: repeat(2, 1fr); padding: 12px; gap: 8px; }
+  .stat-card { padding: 12px 12px; }
+  .stat-card p  { font-size: 0.78rem; margin-bottom: 8px; }
+  .stat-card h2 { font-size: 1.4rem; }
+
+  .tab { padding: 6px 12px; font-size: 0.8rem; }
+  .tab-page { padding: 12px; }
+
+  /* Queue panel shorter on small phones */
+  .queue-panel { max-height: 240px; padding: 14px 10px; }
+  .patient-card { padding: 10px 11px; margin-bottom: 7px; }
+  .patient-card-name { font-size: 0.84rem; }
+
+  .detail-panel { padding: 14px; }
+  .detail-header h2 { font-size: 1.1rem; }
+  #ai-summary-text  { font-size: 0.8rem; }
+
+  /* Settings sub-tabs: tighter */
+  .settings-subtabs { grid-template-columns: 1fr 1fr; }
+  .settings-subtab  { font-size: 0.76rem; padding: 8px 4px; }
+
+  /* Appointment table cells */
+  .appt-table th,
+  .appt-table td { padding: 10px 12px; font-size: 0.8rem; }
+
+  /* Map visual shorter */
+  .map-visual { height: 150px; }
+  .facility-card { padding: 14px 14px; }
+  .map-filter-btn { padding: 5px 10px; font-size: 0.77rem; }
+}
+
+/* ── Fix header wrapping on narrow screens ── */
+@media (max-width: 500px) {
+  .head {
+    padding: 10px 12px;
+    gap: 8px;
+    flex-wrap: nowrap;        /* prevent any wrapping */
+    align-items: center;
+  }
+
+  .logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Shrink the title so it fits on ONE line */
+  .title h2 {
+    font-size: 0.92rem;
+    white-space: nowrap;
+  }
+  .title p { display: none; }   /* hide subtitle */
+
+  /* Make header buttons icon-only */
+  .notif-btn,
+  .logout-btn {
+    padding: 7px 8px;
+    gap: 4px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  /* Hide the text labels, keep icons */
+  .notif-btn .btn-text,
+  .logout-btn .btn-text { display: none; }
+}
+
+/* ── Fix tabs getting cut off ── */
+@media (max-width: 500px) {
+  .tabs {
+    padding: 10px 12px;
+    gap: 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;          /* single scrollable row */
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    flex-shrink: 0;             /* prevent squishing */
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+}
+
+/* ── Fix settings sub-tabs 2×2 layout ── */
+@media (max-width: 500px) {
+  .settings-subtabs {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .settings-subtab {
+    padding: 9px 6px;
+    font-size: 0.78rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
+/* ── Fix stat cards on narrow screens ── */
+@media (max-width: 500px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 14px 12px;
+  }
+
+  .stat-card p  { font-size: 0.78rem; margin-bottom: 8px; }
+  .stat-card h2 { font-size: 1.5rem; }
+}
+
+/* ── Fix settings panel padding ── */
+@media (max-width: 500px) {
+  .settings-panel  { padding: 14px 12px; }
+  .settings-section { padding: 14px 14px; }
+  .settings-title-row { padding: 14px 14px 12px; gap: 10px; }
+  .settings-icon-wrap { width: 36px; height: 36px; border-radius: 9px; }
+  .settings-title-row h3 { font-size: 0.9rem; }
+}
+
+@media (max-width: 640px) {
+
+  /* ── HEADER ── */
+  .head {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .head .left {
+    gap: 8px;
+    flex-shrink: 1;
+    min-width: 0;           /* allows text to shrink */
+  }
+
+  .logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .title {
+    min-width: 0;           /* critical: allows title to shrink */
+    overflow: hidden;
+  }
+
+  .title h2 {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .title p { display: none; }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;         /* buttons never shrink */
+  }
+
+  /* Hide ALL text inside both buttons — keep only icons */
+  .notif-btn,
+  .logout-btn {
+    padding: 7px 9px;
+    gap: 0;
+    font-size: 0;           /* nuclear option: hides text at font level */
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  /* But restore icon size explicitly */
+  .notif-btn svg,
+  .logout-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  /* Keep the badge visible */
+  .notif-badge {
+    font-size: 0.7rem;      /* restore font size for badge only */
+  }
+
+  /* ── STATS ── */
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 12px;
+    gap: 10px;
+  }
+  .stat-card    { padding: 14px 12px; }
+  .stat-card p  { font-size: 0.78rem; margin-bottom: 8px; }
+  .stat-card h2 { font-size: 1.5rem; }
+
+  /* ── TABS: scrollable row, never clips ── */
+  .tabs {
+    padding: 8px 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    gap: 4px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  /* ── SETTINGS SUB-TABS ── */
+  .settings-subtabs {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    padding: 3px;
+  }
+  .settings-subtab {
+    font-size: 0.76rem;
+    padding: 8px 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── SETTINGS PANELS ── */
+  .settings-panel       { padding: 14px 12px; }
+  .settings-section     { padding: 14px; }
+  .settings-title-row   { padding: 14px 14px 12px; gap: 10px; }
+  .settings-icon-wrap   { width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0; }
+  .settings-title-row h3 { font-size: 0.9rem; }
+  .settings-title-row .sub { font-size: 0.75rem; }
+
+  /* ── QUEUE + DETAIL PANELS ── */
+  .dashboard { grid-template-columns: 1fr; }
+  .queue-panel {
+    border-right: none;
+    border-bottom: 1px solid var(--gray-200);
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  .detail-panel         { padding: 14px; }
+  .detail-header        { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .detail-header h2     { font-size: 1.1rem; }
+  .info-grid            { grid-template-columns: 1fr; }
+
+  /* ── APPOINTMENTS TABLE ── */
+  .appointments-card    { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .appt-table           { min-width: 500px; }
+
+  /* ── ANATOMY ── */
+  .anatomy-layout           { grid-template-columns: 1fr; }
+  .anatomy-viewer-toolbar   { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .anatomy-controls         { flex-wrap: wrap; }
+
+  /* ── MAP ── */
+  .facility-grid            { grid-template-columns: 1fr; }
+  .map-section-header       { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .map-filter-btns          { flex-wrap: wrap; gap: 6px; }
+}
+
+/* ── 360px: absolute minimum (Galaxy S8+) ── */
+@media (max-width: 400px) {
+  .title h2       { font-size: 0.82rem; }
+  .stat-card h2   { font-size: 1.3rem; }
+  .tab            { padding: 5px 10px; font-size: 0.76rem; }
 }

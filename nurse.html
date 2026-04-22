@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nurse Dashboard</title>
+<link rel="stylesheet" href="nurse.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo-wrap">
+    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    </svg>
+  </div>
+  <div class="header-text">
+    <h1>Nurse Dashboard</h1>
+    <p>Alice Williams &bull; Emergency Department</p>
+  </div>
+  <div class="header-actions">
+    <button class="notif-btn" onclick="showToast('2 notifications pending')">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      Notifications
+      <span class="notif-badge">2</span>
+    </button>
+    <button class="logout-btn" onclick="handleLogout()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Total Patients</div>
+      <div class="stat-num cyan">4</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Today's Schedule</div>
+      <div class="stat-num blue">5</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Pending Diagnoses</div>
+      <div class="stat-num purple">3</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Tasks Completed</div>
+      <div class="stat-num green">12</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('pending')">Pending Diagnoses</button>
+    <button class="tab" onclick="switchTab('patient')">Patient Care</button>
+    <button class="tab" onclick="switchTab('vitals')">Vital Signs</button>
+    <button class="tab" onclick="switchTab('schedule')">Schedule</button>
+  </div>
+
+  <!-- ===== PENDING DIAGNOSES PANEL ===== -->
+  <div class="panel active" id="tab-pending">
+    <div class="panel-title">
+      <svg width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+      </svg>
+      AI-Suggested Diagnoses Requiring Approval
+    </div>
+    <div class="panel-sub">Review and approve patient symptom analyses from AI assistant</div>
+
+    <!-- Patient 1: Sarah Thompson -->
+    <div class="diag-card" id="diag-sarah">
+      <div class="diag-header">
+        <div>
+          <div class="diag-patient-name">Sarah Thompson</div>
+          <div class="diag-submitted">Submitted: 4/20/2026, 12:59:24 AM</div>
+        </div>
+        <span class="priority-badge medium">MEDIUM PRIORITY</span>
+      </div>
+      <div class="symptoms-label">Patient Symptoms</div>
+      <div class="symptoms-box">Experiencing severe headaches with light sensitivity, nausea, and occasional dizziness. Symptoms started 3 days ago.</div>
+      <div class="ai-analysis-box">
+        <div class="ai-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+          AI Analysis
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Chief Complaint</div>
+          <div class="ai-row-val">Severe headaches with photophobia</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Duration</div>
+          <div class="ai-row-val">Acute (3 days)</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Possible Causes</div>
+          <ul class="ai-list">
+            <li>Migraine</li>
+            <li>Tension headache</li>
+            <li>Cluster headache</li>
+          </ul>
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Recommended Tests</div>
+          <ul class="ai-list">
+            <li>Blood pressure check</li>
+            <li>Neurological assessment</li>
+            <li>CT scan if symptoms persist</li>
+          </ul>
+        </div>
+        <div class="ai-confidence-label">AI Confidence</div>
+        <div class="conf-bar-wrap"><div class="conf-bar" style="width:89%"></div></div>
+        <div class="conf-pct">89%</div>
+      </div>
+      <div class="nurse-notes-label">Nurse Notes (Optional)</div>
+      <textarea class="nurse-notes-area" placeholder="Add any additional observations or corrections..."></textarea>
+      <div class="diag-actions">
+        <button class="btn-approve" onclick="handleApprove('diag-sarah','Sarah Thompson')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Approve &amp; Forward to Doctor
+        </button>
+        <button class="btn-reject" onclick="handleReject('diag-sarah','Sarah Thompson')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Reject Diagnosis
+        </button>
+      </div>
+    </div>
+
+    <!-- Patient 2: James Wilson -->
+    <div class="diag-card" id="diag-james">
+      <div class="diag-header">
+        <div>
+          <div class="diag-patient-name">James Wilson</div>
+          <div class="diag-submitted">Submitted: 4/20/2026, 08:15:00 AM</div>
+        </div>
+        <span class="priority-badge medium">MEDIUM PRIORITY</span>
+      </div>
+      <div class="symptoms-label">Patient Symptoms</div>
+      <div class="symptoms-box">Persistent high blood pressure readings. Reports occasional headaches at the back of the neck and mild shortness of breath during mild exertion.</div>
+      <div class="ai-analysis-box">
+        <div class="ai-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+          AI Analysis
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Chief Complaint</div>
+          <div class="ai-row-val">Hypertension with associated symptoms</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Duration</div>
+          <div class="ai-row-val">Chronic (ongoing)</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Possible Causes</div>
+          <ul class="ai-list">
+            <li>Essential hypertension</li>
+            <li>Secondary hypertension</li>
+            <li>Medication non-compliance</li>
+          </ul>
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Recommended Tests</div>
+          <ul class="ai-list">
+            <li>24-hour BP monitoring</li>
+            <li>Kidney function tests</li>
+            <li>ECG</li>
+          </ul>
+        </div>
+        <div class="ai-confidence-label">AI Confidence</div>
+        <div class="conf-bar-wrap"><div class="conf-bar" style="width:82%"></div></div>
+        <div class="conf-pct">82%</div>
+      </div>
+      <div class="nurse-notes-label">Nurse Notes (Optional)</div>
+      <textarea class="nurse-notes-area" placeholder="Add any additional observations or corrections..."></textarea>
+      <div class="diag-actions">
+        <button class="btn-approve" onclick="handleApprove('diag-james','James Wilson')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Approve &amp; Forward to Doctor
+        </button>
+        <button class="btn-reject" onclick="handleReject('diag-james','James Wilson')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Reject Diagnosis
+        </button>
+      </div>
+    </div>
+
+    <!-- Patient 3: Robert Anderson -->
+    <div class="diag-card" id="diag-robert">
+      <div class="diag-header">
+        <div>
+          <div class="diag-patient-name">Robert Anderson</div>
+          <div class="diag-submitted">Submitted: 4/20/2026, 07:42:10 AM</div>
+        </div>
+        <span class="priority-badge high">HIGH PRIORITY</span>
+      </div>
+      <div class="symptoms-label">Patient Symptoms</div>
+      <div class="symptoms-box">Blood sugar levels dangerously elevated at 18 mmol/L. Reports excessive thirst, frequent urination, blurred vision, and fatigue for the past week.</div>
+      <div class="ai-analysis-box">
+        <div class="ai-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+          AI Analysis
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Chief Complaint</div>
+          <div class="ai-row-val">Hyperglycemia with classic diabetic symptoms</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Duration</div>
+          <div class="ai-row-val">Acute exacerbation (1 week)</div>
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Possible Causes</div>
+          <ul class="ai-list">
+            <li>Uncontrolled Type 2 Diabetes</li>
+            <li>Diabetic ketoacidosis (DKA)</li>
+            <li>Medication non-adherence</li>
+          </ul>
+        </div>
+        <div class="ai-row">
+          <div class="ai-row-label">Recommended Tests</div>
+          <ul class="ai-list">
+            <li>HbA1c blood test</li>
+            <li>Urinalysis for ketones</li>
+            <li>Metabolic panel</li>
+          </ul>
+        </div>
+        <div class="ai-confidence-label">AI Confidence</div>
+        <div class="conf-bar-wrap"><div class="conf-bar" style="width:94%"></div></div>
+        <div class="conf-pct">94%</div>
+      </div>
+      <div class="nurse-notes-label">Nurse Notes (Optional)</div>
+      <textarea class="nurse-notes-area" placeholder="Add any additional observations or corrections..."></textarea>
+      <div class="diag-actions">
+        <button class="btn-approve" onclick="handleApprove('diag-robert','Robert Anderson')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Approve &amp; Forward to Doctor
+        </button>
+        <button class="btn-reject" onclick="handleReject('diag-robert','Robert Anderson')">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Reject Diagnosis
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PATIENT CARE PANEL ===== -->
+  <div class="panel" id="tab-patient">
+    <div class="panel-title">Patient List</div>
+    <div class="panel-sub">View and manage patient information</div>
+    <table class="patient-table">
+      <thead>
+        <tr>
+          <th>Patient Name</th><th>Age</th><th>Condition</th><th>Urgency</th><th>Last Visit</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>James Wilson</td><td>41</td><td>Hypertension</td>
+          <td><span class="urgency-badge medium">medium</span></td>
+          <td>2026-03-10</td>
+          <td><button class="view-btn" onclick="showToast('Viewing James Wilson details')">View Details</button></td>
+        </tr>
+        <tr>
+          <td>Sarah Thompson</td><td>34</td><td>Migraine</td>
+          <td><span class="urgency-badge low">low</span></td>
+          <td>2026-03-12</td>
+          <td><button class="view-btn" onclick="showToast('Viewing Sarah Thompson details')">View Details</button></td>
+        </tr>
+        <tr>
+          <td>Robert Anderson</td><td>58</td><td>Diabetes Type 2</td>
+          <td><span class="urgency-badge high">high</span></td>
+          <td>2026-03-14</td>
+          <td><button class="view-btn" onclick="showToast('Viewing Robert Anderson details')">View Details</button></td>
+        </tr>
+        <tr>
+          <td>Maria Garcia</td><td>27</td><td>Respiratory Infection</td>
+          <td><span class="urgency-badge medium">medium</span></td>
+          <td>2026-03-15</td>
+          <td><button class="view-btn" onclick="showToast('Viewing Maria Garcia details')">View Details</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== VITAL SIGNS PANEL ===== -->
+  <div class="panel" id="tab-vitals">
+    <div class="panel-title">Record Vital Signs</div>
+    <div class="panel-sub">Monitor and record patient vital signs</div>
+    <div id="vitals-list"></div>
+  </div>
+
+  <!-- ===== RECORD VITALS MODAL ===== -->
+  <div id="record-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:18px;padding:36px;width:480px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.18);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+        <div>
+          <div style="font-size:18px;font-weight:700;color:#111827;" id="modal-record-title">Record Vitals</div>
+          <div style="font-size:13px;color:#9ca3af;" id="modal-record-sub"></div>
+        </div>
+        <button onclick="closeModal('record-modal')" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:22px;line-height:1;">&times;</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+        <div>
+          <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Blood Pressure (mmHg)</label>
+          <input id="inp-bp" placeholder="e.g. 120/80" style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:14px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e5e7eb'"/>
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Heart Rate (bpm)</label>
+          <input id="inp-hr" type="number" placeholder="e.g. 72" style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:14px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e5e7eb'"/>
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Temperature (°C)</label>
+          <input id="inp-temp" type="number" step="0.1" placeholder="e.g. 36.8" style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:14px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e5e7eb'"/>
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">O2 Saturation (%)</label>
+          <input id="inp-o2" type="number" placeholder="e.g. 98" style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:14px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e5e7eb'"/>
+        </div>
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Notes (optional)</label>
+        <textarea id="inp-notes" placeholder="Any additional observations..." style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:14px;font-family:inherit;outline:none;resize:vertical;min-height:64px;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+      </div>
+      <div id="record-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;margin-bottom:14px;">Please fill in all vital fields before saving.</div>
+      <div style="display:flex;gap:12px;">
+        <button onclick="closeModal('record-modal')" style="flex:1;padding:12px;border-radius:10px;border:1.5px solid #e5e7eb;background:#fff;font-size:14px;font-weight:600;cursor:pointer;color:#374151;">Cancel</button>
+        <button onclick="saveVitals()" style="flex:2;padding:12px;border-radius:10px;border:none;background:#0ea5e9;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">
+          ✓ Save Vitals
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HISTORY MODAL ===== -->
+  <div id="history-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:18px;padding:36px;width:640px;max-width:95vw;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.18);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+        <div>
+          <div style="font-size:18px;font-weight:700;color:#111827;" id="modal-history-title">Vital Signs History</div>
+          <div style="font-size:13px;color:#9ca3af;" id="modal-history-sub"></div>
+        </div>
+        <button onclick="closeModal('history-modal')" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:22px;line-height:1;">&times;</button>
+      </div>
+      <div id="history-body"></div>
+    </div>
+  </div>
+
+
+  <!-- ===== SCHEDULE PANEL ===== -->
+  <div class="panel" id="tab-schedule">
+    <div class="panel-title">Today's Schedule</div>
+    <div class="panel-sub">Appointments and tasks for 4/20/2026</div>
+    <table class="schedule-table">
+      <thead>
+        <tr>
+          <th>Time</th><th>Patient</th><th>Doctor</th><th>Status</th><th>Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>09:00</td><td>James Wilson</td><td>Dr. Michael Chen</td>
+          <td><span class="status-badge scheduled">Scheduled</span></td>
+          <td><span class="urgency-badge medium">medium</span></td>
+        </tr>
+        <tr>
+          <td>10:30</td><td>Sarah Thompson</td><td>Dr. Emily Rodriguez</td>
+          <td><span class="status-badge scheduled">Scheduled</span></td>
+          <td><span class="urgency-badge low">low</span></td>
+        </tr>
+        <tr>
+          <td>14:00</td><td>Robert Anderson</td><td>Dr. Michael Chen</td>
+          <td><span class="status-badge confirmed">Confirmed</span></td>
+          <td><span class="urgency-badge high">high</span></td>
+        </tr>
+        <tr>
+          <td>11:00</td><td>Maria Garcia</td><td>Dr. Emily Rodriguez</td>
+          <td><span class="status-badge pending">Pending</span></td>
+          <td><span class="urgency-badge medium">medium</span></td>
+        </tr>
+        <tr>
+          <td>15:30</td><td>David Lee</td><td>Dr. Michael Chen</td>
+          <td><span class="status-badge scheduled">Scheduled</span></td>
+          <td><span class="urgency-badge low">low</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+<script src="nurse.js"></script>
+</body>
+</html>

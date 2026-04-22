@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — MedIntel</title>
+  <link rel="stylesheet" href="admin2.css" />
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo">
+      <!-- Gear / settings icon -->
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33
+                 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33
+                 l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3
+                 a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83
+                 l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09
+                 a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06
+                 A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
+                 a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </div>
+    <div class="header-info">
+      <h1>Admin Dashboard</h1>
+      <p>Hospital System Administrator &amp; Appointment Management</p>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <!-- Notifications -->
+    <button class="header-btn" onclick="toggleNotif()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      Notifications
+      <span class="notif-dot" id="notifCount">2</span>
+    </button>
+    <!-- Logout -->
+    <button class="header-btn" onclick="handleLogout()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </button>
+  </div>
+</header>
+
+<!-- Notification Popup -->
+<div class="notif-popup" id="notifPopup">
+  <div class="notif-popup-header">
+    <span>Recent Notifications</span>
+    <button onclick="clearNotifs()">Clear All</button>
+  </div>
+  <div id="notifList">
+    <div class="notif-item">New appointment booked: James Wilson — 2026-03-20</div>
+    <div class="notif-item">Urgent case flagged: Robert Anderson — High priority</div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- STAT CARDS -->
+  <div class="stats">
+    <div class="stat-card stat-blue">
+      <div class="stat-label">Total Doctors</div>
+      <div class="stat-num blue" id="statDoctors">2</div>
+      <div class="stat-sub">Active medical staff</div>
+    </div>
+    <div class="stat-card stat-teal">
+      <div class="stat-label">Total Nurses</div>
+      <div class="stat-num teal" id="statNurses">2</div>
+      <div class="stat-sub">Nursing staff</div>
+    </div>
+    <div class="stat-card stat-purple">
+      <div class="stat-label">Total Appointments</div>
+      <div class="stat-num purple" id="statAppointments">5</div>
+      <div class="stat-sub">Scheduled appointments</div>
+    </div>
+    <div class="stat-card stat-red">
+      <div class="stat-label">Urgent Cases</div>
+      <div class="stat-num red" id="statUrgent">1</div>
+      <div class="stat-sub">Require immediate attention</div>
+    </div>
+  </div>
+
+  <!-- TABS + ADD BUTTON -->
+  <div class="tabs-bar">
+    <nav class="tabs" id="tabsNav">
+      <button class="tab active" onclick="switchTab('doctors', this)">Doctors (2)</button>
+      <button class="tab" onclick="switchTab('nurses', this)">Nurses (2)</button>
+      <button class="tab" onclick="switchTab('appointments', this)">Appointments (5)</button>
+      <button class="tab" onclick="switchTab('queue', this)">Patient Queue</button>
+    </nav>
+    <button class="btn btn-blue" onclick="openAddStaffModal()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <line x1="19" y1="8" x2="19" y2="14"/>
+        <line x1="22" y1="11" x2="16" y2="11"/>
+      </svg>
+      Add Staff Member
+    </button>
+  </div>
+
+  <!-- ══ DOCTORS TAB ══ -->
+  <div id="tab-doctors" class="tab-content">
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Doctor Management</div>
+          <div class="section-sub">Manage doctor accounts and assignments</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Specialization</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="doctorsTableBody">
+          <tr>
+            <td>
+              <div class="td-name">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+                  <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+                  <circle cx="20" cy="10" r="2"/>
+                </svg>
+                Dr. Michael Chen
+              </div>
+            </td>
+            <td>doctor@medintel.com</td>
+            <td><span class="badge-dept">Cardiology</span></td>
+            <td>Cardiologist</td>
+            <td><span class="badge-active">Active</span></td>
+            <td>
+              <button class="btn btn-red" onclick="removeDoctor('Dr. Michael Chen')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                </svg>
+                Remove
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-name">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+                  <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+                  <circle cx="20" cy="10" r="2"/>
+                </svg>
+                Dr. Emily Rodriguez
+              </div>
+            </td>
+            <td>doctor2@medintel.com</td>
+            <td><span class="badge-dept">Pediatrics</span></td>
+            <td>Pediatrician</td>
+            <td><span class="badge-active">Active</span></td>
+            <td>
+              <button class="btn btn-red" onclick="removeDoctor('Dr. Emily Rodriguez')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                </svg>
+                Remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ NURSES TAB ══ -->
+  <div id="tab-nurses" class="tab-content" style="display:none;">
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Nurse Management</div>
+          <div class="section-sub">Manage nursing staff accounts and assignments</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="nursesTableBody">
+          <tr>
+            <td>
+              <div class="td-name">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                Alice Williams
+              </div>
+            </td>
+            <td>nurse@medintel.com</td>
+            <td><span class="badge-dept">Emergency</span></td>
+            <td><span class="badge-active">Active</span></td>
+            <td>
+              <button class="btn btn-red" onclick="removeNurse('Alice Williams')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                </svg>
+                Remove
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="td-name">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                Tom Jackson
+              </div>
+            </td>
+            <td>nurse2@medintel.com</td>
+            <td><span class="badge-dept">Cardiology</span></td>
+            <td><span class="badge-active">Active</span></td>
+            <td>
+              <button class="btn btn-red" onclick="removeNurse('Tom Jackson')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+                </svg>
+                Remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ APPOINTMENTS TAB ══ -->
+  <div id="tab-appointments" class="tab-content" style="display:none;">
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Appointment Management</div>
+          <div class="section-sub">View, confirm, and manage all appointments</div>
+        </div>
+        <button class="btn btn-purple" onclick="openScheduleModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          Schedule Appointment
+        </button>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Urgency</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="appointmentsTableBody">
+          <tr>
+            <td style="font-weight:700;color:#111827;">James Wilson</td>
+            <td>Dr. Michael Chen</td>
+            <td>2026-03-20</td>
+            <td>
+              <span class="td-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                09:00
+              </span>
+            </td>
+            <td><span class="badge-scheduled">Scheduled</span></td>
+            <td><span class="badge-medium">medium</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:#111827;">Sarah Thompson</td>
+            <td>Dr. Emily Rodriguez</td>
+            <td>2026-03-18</td>
+            <td>
+              <span class="td-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                10:30
+              </span>
+            </td>
+            <td><span class="badge-scheduled">Scheduled</span></td>
+            <td><span class="badge-low">low</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:#111827;">Robert Anderson</td>
+            <td>Dr. Michael Chen</td>
+            <td>2026-03-17</td>
+            <td>
+              <span class="td-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                14:00
+              </span>
+            </td>
+            <td><span class="badge-confirmed">Confirmed</span></td>
+            <td><span class="badge-high">high</span></td>
+            <td><span class="action-confirmed-text">Confirmed</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:#111827;">Maria Garcia</td>
+            <td>Dr. Emily Rodriguez</td>
+            <td>2026-03-16</td>
+            <td>
+              <span class="td-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                11:00
+              </span>
+            </td>
+            <td><span class="badge-pending">Pending</span></td>
+            <td><span class="badge-medium">medium</span></td>
+            <td>
+              <button class="btn btn-green" onclick="confirmAppt(this, 'Maria Garcia')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Confirm
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:#111827;">David Lee</td>
+            <td>Dr. Michael Chen</td>
+            <td>2026-03-16</td>
+            <td>
+              <span class="td-time">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                15:30
+              </span>
+            </td>
+            <td><span class="badge-scheduled">Scheduled</span></td>
+            <td><span class="badge-low">low</span></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ PATIENT QUEUE TAB ══ -->
+  <div id="tab-queue" class="tab-content" style="display:none;">
+    <div class="section-card">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Real-Time Patient Queue</div>
+          <div class="section-sub">AI-sorted by urgency for optimal patient flow</div>
+        </div>
+      </div>
+      <div class="queue-list">
+
+        <!-- Queue Card 1 — MEDIUM -->
+        <div class="queue-card queue-medium">
+          <div class="queue-top">
+            <div class="queue-avatar">1</div>
+            <div class="queue-info">
+              <div class="queue-name">James Wilson</div>
+              <div class="queue-condition">Hypertension</div>
+              <div class="queue-phone">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 17Z"/>
+                </svg>
+                +27 82 123 4567
+              </div>
+            </div>
+            <div class="queue-right">
+              <div class="queue-badges">
+                <span class="badge-medium">MEDIUM</span>
+              </div>
+              <div class="queue-next">Next: 2026-03-20</div>
+            </div>
+          </div>
+          <div class="queue-divider"></div>
+          <div class="queue-summary">
+            <span class="ai-label">AI Summary:</span>
+            Patient reports recurring chest discomfort. History of high blood pressure. Recommended: ECG, Blood pressure monitoring.
+          </div>
+        </div>
+
+        <!-- Queue Card 2 — LOW -->
+        <div class="queue-card queue-low">
+          <div class="queue-top">
+            <div class="queue-avatar">2</div>
+            <div class="queue-info">
+              <div class="queue-name">Sarah Thompson</div>
+              <div class="queue-condition">Migraine</div>
+              <div class="queue-phone">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 17Z"/>
+                </svg>
+                +27 83 456 7890
+              </div>
+            </div>
+            <div class="queue-right">
+              <div class="queue-badges">
+                <span class="badge-low">LOW</span>
+              </div>
+              <div class="queue-next">Next: 2026-03-18</div>
+            </div>
+          </div>
+          <div class="queue-divider"></div>
+          <div class="queue-summary">
+            <span class="ai-label">AI Summary:</span>
+            Recurring headaches, photophobia. Duration: 3 days. Possible migraine. Recommended: Neurological assessment.
+          </div>
+        </div>
+
+        <!-- Queue Card 3 — HIGH -->
+        <div class="queue-card queue-high">
+          <div class="queue-top">
+            <div class="queue-avatar">3</div>
+            <div class="queue-info">
+              <div class="queue-name">Robert Anderson</div>
+              <div class="queue-condition">Diabetes Type 2</div>
+              <div class="queue-phone">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 17Z"/>
+                </svg>
+                +27 84 789 0123
+              </div>
+            </div>
+            <div class="queue-right">
+              <div class="queue-badges">
+                <span class="badge-high">HIGH</span>
+                <span class="urgent-circle">!</span>
+              </div>
+              <div class="queue-next">Next: 2026-03-17</div>
+            </div>
+          </div>
+          <div class="queue-divider"></div>
+          <div class="queue-summary">
+            <span class="ai-label">AI Summary:</span>
+            Elevated blood glucose levels. Patient reports dizziness and frequent urination. Urgent: Blood sugar monitoring, A1C test.
+          </div>
+        </div>
+
+        <!-- Queue Card 4 — MEDIUM -->
+        <div class="queue-card queue-medium">
+          <div class="queue-top">
+            <div class="queue-avatar">4</div>
+            <div class="queue-info">
+              <div class="queue-name">Maria Garcia</div>
+              <div class="queue-condition">Chest Pain</div>
+              <div class="queue-phone">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 17Z"/>
+                </svg>
+                +27 85 321 6540
+              </div>
+            </div>
+            <div class="queue-right">
+              <div class="queue-badges">
+                <span class="badge-medium">MEDIUM</span>
+              </div>
+              <div class="queue-next">Next: 2026-03-16</div>
+            </div>
+          </div>
+          <div class="queue-divider"></div>
+          <div class="queue-summary">
+            <span class="ai-label">AI Summary:</span>
+            Intermittent chest tightness on exertion. No prior cardiac history. Recommended: ECG, stress test.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ ADD STAFF MODAL ══ -->
+<div class="modal hidden" id="addStaffModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Add Staff Member</div>
+        <div class="modal-sub">Create a new doctor or nurse account</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('addStaffModal')">&times;</button>
+    </div>
+    <span class="form-note">Fields marked * are required</span>
+    <div class="form-grid">
+      <div>
+        <label>Full Name *</label>
+        <input type="text" id="staffName" placeholder="Dr. Jane Smith">
+        <span class="error" id="errStaffName"></span>
+      </div>
+      <div>
+        <label>Email *</label>
+        <input type="email" id="staffEmail" placeholder="jane@medintel.com">
+        <span class="error" id="errStaffEmail"></span>
+      </div>
+      <div>
+        <label>Role *</label>
+        <select id="staffRole">
+          <option value="">Select role...</option>
+          <option value="doctor">Doctor</option>
+          <option value="nurse">Nurse</option>
+        </select>
+        <span class="error" id="errStaffRole"></span>
+      </div>
+      <div>
+        <label>Department *</label>
+        <select id="staffDept">
+          <option value="">Select department...</option>
+          <option>Cardiology</option>
+          <option>Pediatrics</option>
+          <option>Emergency</option>
+          <option>Neurology</option>
+          <option>Radiology</option>
+          <option>General</option>
+        </select>
+        <span class="error" id="errStaffDept"></span>
+      </div>
+      <div>
+        <label>Specialization</label>
+        <input type="text" id="staffSpec" placeholder="e.g. Cardiologist">
+      </div>
+      <div>
+        <label>Password *</label>
+        <input type="password" id="staffPass" placeholder="••••••••">
+        <span class="error" id="errStaffPass"></span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-blue" onclick="submitAddStaff()">Add Staff Member</button>
+      <button class="btn btn-outline" onclick="closeModal('addStaffModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCHEDULE APPOINTMENT MODAL ══ -->
+<div class="modal hidden" id="scheduleModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Schedule Appointment</div>
+        <div class="modal-sub">Book a new patient appointment</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
+    </div>
+    <div class="form-grid">
+      <div>
+        <label>Patient Name *</label>
+        <input type="text" id="apptPatient" placeholder="Full name">
+      </div>
+      <div>
+        <label>Doctor *</label>
+        <select id="apptDoctor">
+          <option value="">Select doctor...</option>
+          <option>Dr. Michael Chen</option>
+          <option>Dr. Emily Rodriguez</option>
+        </select>
+      </div>
+      <div>
+        <label>Date *</label>
+        <input type="date" id="apptDate">
+      </div>
+      <div>
+        <label>Time *</label>
+        <input type="time" id="apptTime">
+      </div>
+      <div>
+        <label>Urgency</label>
+        <select id="apptUrgency">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div>
+        <label>Status</label>
+        <select id="apptStatus">
+          <option value="scheduled">Scheduled</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-purple" onclick="submitSchedule()">Schedule Appointment</button>
+      <button class="btn btn-outline" onclick="closeModal('scheduleModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Help button -->
+<button class="help-btn" title="Help">?</button>
+
+<script src="admin2.js"></script>
+</body>
+</html>

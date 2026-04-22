@@ -1,0 +1,539 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #dbeafe 0%, #ffffff 50%, #cffafe 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* ── Floating bubbles ───────────────────────────────────────── */
+.bubble {
+    position: fixed;
+    bottom: -150px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%,
+            rgba(180, 215, 245, 0.55),
+            rgba(130, 185, 230, 0.2));
+    border: 1px solid rgba(160, 205, 240, 0.35);
+    animation: floatUp linear infinite;
+    pointer-events: none;
+    z-index: 0;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.9;
+    }
+
+    90% {
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: translateY(-110vh);
+        opacity: 0;
+    }
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+header {
+    text-align: center;
+    padding: 52px 20px 40px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Icon + text side by side, centred */
+.logo-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+/* Blue rounded-square box */
+.logo-icon {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(145deg, #1a6ff0 0%, #0ea5e9 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 22px rgba(26, 111, 240, 0.32);
+    flex-shrink: 0;
+}
+
+/* Text block to the right of icon */
+.logo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.logo-text h1 {
+    font-size: 2.7rem;
+    font-weight: 800;
+    color: #1a6ff0;
+    letter-spacing: -0.5px;
+    line-height: 1;
+}
+
+.logo-text .tagline {
+    font-size: 0.92rem;
+    color: #64748b;
+    font-style: italic;
+    margin-top: 3px;
+}
+
+/* Subtitle below the logo block */
+header .subtitle {
+    font-size: 1.05rem;
+    color: #334155;
+    max-width: 580px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+/* ── Feature Cards ──────────────────────────────────────────── */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 980px;
+    margin: 0 auto 40px;
+    padding: 0 28px;
+    position: relative;
+    z-index: 1;
+}
+
+.feature-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 28px 24px 32px;
+    border: 1.5px solid #dde6f0;
+    box-shadow: none;
+    transition: box-shadow 0.25s, transform 0.25s;
+}
+
+.feature-card:hover {
+    box-shadow: 0 6px 24px rgba(148, 163, 184, 0.15);
+    transform: translateY(-3px);
+}
+
+/* Icon sits directly on card — no background box */
+.feature-icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-icon svg {
+    width: 44px;
+    height: 44px;
+}
+
+.feature-icon.blue svg {
+    color: #2563eb;
+}
+
+.feature-icon.cyan svg {
+    color: #0891b2;
+}
+
+.feature-icon.navy svg {
+    color: #3730a3;
+}
+
+.feature-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+}
+
+.feature-card p {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.65;
+}
+
+/* ── Access Card ─────────────────────────────────────────────── */
+.access-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 36px 36px 32px;
+    max-width: 530px;
+    margin: 0 auto 80px;
+    box-shadow: 0 4px 32px rgba(148, 163, 184, 0.15);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    z-index: 1;
+}
+
+.access-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 5px;
+}
+
+.access-subtext {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 26px;
+    line-height: 1.45;
+}
+
+/* ── Toggle ──────────────────────────────────────────────────── */
+.toggle-container {
+    display: flex;
+    background: #f1f3f5;
+    border-radius: 50px;
+    padding: 4px;
+    margin-bottom: 28px;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    background: transparent;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.toggle-btn.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Form ────────────────────────────────────────────────────── */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.input-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.input-group input {
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #1e293b;
+    background: #f8fafc;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    font-family: inherit;
+}
+
+.input-group input::placeholder {
+    color: #94a3b8;
+}
+
+.input-group input:focus {
+    border-color: #3b82f6;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* ── Primary Button ──────────────────────────────────────────── */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, #1a6ff0 0%, #0ea5e9 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4);
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 22px rgba(14, 165, 233, 0.5);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ── Demo Box ────────────────────────────────────────────────── */
+.demo-box {
+    margin-top: 24px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px 18px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 4px rgba(148, 163, 184, 0.08);
+}
+
+.demo-box h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.demo-box p {
+    font-size: 0.8rem;
+    color: #475569;
+    line-height: 1.9;
+}
+
+/* ── Signup note ─────────────────────────────────────────────── */
+.signup-note {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    text-align: center;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+/* ── Message ─────────────────────────────────────────────────── */
+#message {
+    text-align: center;
+    padding: 8px;
+    font-size: 0.875rem;
+    color: #16a34a;
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 720px) {
+    .features-grid {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+    }
+
+    .logo-text h1 {
+        font-size: 2rem;
+    }
+
+    .logo-icon {
+        width: 58px;
+        height: 58px;
+        border-radius: 16px;
+    }
+
+    .access-card {
+        margin: 0 16px 60px;
+        padding: 28px 22px;
+    }
+}
+
+/* ── RESPONSIVE: nurse-style.css ── */
+@media (max-width: 1024px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .vitals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 0 16px;
+        height: auto;
+        min-height: 70px;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .header-text p {
+        display: none;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .notif-btn span,
+    .logout-btn span {
+        display: none;
+    }
+
+    .notif-btn,
+    .logout-btn {
+        padding: 8px 10px;
+    }
+
+    .main {
+        padding: 18px 16px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        padding: 18px 16px;
+    }
+
+    .stat-num {
+        font-size: 28px;
+    }
+
+    .tabs {
+        display: flex;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        padding: 4px;
+    }
+
+    .tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab {
+        flex-shrink: 0;
+    }
+
+    .panel {
+        padding: 18px 16px;
+    }
+
+    .diag-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .diag-actions {
+        flex-direction: column;
+    }
+
+    .btn-approve,
+    .btn-reject {
+        width: 100%;
+    }
+
+    .patient-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .vital-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .vital-btns {
+        width: 100%;
+    }
+
+    .btn-record,
+    .btn-history {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .vitals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .schedule-table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 14px 12px;
+    }
+
+    .stat-num {
+        font-size: 24px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .vitals-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .vital-stat-val {
+        font-size: 13px;
+    }
+
+    .panel-title {
+        font-size: 15px;
+    }
+
+    .ai-analysis-box {
+        padding: 14px;
+    }
+
+    .toast {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        text-align: center;
+    }
+}

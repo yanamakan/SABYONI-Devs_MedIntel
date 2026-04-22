@@ -50,9 +50,8 @@ function displayMessage(text, isError = true) {
 
 // ===== LOGOUT =====
 function handleLogout() {
-  if (confirm("Are you sure you want to logout?")) {
     window.location.href = "login.html";
-  }
+  
 }
 
 // ===== MAIN TAB SWITCHING =====

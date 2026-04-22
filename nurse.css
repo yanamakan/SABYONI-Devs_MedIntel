@@ -400,7 +400,7 @@
   .vital-stat-val   { font-size: 13px; }
 
   /* ── SCHEDULE TABLE ── */
-  .schedule-table { min-width: 460px; }
+  .schedule-table { min-width: 460px;}
   .schedule-table thead tr th,
   .schedule-table tbody tr td { padding: 10px 10px; font-size: 12px; }
 

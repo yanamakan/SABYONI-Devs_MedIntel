@@ -7,7 +7,7 @@ const SUPABASE_URL = "https://epuphcvapnqngdwgwpyu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwdXBoY3ZhcG5xbmdkd2d3cHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Mjg4MDUsImV4cCI6MjA4OTUwNDgwNX0.1sdd1YzWfh0KbSENK8oZJ-iMHlrcjeKMcFCfFjRgXZ4";
 
 // Vercel API URL — updated after deployment
-let VERCEL_API_URL = "https://medintel-israel.vercel.app";
+let VERCEL_API_URL = "https://sabyoni-devs-med-intel.vercel.app";
 
 const params = new URLSearchParams(window.location.search);
 const patientId = params.get("patientId");

@@ -1,6 +1,5 @@
 import { fetchAllPatients } from "../models/patientModel.js";
 import { runSentinelAnalysis } from "./sentinelService.js";
-import { getSimulatorStatus } from "../models/settingsModel.js";
 
 function generateVitals() {
   return {
@@ -13,13 +12,6 @@ function generateVitals() {
 }
 
 export async function sendReadings() {
-  const running = await getSimulatorStatus();
-
-  if (!running) {
-    console.log("Simulator paused...");
-    return;
-  }
-
   const patients = await fetchAllPatients();
 
   if (!patients || patients.length === 0) {
@@ -28,6 +20,11 @@ export async function sendReadings() {
   }
 
   for (const patient of patients) {
+    if (!patient.simulator_active) {
+      console.log(`Simulator inactive for ${patient.first_name} ${patient.last_name}, skipping...`);
+      continue;
+    }
+
     const vitals = generateVitals();
     console.log(`Generating vitals for ${patient.first_name} ${patient.last_name}...`);
 

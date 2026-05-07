@@ -6,7 +6,6 @@
 const SUPABASE_URL = "https://epuphcvapnqngdwgwpyu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwdXBoY3ZhcG5xbmdkd2d3cHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Mjg4MDUsImV4cCI6MjA4OTUwNDgwNX0.1sdd1YzWfh0KbSENK8oZJ-iMHlrcjeKMcFCfFjRgXZ4";
 
-// Vercel API URL — updated after deployment
 let VERCEL_API_URL = "https://sabyoni-devs-med-intel.vercel.app";
 
 const params = new URLSearchParams(window.location.search);
@@ -20,11 +19,11 @@ let currentPatient = null;
 let currentAnalysis = null;
 
 const VITALS_CONFIG = {
-  heart_rate:               { label: "Heart Rate",        color: "#E05C6A", unit: "bpm"  },
-  blood_pressure_systolic:  { label: "BP Systolic",       color: "#4A9FD4", unit: "mmHg" },
-  blood_pressure_diastolic: { label: "BP Diastolic",      color: "#60a5fa", unit: "mmHg" },
-  oxygen_saturation:        { label: "O2 Saturation",     color: "#48C9A9", unit: "%"    },
-  temperature:              { label: "Temperature",       color: "#F0A500", unit: "°C"   },
+  heart_rate:               { label: "Heart Rate",    color: "#E05C6A", unit: "bpm"  },
+  blood_pressure_systolic:  { label: "BP Systolic",   color: "#4A9FD4", unit: "mmHg" },
+  blood_pressure_diastolic: { label: "BP Diastolic",  color: "#60a5fa", unit: "mmHg" },
+  oxygen_saturation:        { label: "O2 Saturation", color: "#48C9A9", unit: "%"    },
+  temperature:              { label: "Temperature",   color: "#F0A500", unit: "°C"   },
 };
 
 const COLORS = {
@@ -39,7 +38,7 @@ const COLORS = {
 
 async function fetchPatient() {
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/patients?patient_id=eq.${patientId}&select=first_name,last_name,at_risk,risk_reason`,
+    `${SUPABASE_URL}/rest/v1/patients?patient_id=eq.${patientId}&select=first_name,last_name,at_risk,risk_reason,simulator_active`,
     { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
   );
   if (!res.ok) throw new Error("Failed to fetch patient");
@@ -69,7 +68,7 @@ async function fetchAlertHistory() {
 // ── SIMULATOR CONTROLS ─────────────────────────────
 
 async function startSimulator() {
-  await fetch(`${SUPABASE_URL}/rest/v1/settings?key=eq.simulator_running`, {
+  await fetch(`${SUPABASE_URL}/rest/v1/patients?patient_id=eq.${patientId}`, {
     method: "PATCH",
     headers: {
       apikey: SUPABASE_ANON_KEY,
@@ -77,7 +76,7 @@ async function startSimulator() {
       "Content-Type": "application/json",
       "Prefer": "return=minimal",
     },
-    body: JSON.stringify({ value: "true" }),
+    body: JSON.stringify({ simulator_active: true }),
   });
   document.getElementById("sim-status").textContent = "● LIVE";
   document.getElementById("sim-status").className = "running";
@@ -85,7 +84,7 @@ async function startSimulator() {
 }
 
 async function stopSimulator() {
-  await fetch(`${SUPABASE_URL}/rest/v1/settings?key=eq.simulator_running`, {
+  await fetch(`${SUPABASE_URL}/rest/v1/patients?patient_id=eq.${patientId}`, {
     method: "PATCH",
     headers: {
       apikey: SUPABASE_ANON_KEY,
@@ -93,7 +92,7 @@ async function stopSimulator() {
       "Content-Type": "application/json",
       "Prefer": "return=minimal",
     },
-    body: JSON.stringify({ value: "false" }),
+    body: JSON.stringify({ simulator_active: false }),
   });
   document.getElementById("sim-status").textContent = "● PAUSED";
   document.getElementById("sim-status").className = "paused";
@@ -290,7 +289,6 @@ async function runAnalysis() {
   btn.disabled = true;
 
   try {
-    // Call Vercel API securely — Groq key stays on the server
     const res = await fetch(
       `${VERCEL_API_URL}/api/sentinel?patientId=${patientId}`
     );
@@ -299,7 +297,6 @@ async function runAnalysis() {
 
     currentAnalysis = await res.json();
 
-    // Fetch latest vitals to update cards
     const vitalsRes = await fetch(
       `${SUPABASE_URL}/rest/v1/patient_vitals?patient_id=eq.${patientId}&order=timestamp.desc&limit=1`,
       { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
@@ -375,6 +372,16 @@ async function loadPage() {
     if (patient) {
       document.getElementById("patientName").textContent =
         `${patient.first_name} ${patient.last_name} ${patient.at_risk ? "— ⚠ AT RISK" : "— Stable"}`;
+
+      // Sync simulator button state with DB
+      if (patient.simulator_active) {
+        document.getElementById("sim-status").textContent = "● LIVE";
+        document.getElementById("sim-status").className = "running";
+        startAutoRefresh();
+      } else {
+        document.getElementById("sim-status").textContent = "● PAUSED";
+        document.getElementById("sim-status").className = "paused";
+      }
     }
 
     if (vitals.length > 0) {
@@ -383,7 +390,6 @@ async function loadPage() {
     }
 
     await loadAlertHistory();
-    startAutoRefresh();
 
   } catch (err) {
     console.error("Page load error:", err.message);

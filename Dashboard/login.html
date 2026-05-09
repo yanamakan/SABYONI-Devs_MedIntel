@@ -34,55 +34,19 @@
         </div>
         <p class="subtitle">Revolutionizing healthcare with AI-powered patient management and centralized medical records</p>
     </header>
-    <!-- Header Section -->
-    <!--<header>
-      <h1>MedIntel</h1>
-      <p><small>Intelligent Medical Support</small></p>
-      <p>
-        Revolutionizing healthcare with AI-powered patient management and
-        centralized medical records
-      </p>
 
-    </header>-->
-
-    <!--<section class="features-grid">
-        <div class="feature-card">
-            <div class="feature-icon blue">🧠</div>
-            <h3>AI-Powered Triage</h3>
-            <p>Intelligent symptom analysis and urgency categorization to optimize patient flow</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon cyan">🧬</div>
-            <h3>Centralized Records</h3>
-            <p>Secure cloud-based storage for complete patient histories and prescriptions</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon navy">🛡️</div>
-            <h3>POPIA Compliant</h3>
-            <p>Enterprise-grade security with encrypted data and role-based access control</p>
-        </div>
-    </section>-->
-
-     
     <!-- Feature Cards -->
     <section class="features-grid">
  
-        <!-- Card 1: Brain icon – blue #2563eb -->
+        <!-- Card 1 -->
         <div class="feature-card">
             <div class="feature-icon blue">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- left hemisphere -->
                     <path d="M9.5 3C7 3 5 5 5 7.5C5 8.6 5.4 9.6 6.1 10.3C4.8 11 4 12.4 4 14C4 16.2 5.8 18 8 18H9V21H12V18"/>
-                    <!-- right hemisphere -->
                     <path d="M14.5 3C17 3 19 5 19 7.5C19 8.6 18.6 9.6 17.9 10.3C19.2 11 20 12.4 20 14C20 16.2 18.2 18 16 18H15V21H12V18"/>
-                    <!-- centre divider -->
                     <line x1="12" y1="3" x2="12" y2="18"/>
-                    <!-- left details -->
                     <path d="M6 11.5 Q7.5 13 9 11.5"/>
                     <path d="M5.5 8.5 Q7 10 8.5 8.5"/>
-                    <!-- right details -->
                     <path d="M18 11.5 Q16.5 13 15 11.5"/>
                     <path d="M18.5 8.5 Q17 10 15.5 8.5"/>
                 </svg>
@@ -91,7 +55,7 @@
             <p>Intelligent symptom analysis and urgency categorization to optimize patient flow</p>
         </div>
  
-        <!-- Card 2: Pulse/heartbeat icon – teal #0891b2 -->
+        <!-- Card 2 -->
         <div class="feature-card">
             <div class="feature-icon cyan">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -102,7 +66,7 @@
             <p>Secure cloud-based storage for complete patient histories and prescriptions</p>
         </div>
  
-        <!-- Card 3: Shield with checkmark – navy #3730a3 -->
+        <!-- Card 3 -->
         <div class="feature-card">
             <div class="feature-icon navy">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -115,7 +79,6 @@
         </div>
  
     </section>
-
 
     <div class="access-card">
         <h3>Access MedIntel</h3>
@@ -194,64 +157,70 @@
             document.getElementById("loginTab").classList.remove("active");
         }
 
-        /*function handleLogin() {
-            // Add your login logic here (e.g., redirecting to dashboard)
-            window.location.href = 'super-admin.html';
-        }*/
-       function handleLogin() {
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
-    const messageEl = document.getElementById("message");
+        function handleLogin() {
+          const email = document.getElementById("loginEmail").value.trim();
+          const password = document.getElementById("loginPassword").value.trim();
+          const messageEl = document.getElementById("message");
 
-    const users = {
-        "superadmin@medintel.com": { password: "super123",  redirect: "super-admin.html" },
-        "admin@medintel.com":      { password: "admin123",  redirect: "admin2.html" },
-        "doctor@medintel.com":     { password: "doctor123", redirect: "doctor-dash.html" },
-        "nurse@medintel.com":      { password: "nurse123",  redirect: "nurse.html" },
-        "patient@example.com":     { password: "patient123",redirect: "patient.html" }
-    };
+          const users = {
+            "superadmin@medintel.com": { password: "super123",  redirect: "super-admin.html", role: "superadmin", name: "Super Admin", department: "Administration" },
+            "admin@medintel.com":      { password: "admin123",  redirect: "admin2.html",       role: "admin",      name: "Admin User",  department: "Administration" },
+            "doctor@medintel.com":     { password: "doctor123", redirect: "doctor-dash.html",  role: "doctor",     name: "Dr. Michael Chen", department: "General Practice" },
+            "nurse@medintel.com":      { password: "nurse123",  redirect: "nurse.html",        role: "nurse",      name: "Alice Williams",   department: "Emergency Department" },
+            "patient@example.com":     { password: "patient123",redirect: "patient.html",      role: "patient",    name: "James Wilson", department: "" }
+          };
 
-    if (!email || !password) {
-        messageEl.style.cssText = "color:#ef4444; text-align:center; margin-top:12px; font-size:14px;";
-        messageEl.textContent = "Please enter your email and password.";
-        return;
-    }
+          if (!email || !password) {
+            messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
+            messageEl.textContent = "Please enter your email and password.";
+            return;
+          }
 
-    const user = users[email];
+          const user = users[email];
 
-    if (user && user.password === password) {
-        messageEl.style.cssText = "color:#16a34a; text-align:center; margin-top:12px; font-size:14px;";
-        messageEl.textContent = "Login successful! Redirecting...";
-        setTimeout(() => {
-            window.location.href = user.redirect;
-        }, 800);
-    } else {
-        messageEl.style.cssText = "color:#ef4444; text-align:center; margin-top:12px; font-size:14px;";
-        messageEl.textContent = "Invalid email or password. Please try again.";
-    }
-}
-    
+          if (user && user.password === password) {
 
-         // Floating bubbles
-    (function() {
-        const sizes  = [30, 50, 70, 90, 110, 140];
-        const lefts  = [5, 12, 22, 35, 48, 58, 68, 78, 88, 95];
-        const delays = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
-        const durations = [10, 13, 16, 19, 22];
+            // Save user info to localStorage
+            localStorage.setItem('medintel_user', JSON.stringify({
+              email,
+              role: user.role,
+              name: user.name,
+              department: user.department,
+            }));
 
-        lefts.forEach((left, i) => {
-            const el = document.createElement('div');
-            el.className = 'bubble';
-            el.style.cssText = `
-                width: ${sizes[i % sizes.length]}px;
-                height: ${sizes[i % sizes.length]}px;
-                left: ${left}%;
-                animation-duration: ${durations[i % durations.length]}s;
-                animation-delay: ${delays[i]}s;
-            `;
-            document.body.appendChild(el);
-        });
-    })();
+            messageEl.style.cssText = "color:#16a34a;text-align:center;margin-top:12px;font-size:14px;";
+            messageEl.textContent = "Login successful! Redirecting...";
+
+            setTimeout(() => {
+              window.location.href = user.redirect;
+            }, 800);
+
+          } else {
+            messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
+            messageEl.textContent = "Invalid email or password. Please try again.";
+          }
+        }
+
+        // Floating bubbles
+        (function() {
+            const sizes  = [30, 50, 70, 90, 110, 140];
+            const lefts  = [5, 12, 22, 35, 48, 58, 68, 78, 88, 95];
+            const delays = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
+            const durations = [10, 13, 16, 19, 22];
+
+            lefts.forEach((left, i) => {
+                const el = document.createElement('div');
+                el.className = 'bubble';
+                el.style.cssText = `
+                    width: ${sizes[i % sizes.length]}px;
+                    height: ${sizes[i % sizes.length]}px;
+                    left: ${left}%;
+                    animation-duration: ${durations[i % durations.length]}s;
+                    animation-delay: ${delays[i]}s;
+                `;
+                document.body.appendChild(el);
+            });
+        })();
 
     </script>
 </body>

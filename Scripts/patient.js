@@ -118,7 +118,8 @@ window.onload = function () {
   
   updateNotificationUI();
 
-  setTimeout(() => addNotification("👋 Welcome back, James! You have 2 unread messages."), 1000);
+  const userName = sessionStorage.getItem("userName") || "there";
+setTimeout(() => addNotification("👋 Welcome back, " + userName + "! You have 2 unread messages."), 1000);
 
   // Dark mode toggle
   const darkToggle = document.getElementById('darkToggle');

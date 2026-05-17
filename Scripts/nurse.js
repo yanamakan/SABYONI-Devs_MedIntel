@@ -2,10 +2,9 @@
 const SUPABASE_URL = "https://epuphcvapnqngdwgwpyu.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwdXBoY3ZhcG5xbmdkd2d3cHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Mjg4MDUsImV4cCI6MjA4OTUwNDgwNX0.1sdd1YzWfh0KbSENK8oZJ-iMHlrcjeKMcFCfFjRgXZ4";
 
-
 // ======== SESSION ========
 function loadSession() {
-  const raw = localStorage.getItem('medintel_user');
+  const raw = sessionStorage.getItem('medintel_user');
   if (!raw) return null;
   return JSON.parse(raw);
 }
@@ -17,7 +16,6 @@ function applySessionToHeader() {
     nameEl.textContent = `${user.name} • ${user.department}`;
   }
 }
-
 
 // ======== SUPABASE FETCHERS ========
 async function fetchPatients() {
@@ -750,68 +748,6 @@ async function saveVitals() {
   }
 }
 
-// ======== MODAL HELPERS ========
-function showModal(id) {
-  document.getElementById(id).style.display = 'flex';
-}
-
-function closeModal(id) {
-  document.getElementById(id).style.display = 'none';
-}
-
-['record-modal', 'history-modal', 'patient-detail-modal', 'appointment-modal'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('click', function (e) {
-      if (e.target === this) closeModal(id);
-    });
-  }
-});
-
-// ======== LOGOUT ========
-function handleLogout() {
-  if (confirm('Are you sure you want to logout?')) {
-    localStorage.removeItem('medintel_user');
-    window.location.href = 'login.html';
-  }
-}
-
-// ======== TABS ========
-function switchTab(tabName) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById(`tab-${tabName}`).classList.add('active');
-  document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
-
-  if (tabName === 'patient') renderPatientCare();
-  if (tabName === 'schedule') renderSchedule();
-}
-
-// ======== TOAST ========
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-// ======== INIT ========
-async function init() {
-  applySessionToHeader();
-  await renderVitalsList();
-  const reports = await fetchPendingDiagnoses();
-  await renderStats(patients, reports.length);
-  await renderPendingDiagnoses();
-  await renderNotifications();
-
-  // Auto-refresh notifications every 30 seconds
-  setInterval(async () => {
-    await renderNotifications();
-  }, 30000);
-}
-
 // ======== NOTIFICATIONS ========
 let notificationsOpen = false;
 
@@ -839,6 +775,8 @@ async function renderNotifications() {
     badge.style.display = 'none';
   }
 
+  if (!list) return;
+
   if (notifications.length === 0) {
     list.innerHTML = `
       <div style="padding:32px 20px;text-align:center;color:#9ca3af;">
@@ -849,17 +787,8 @@ async function renderNotifications() {
     return;
   }
 
-  const typeIcon = {
-    diagnosis: '🧠',
-    critical_alert: '⚠️',
-    appointment: '📅',
-  };
-
-  const typeColor = {
-    diagnosis: '#7c3aed',
-    critical_alert: '#dc2626',
-    appointment: '#0ea5e9',
-  };
+  const typeIcon = { diagnosis: '🧠', critical_alert: '⚠️', appointment: '📅' };
+  const typeColor = { diagnosis: '#7c3aed', critical_alert: '#dc2626', appointment: '#0ea5e9' };
 
   list.innerHTML = notifications.map(n => {
     const time = new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -932,14 +861,75 @@ async function clearAllNotifications() {
   toggleNotifications();
 }
 
-// Close dropdown when clicking outside
 document.addEventListener('click', function(e) {
   const dropdown = document.getElementById('notif-dropdown');
   const btn = document.querySelector('.notif-btn');
-  if (notificationsOpen && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+  if (notificationsOpen && dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
     dropdown.style.display = 'none';
     notificationsOpen = false;
   }
 });
+
+// ======== MODAL HELPERS ========
+function showModal(id) {
+  document.getElementById(id).style.display = 'flex';
+}
+
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+['record-modal', 'history-modal', 'patient-detail-modal', 'appointment-modal'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('click', function(e) {
+      if (e.target === this) closeModal(id);
+    });
+  }
+});
+
+// ======== LOGOUT ========
+function handleLogout() {
+  if (confirm('Are you sure you want to logout?')) {
+    sessionStorage.clear();
+    window.location.href = 'login.html';
+  }
+}
+
+// ======== TABS ========
+function switchTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+  document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+
+  if (tabName === 'patient') renderPatientCare();
+  if (tabName === 'schedule') renderSchedule();
+}
+
+// ======== TOAST ========
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ======== INIT ========
+async function init() {
+  applySessionToHeader();
+  await renderVitalsList();
+  const reports = await fetchPendingDiagnoses();
+  await renderStats(patients, reports.length);
+  await renderPendingDiagnoses();
+  await renderNotifications();
+
+  // Auto-refresh notifications every 30 seconds
+  setInterval(async () => {
+    await renderNotifications();
+  }, 30000);
+}
 
 init();

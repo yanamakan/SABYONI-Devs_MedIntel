@@ -3,8 +3,8 @@
 // Timeout: 30 minutes of inactivity
 // Warning: shown at 25 minutes
 
-const SESSION_TIMEOUT = 30 * 60 * 1000;    // 30 minutes
-const SESSION_WARNING = 25 * 60 * 1000;    // 25 minutes
+const SESSION_TIMEOUT = 30 * 60 * 1000;
+const SESSION_WARNING = 25 * 60 * 1000;
 const SESSION_KEY = 'medintel_user';
 
 let timeoutTimer;
@@ -92,7 +92,7 @@ function extendSession() {
 function sessionLogout() {
   clearTimers();
   hideWarning();
-  localStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
   window.location.href = 'login.html';
 }
 
@@ -115,22 +115,54 @@ function clearTimers() {
   clearTimeout(timeoutTimer);
 }
 
+// Check system status
+async function checkSystemStatus() {
+  try {
+    if (window.location.pathname.includes('super-admin.html')) return;
+
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/settings?key=eq.system_status`,
+      {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      }
+    );
+    const data = await res.json();
+    if (data[0]?.value === 'offline') {
+      sessionStorage.clear();
+
+      // Find the maintenance.html relative to current page location
+      const currentPath = window.location.pathname;
+      const dashboardIndex = currentPath.indexOf('/Dashboard/');
+      
+      if (dashboardIndex !== -1) {
+        // We are inside Dashboard folder — maintenance.html is in the same folder
+        const basePath = currentPath.substring(0, dashboardIndex);
+        window.location.href = window.location.origin + basePath + '/Dashboard/maintenance.html';
+      } else {
+        // Fallback
+        window.location.href = 'maintenance.html';
+      }
+    }
+  } catch (e) {}
+}
+
 // ======== ACTIVITY LISTENERS ========
 function initSessionManager() {
-  // Check if user is logged in
-  const user = localStorage.getItem(SESSION_KEY);
+
+  checkSystemStatus();
+
+  const user = sessionStorage.getItem(SESSION_KEY);
   if (!user) {
     window.location.href = 'login.html';
     return;
   }
 
-  // Create the warning modal
   createWarningModal();
-
-  // Start timers
   resetTimers();
 
-  // Reset on any user activity
   ['mousemove', 'mousedown', 'keypress', 'touchstart', 'click', 'scroll'].forEach(event => {
     document.addEventListener(event, () => {
       if (!warningShown) resetTimers();

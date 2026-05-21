@@ -1,8 +1,4 @@
-const express = require("express");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,6 +14,13 @@ export default async function handler(req, res) {
     if (!symptoms || !symptoms.trim()) {
       return res.status(400).json({ error: 'No symptoms provided' });
     }
+
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const patientContext = patientName
       ? `Patient: ${patientName}${patientAge ? `, Age: ${patientAge}` : ''}${patientGender ? `, Gender: ${patientGender}` : ''}.`
@@ -37,7 +40,7 @@ Guidelines:
 - Use clear plain language — avoid excessive medical jargon
 - Always err on the side of caution for serious or emergency symptoms
 - Never diagnose definitively — only suggest possibilities
-- Structure your response with clear sections using headers like ## Possible Conditions, ## Recommended Next Steps, ## General Guidance
+- Structure your response with clear sections: ## Possible Conditions, ## Recommended Next Steps, ## General Guidance
 - Keep responses concise but thorough (300-500 words)
 - End every response with: "⚠️ This assessment is for informational purposes only. Always consult your doctor or a qualified healthcare professional for proper diagnosis and treatment."
 
@@ -47,8 +50,7 @@ Patient's described symptoms:
 ${symptoms}`;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = result.response.text();
 
     if (!text) {
       return res.status(502).json({ error: 'ARIA did not return a response. Please try again.' });
@@ -61,7 +63,7 @@ ${symptoms}`;
     });
 
   } catch (err) {
-    console.error('ARIA handler error:', err);
+    console.error('ARIA handler error:', err.message);
     return res.status(500).json({ error: 'ARIA error: ' + err.message });
   }
 }

@@ -28,7 +28,7 @@ async function handleLogin() {
 
   const { data: userData, error: roleError } = await client
     .from("users")
-    .select("role")
+    .select("role, full_name, phone")
     .eq("id", userId)
     .single();
 
@@ -65,8 +65,7 @@ async function handleLogin() {
       .eq('user_id', userId)
       .single();
     if (patientData) {
-      userName = `${patientData.first_name} ${patientData.last_name}`.trim();
-      department = '';
+      userName = `${patientData.first_name || ''} ${patientData.last_name || ''}`.trim() || email.split('@')[0];
     }
   } else if (role === 'nurse') {
     const { data: nurseData } = await client
@@ -103,12 +102,13 @@ async function handleLogin() {
     department = 'Administration';
   }
 
-  // ── Save session to sessionStorage ──
+  // ── Save session — NOW INCLUDES id ──
   sessionStorage.setItem('userRole', role);
   sessionStorage.setItem('userEmail', email);
   sessionStorage.setItem('userId', userId);
   sessionStorage.setItem('userName', userName);
   sessionStorage.setItem('medintel_user', JSON.stringify({
+    id: userId,        // ← THE FIX — was missing before
     email,
     role,
     name: userName,
@@ -137,14 +137,14 @@ async function handleLogin() {
 
 // ===== SIGN UP =====
 async function handleSignUp() {
-  const fullName = document.getElementById("signupName").value.trim();
+  const fullName  = document.getElementById("signupName").value.trim();
   const firstName = fullName.split(" ")[0];
-  const lastName = fullName.split(" ").slice(1).join(" ") || "";
-  const email = document.getElementById("signupEmail").value.trim();
-  const phone = document.getElementById("signupPhone").value.trim();
-  const dob = document.getElementById("signupDob").value;
-  const password = document.getElementById("signupPassword").value.trim();
-  const confirm = document.getElementById("Confirm_signupPassword").value.trim();
+  const lastName  = fullName.split(" ").slice(1).join(" ") || "";
+  const email     = document.getElementById("signupEmail").value.trim();
+  const phone     = document.getElementById("signupPhone").value.trim();
+  const dob       = document.getElementById("signupDob").value;
+  const password  = document.getElementById("signupPassword").value.trim();
+  const confirm   = document.getElementById("Confirm_signupPassword").value.trim();
   const messageEl = document.getElementById("message");
 
   if (!fullName || !email || !phone || !dob || !password || !confirm) {
@@ -164,57 +164,58 @@ async function handleSignUp() {
 
   const { data, error } = await client.auth.signUp({ email, password });
 
-if (error) {
-  messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
-  messageEl.textContent = error.message;
-  return;
-}
+  if (error) {
+    messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
+    messageEl.textContent = error.message;
+    return;
+  }
 
-// When email confirmation is ON, user is created but session is null
-// We still get the user ID from data.user
-if (!data.user) {
+  if (!data.user || !data.user.id) {
+    messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
+    messageEl.textContent = "This email may already be registered. Please try logging in.";
+    return;
+  }
+
+  const userId = data.user.id;
+
+  // Insert into users table
+  const { error: userInsertError } = await client
+    .from("users")
+    .insert([{ id: userId, email, role: "patient" }]);
+
+  if (userInsertError) {
+    messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
+    messageEl.textContent = "Error saving user: " + userInsertError.message;
+    return;
+  }
+
+  // Insert into patients table
+  const { error: patientInsertError } = await client
+    .from("patients")
+    .insert([{ user_id: userId, first_name: firstName, last_name: lastName, dob, phone }]);
+
+  if (patientInsertError) {
+    messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
+    messageEl.textContent = "Error saving patient info: " + patientInsertError.message;
+    return;
+  }
+
+  // ── Save session with id and redirect immediately ──
+  sessionStorage.setItem('userRole', 'patient');
+  sessionStorage.setItem('userEmail', email);
+  sessionStorage.setItem('userId', userId);
+  sessionStorage.setItem('userName', fullName);
+  sessionStorage.setItem('medintel_user', JSON.stringify({
+    id: userId,        // ← included from the start
+    email,
+    role: 'patient',
+    name: fullName,
+    department: '',
+  }));
+
   messageEl.style.cssText = "color:#16a34a;text-align:center;margin-top:12px;font-size:14px;";
-  messageEl.textContent = "Account created! Please check your email to confirm your account before logging in.";
-  return;
-}
+  messageEl.textContent = "Account created! Redirecting...";
 
-// Supabase returns empty user if email already registered
-if (!data.user || !data.user.id) {
-  messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
-  messageEl.textContent = "This email may already be registered. Please try logging in.";
-  return;
-}
-
-const userId = data.user.id;
-
-const { error: userInsertError } = await client
-  .from("users")
-  .insert([{ id: userId, email, role: "patient" }]);
-
-if (userInsertError) {
-  messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
-  messageEl.textContent = "Error saving user: " + userInsertError.message;
-  return;
-}
-
-const { error: patientInsertError } = await client
-  .from("patients")
-  .insert([{ user_id: userId, first_name: firstName, last_name: lastName, dob, phone }]);
-
-if (patientInsertError) {
-  messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
-  messageEl.textContent = "Error saving patient info: " + patientInsertError.message;
-  return;
-}
-
-sessionStorage.setItem('userRole', 'patient');
-sessionStorage.setItem('userEmail', email);
-sessionStorage.setItem('userId', userId);
-sessionStorage.setItem('userName', fullName);
-sessionStorage.setItem('medintel_user', JSON.stringify({
-  email, role: 'patient', name: fullName, department: '',
-}));
-
-messageEl.style.cssText = "color:#16a34a;text-align:center;margin-top:12px;font-size:14px;";
-messageEl.textContent = "Account created! Please check your email to confirm your account before logging in.";
+  // Redirect directly — no email confirmation needed
+  setTimeout(() => window.location.href = 'patient.html', 800);
 }

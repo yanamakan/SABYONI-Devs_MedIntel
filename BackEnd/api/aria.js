@@ -76,7 +76,7 @@ ${patientContext}`;
     };
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,9 +85,9 @@ ${patientContext}`;
     );
 
     if (!geminiRes.ok) {
-      const errBody = await geminiRes.text();
-      console.error('Gemini API error:', errBody);
-      return res.status(502).json({ error: 'ARIA is temporarily unavailable. Please try again shortly.' });
+        const errBody = await geminiRes.text();
+        console.error('Gemini API error:', errBody);
+        return res.status(502).json({ error: 'Gemini error: ' + errBody });
     }
 
     const geminiData = await geminiRes.json();

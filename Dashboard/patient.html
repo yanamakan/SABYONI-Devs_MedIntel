@@ -150,6 +150,8 @@
 
   <!-- ===== AI HEALTH ASSISTANT ===== -->
   <section id="aiHealthAssistantSection" class="tab-content" style="display:none;">
+
+    <!-- Top row: input card + result panel side by side -->
     <div class="portal-row">
       <div class="content-box ai-input-card">
         <div class="ai-card-header">
@@ -168,17 +170,24 @@
           <label>Describe Your Symptoms</label>
           <textarea id="symptomsInput" placeholder="E.g., I've been experiencing headaches and mild fever for 2 days..."></textarea>
         </div>
-        <button class="btn-ai-gradient" onclick="getAIAnalysis()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
-            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
-          </svg>
-          Get AI Analysis
-        </button>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn-ai-gradient" onclick="getAIAnalysis()" style="flex:1;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+            </svg>
+            Get AI Analysis
+          </button>
+          <!-- HISTORY BUTTON — sits next to the main button -->
+          <button class="aria-history-btn" onclick="toggleChatHistoryPanel()" title="View chat history">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            History
+          </button>
+        </div>
         <p class="disclaimer-text">AI assistance is for informational purposes only. Always consult with a healthcare professional.</p>
       </div>
 
-      <!-- ARIA RESULT PANEL — replaces the empty state card -->
+      <!-- ARIA RESULT PANEL -->
       <div id="ariaResultPanel" class="content-box" style="display:none;">
         <div id="ariaResultContent"></div>
       </div>
@@ -196,6 +205,24 @@
         </div>
       </div>
     </div>
+
+    <!-- SLIDE-OUT PANEL — outside portal-row, at section level -->
+    <div id="ariaHistoryPanel" class="aria-history-panel">
+      <div class="aria-history-panel-header">
+        <div>
+          <h4>ARIA Chat History</h4>
+          <p>Your previous health assessments</p>
+        </div>
+        <button class="aria-history-close" onclick="toggleChatHistoryPanel()">✕</button>
+      </div>
+      <div id="ariaChatHistory" class="aria-history-list">
+        <div class="loading-row">Loading...</div>
+      </div>
+    </div>
+
+    <!-- OVERLAY — also outside portal-row -->
+    <div id="ariaHistoryOverlay" class="aria-history-overlay" onclick="toggleChatHistoryPanel()"></div>
+
   </section>
 
   <!-- ===== APPOINTMENTS ===== -->
@@ -243,95 +270,57 @@
     </div>
   </section>
 
-  <!-- ===== CLINIC MAP ===== -->
+    <!-- ===== CLINIC MAP ===== -->
   <section id="clinicMapSection" class="tab-content" style="display:none;">
     <div class="map-container-box">
+
+      <!-- Header -->
       <div class="map-main-header">
         <h3>Clinic Map</h3>
-        <p>Find your way to the clinic</p>
+        <p>Find nearby clinics and pharmacies based on your location</p>
       </div>
+
+      <!-- Search bar + filter toggle -->
       <div class="map-sub-header">
         <div class="map-title-group">
-          <h4>Find Nearby Clinics &amp; Pharmacies</h4>
-          <p>6 facilities found near you</p>
+          <h4 id="mapResultTitle">Finding facilities near you...</h4>
+          <p id="mapResultCount">Waiting for location</p>
         </div>
         <div class="map-filter-toggle">
-          <button class="toggle-btn active">
+          <button class="toggle-btn active" id="filterNearest" onclick="setMapFilter('nearest', this)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
             Nearest
           </button>
-          <button class="toggle-btn">
+          <button class="toggle-btn" id="filterTopRated" onclick="setMapFilter('top_rated', this)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             Top Rated
           </button>
         </div>
       </div>
-      <div class="map-interactive-area">
-        <span class="map-pin" style="top:20%;left:15%;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="#ef4444"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>
-        </span>
-        <span class="map-pin" style="bottom:25%;left:35%;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="#22c55e"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>
-        </span>
-        <span class="map-pin" style="top:45%;right:15%;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="#3b82f6"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>
-        </span>
-        <div class="map-center-content">
-          <div class="big-blue-pin">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="#3b82f6"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>
-          </div>
-          <h4>Interactive Map View</h4>
-          <p>Map integration ready for deployment. Shows clinic locations with interactive markers and navigation.</p>
-          <button class="btn-location-services">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            Enable Location Services
-          </button>
+
+      <!-- Map canvas -->
+      <div id="googleMap" class="google-map-canvas">
+        <div class="map-loading-state" id="mapLoadingState">
+          <div class="map-loading-spinner"></div>
+          <p>Getting your location...</p>
         </div>
       </div>
-      <div class="facility-display-grid">
-        <div class="facility-item-card">
-          <div class="card-top"><h5>City Medical Center</h5><span class="badge nearby">Nearby</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.8 <span class="dot">•</span> 1.2 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> 123 Main Street, Johannesburg</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 123 4567 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mon-Fri: 8AM-6PM</p>
-          <div class="tag-row"><span class="f-tag">General Practice</span><span class="f-tag">Pharmacy</span><span class="f-tag">Emergency</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Sandton Health Clinic</h5><span class="badge close">Close</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.6 <span class="dot">•</span> 2.5 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> 45 Rivonia Road, Sandton</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 234 5678 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mon-Sat: 7AM-8PM</p>
-          <div class="tag-row"><span class="f-tag">Specialists</span><span class="f-tag">Pharmacy</span><span class="f-tag">Lab Tests</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Melrose Arch Medical Centre</h5><span class="badge close">Close</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.7 <span class="dot">•</span> 3.2 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Melrose Arch, Johannesburg</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 678 9012 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mon-Sat: 8AM-7PM</p>
-          <div class="tag-row"><span class="f-tag">Specialists</span><span class="f-tag">Dentistry</span><span class="f-tag">Optometry</span><span class="f-tag">Pharmacy</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Rosebank Medical Plaza</h5><span class="badge close">Close</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.7 <span class="dot">•</span> 3.8 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> 78 Oxford Road, Rosebank</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 345 6789 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mon-Fri: 9AM-5PM</p>
-          <div class="tag-row"><span class="f-tag">General Practice</span><span class="f-tag">Pharmacy</span><span class="f-tag">Radiology</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Greenside Family Clinic</h5><span class="badge far">Far</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.5 <span class="dot">•</span> 4.1 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Gleneagles Road, Greenside</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 567 8901 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mon-Fri: 8AM-5PM</p>
-          <div class="tag-row"><span class="f-tag">General Practice</span><span class="f-tag">Pediatrics</span><span class="f-tag">Vaccinations</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Fourways Life Hospital</h5><span class="badge far">Far</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.9 <span class="dot">•</span> 5.2 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Cedar Road, Fourways</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 456 7890 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 24/7 Emergency</p>
-          <div class="tag-row"><span class="f-tag">Hospital</span><span class="f-tag">Emergency</span><span class="f-tag">Pharmacy</span><span class="f-tag">Surgery</span></div>
-        </div>
+
+      <!-- Location error state -->
+      <div id="mapErrorState" class="map-error-state" style="display:none;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <p id="mapErrorMsg">Location access denied.</p>
+        <button class="btn-location-services" onclick="initMap()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Try Again
+        </button>
       </div>
+
+      <!-- Facilities list -->
+      <div id="facilityList" class="facility-display-grid" style="margin-top:20px;">
+        <!-- populated by JS -->
+      </div>
+
     </div>
   </section>
 

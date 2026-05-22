@@ -28,27 +28,98 @@ function getSession() {
 }
 
 // ── NOTIFICATIONS ─────────────────────────────────────────────
-var notifications = [
-  "📅 Reminder: You have an upcoming appointment",
-  "💊 Your prescription refill may be due soon",
-  "📝 Your medical records have been updated"
-];
+// ── NOTIFICATIONS ─────────────────────────────────────────────
+var notifications = [];
 
 function updateNotificationUI() {
-  var listDiv = document.getElementById('notificationList');
+  var listDiv   = document.getElementById('notificationList');
   var countSpan = document.getElementById('notificationCount');
   if (!listDiv) return;
+
   if (notifications.length === 0) {
     listDiv.innerHTML = '<div style="color:#9ca3af;font-size:13px;padding:6px 0;">No new notifications</div>';
     if (countSpan) countSpan.style.display = 'none';
   } else {
     listDiv.innerHTML = notifications.map(function(n) {
-      return '<div>' + n + '</div>';
+      return '<div class="notif-item' + (n.is_read ? '' : ' notif-unread') + '">'
+        + '<span>' + n.message + '</span>'
+        + '<small style="display:block;color:#9ca3af;font-size:11px;margin-top:3px;">'
+        + getTimeAgo(n.created_at) + '</small>'
+        + '</div>';
     }).join('');
     if (countSpan) {
-      countSpan.textContent = notifications.length;
-      countSpan.style.display = 'inline-flex';
+      var unread = notifications.filter(function(n) { return !n.is_read; }).length;
+      if (unread > 0) {
+        countSpan.textContent = unread;
+        countSpan.style.display = 'inline-flex';
+      } else {
+        countSpan.style.display = 'none';
+      }
     }
+  }
+}
+
+async function loadNotifications() {
+  if (!supabaseClient || !currentPatient) return;
+  try {
+    var result = await supabaseClient
+      .from('nurse_notifications')
+      .select('*')
+      .eq('patient_id', currentPatient.patient_id)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (!result.error && result.data) {
+      notifications = result.data;
+      updateNotificationUI();
+    }
+
+    // Add welcome notification if none exist
+    if (!result.data || result.data.length === 0) {
+      await addNotificationToDB('👋 Welcome back, '
+        + (currentPatient.first_name || 'there') + '! Your portal is ready.');
+    }
+
+  } catch (err) {
+    console.error('loadNotifications error:', err);
+  }
+}
+
+async function addNotificationToDB(message, type) {
+  if (!supabaseClient || !currentPatient) return;
+  try {
+    var result = await supabaseClient
+      .from('nurse_notifications')
+      .insert({
+        message:    message,
+        patient_id: currentPatient.patient_id,
+        type:       type || 'info',
+        is_read:    false
+      })
+      .select()
+      .single();
+
+    if (!result.error && result.data) {
+      notifications.unshift(result.data);
+      updateNotificationUI();
+    }
+  } catch (err) {
+    console.error('addNotificationToDB error:', err);
+  }
+}
+
+// Keep addNotification for instant local notifications
+function addNotification(message, type) {
+  if (currentPatient) {
+    addNotificationToDB(message, type || 'info');
+  } else {
+    // Fallback before patient loads
+    notifications.unshift({
+      message:    message,
+      is_read:    false,
+      created_at: new Date().toISOString()
+    });
+    updateNotificationUI();
   }
 }
 
@@ -58,22 +129,41 @@ function toggleNotificationPopup() {
   popup.classList.toggle('show-notification');
   if (popup.classList.contains('show-notification')) {
     updateNotificationUI();
-    setTimeout(function() {
-      popup.classList.remove('show-notification');
-    }, 5000);
+    markAllNotificationsRead();
   }
 }
 
-function clearAllNotifications() {
-  notifications = [];
-  updateNotificationUI();
-  var popup = document.getElementById('notificationPopup');
-  if (popup) popup.classList.remove('show-notification');
+async function markAllNotificationsRead() {
+  if (!supabaseClient || !currentPatient) return;
+  try {
+    await supabaseClient
+      .from('nurse_notifications')
+      .update({ is_read: true })
+      .eq('patient_id', currentPatient.patient_id)
+      .eq('is_read', false);
+
+    notifications.forEach(function(n) { n.is_read = true; });
+    updateNotificationUI();
+  } catch (err) {
+    console.error('markAllRead error:', err);
+  }
 }
 
-function addNotification(message) {
-  notifications.unshift(message);
-  updateNotificationUI();
+async function clearAllNotifications() {
+  if (!supabaseClient || !currentPatient) return;
+  try {
+    await supabaseClient
+      .from('nurse_notifications')
+      .delete()
+      .eq('patient_id', currentPatient.patient_id);
+
+    notifications = [];
+    updateNotificationUI();
+    var popup = document.getElementById('notificationPopup');
+    if (popup) popup.classList.remove('show-notification');
+  } catch (err) {
+    console.error('clearAllNotifications error:', err);
+  }
 }
 
 // ── LOGOUT ────────────────────────────────────────────────────
@@ -97,6 +187,8 @@ function switchTab(event, sectionId) {
   if (sectionId === 'appointmentsSection') loadAppointments();
   if (sectionId === 'prescriptionsSection') loadPrescriptions();
   if (sectionId === 'medicalRecordsSection') loadMedicalRecords();
+  if (sectionId === 'aiHealthAssistantSection') loadChatHistory();
+  if (sectionId === 'clinicMapSection') initMap();
 }
 
 function switchSettingsSubTab(event, subId) {
@@ -233,6 +325,7 @@ async function loadPatientProfile() {
     renderPatientProfile(currentPatient, lastVisitDate);
     await loadStats();
     await loadRecentActivity();
+    await loadNotifications();
 
   } catch (err) {
     console.error('loadPatientProfile exception:', err);
@@ -282,7 +375,6 @@ function renderPatientProfile(patient, lastVisitDate) {
   setVal('settingsPhone', phone);
   setVal('settingsDob',   dob);
 
-  addNotification('👋 Welcome back, ' + (firstName || 'there') + '!');
 }
 
 // ── LOAD STATS ────────────────────────────────────────────────
@@ -330,35 +422,127 @@ async function loadRecentActivity() {
   if (!container) return;
 
   try {
-    // Check what columns audit_logs actually has
-    var result = await supabaseClient
-      .from('audit_logs')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(4);
+    var pid = currentPatient.patient_id;
+    var activities = [];
 
-    if (result.error || !result.data || result.data.length === 0) return;
+    // Get recent appointments
+    var apptRes = await supabaseClient
+      .from('appointments')
+      .select('appointment_id, date, time, status, notes, doctors:doctor_id(first_name, last_name)')
+      .eq('patient_id', pid)
+      .order('date', { ascending: false })
+      .limit(3);
+
+    if (!apptRes.error && apptRes.data) {
+      apptRes.data.forEach(function(a) {
+        var doctorName = a.doctors
+          ? 'Dr. ' + a.doctors.first_name + ' ' + a.doctors.last_name
+          : 'a doctor';
+        activities.push({
+          type: 'appointment',
+          text: a.status === 'completed'
+            ? 'Appointment completed with ' + doctorName
+            : a.status === 'cancelled'
+            ? 'Appointment cancelled with ' + doctorName
+            : 'Appointment scheduled with ' + doctorName,
+          date: a.date + (a.time ? 'T' + a.time : 'T00:00:00'),
+          color: a.status === 'completed' ? 'green'
+               : a.status === 'cancelled' ? 'yellow'
+               : 'blue'
+        });
+      });
+    }
+
+    // Get recent medical records
+    var recRes = await supabaseClient
+      .from('medical_records')
+      .select('id, diagnosis, created_at')
+      .eq('patient_id', pid)
+      .order('created_at', { ascending: false })
+      .limit(2);
+
+    if (!recRes.error && recRes.data) {
+      recRes.data.forEach(function(r) {
+        activities.push({
+          type: 'record',
+          text: 'Medical record added: ' + (r.diagnosis || 'General record'),
+          date: r.created_at,
+          color: 'purple'
+        });
+      });
+    }
+
+    // Get recent notifications (refill requests, messages, certificates)
+    var notifRes = await supabaseClient
+      .from('nurse_notifications')
+      .select('notification_id, message, type, created_at')
+      .eq('patient_id', pid)
+      .order('created_at', { ascending: false })
+      .limit(3);
+
+    if (!notifRes.error && notifRes.data) {
+      notifRes.data.forEach(function(n) {
+        var text = n.type === 'refill_request'    ? '💊 Refill request sent'
+                 : n.type === 'patient_message'   ? '💬 Message sent to doctor'
+                 : n.type === 'certificate_request' ? '📋 Certificate request submitted'
+                 : n.type === 'new_appointment'   ? '📅 New appointment booked'
+                 : n.message.substring(0, 60) + '...';
+        activities.push({
+          type: 'notification',
+          text: text,
+          date: n.created_at,
+          color: 'yellow'
+        });
+      });
+    }
+
+    // Get recent ARIA sessions
+    var ariaRes = await supabaseClient
+      .from('ai_chat_history')
+      .select('chat_id, message, timestamp')
+      .eq('patient_id', pid)
+      .order('timestamp', { ascending: false })
+      .limit(2);
+
+    if (!ariaRes.error && ariaRes.data) {
+      ariaRes.data.forEach(function(a) {
+        activities.push({
+          type: 'aria',
+          text: '🤖 ARIA health assessment: ' + a.message.substring(0, 50) + '...',
+          date: a.timestamp,
+          color: 'purple'
+        });
+      });
+    }
+
+    // Sort all activities by date, most recent first
+    activities.sort(function(a, b) {
+      return new Date(b.date) - new Date(a.date);
+    });
+
+    // Take top 5
+    activities = activities.slice(0, 5);
+
+    if (activities.length === 0) {
+      container.innerHTML = '<div class="activity-item"><div class="act-text"><strong>No recent activity yet</strong><small>Your activity will appear here as you use the portal</small></div></div>';
+      return;
+    }
 
     var iconMap = {
-      appointment: { color: 'blue',   svg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' },
-      prescription: { color: 'green', svg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/></svg>' },
-      record:       { color: 'purple', svg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' },
-      default:      { color: 'yellow', svg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>' }
+      appointment: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+      record:      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+      notification:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+      aria:        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>'
     };
 
-    container.innerHTML = result.data.map(function(item) {
-      var action = (item.action || item.event || item.description || '').toLowerCase();
-      var type = action.includes('appoint') ? 'appointment'
-               : action.includes('presc')   ? 'prescription'
-               : action.includes('record')  ? 'record'
-               : 'default';
-      var icon = iconMap[type];
-      var timeField = item.created_at || item.timestamp || item.logged_at;
+    container.innerHTML = activities.map(function(item) {
       return '<div class="activity-item">'
-        + '<span class="act-icon ' + icon.color + '">' + icon.svg + '</span>'
+        + '<span class="act-icon ' + item.color + '">'
+        + (iconMap[item.type] || iconMap.notification)
+        + '</span>'
         + '<div class="act-text">'
-        + '<strong>' + (item.action || item.event || item.description || 'Activity recorded') + '</strong>'
-        + '<small>' + (timeField ? getTimeAgo(timeField) : '') + '</small>'
+        + '<strong>' + item.text + '</strong>'
+        + '<small>' + getTimeAgo(item.date) + '</small>'
         + '</div></div>';
     }).join('');
 
@@ -450,6 +634,9 @@ async function getAIAnalysis() {
         + '</div>';
     }
 
+    // Save to chat history
+    await saveChatHistory(symptoms, data.analysis);
+    loadChatHistory();
     addNotification('🤖 ARIA health assessment completed');
 
   } catch (err) {
@@ -613,23 +800,42 @@ async function confirmBooking() {
   if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Booking...'; }
 
   try {
-    var result = await supabaseClient
-      .from('appointments')
-      .insert({
-        patient_id: currentPatient.patient_id,
-        doctor_id:  doctorId,
-        date:       date,
-        time:       time,
-        notes:      notes || null,
-        status:     'scheduled',
-        created_by: currentUser.email || 'patient'
-      });
+  var result = await supabaseClient
+    .from('appointments')
+    .insert({
+      patient_id: currentPatient.patient_id,
+      doctor_id:  doctorId,
+      date:       date,
+      time:       time,
+      notes:      notes || null,
+      status:     'scheduled',
+      created_by: currentUser.email || 'patient'
+    });
 
-    if (result.error) throw result.error;
-    closeModal('bookingModal');
-    addNotification('📅 Appointment booked for ' + date + ' at ' + time);
-    loadAppointments();
-    loadStats();
+  if (result.error) throw result.error;
+
+  // Notify nurse about new appointment
+  var doctorSelect = document.getElementById('bookDoctor');
+  var doctorName = doctorSelect 
+    ? doctorSelect.options[doctorSelect.selectedIndex].text 
+    : 'a doctor';
+  var patientName = (currentPatient.first_name + ' ' + currentPatient.last_name).trim();
+
+  await supabaseClient.from('nurse_notifications').insert({
+    message: '📅 New appointment booked — Patient: ' + patientName
+      + ' | Doctor: ' + doctorName
+      + ' | Date: ' + date
+      + ' | Time: ' + time
+      + (notes ? ' | Reason: ' + notes : ''),
+    patient_id: currentPatient.patient_id,
+    type: 'new_appointment',
+    is_read: false
+  });
+
+  closeModal('bookingModal');
+  addNotification('📅 Appointment booked for ' + date + ' at ' + time);
+  loadAppointments();
+  loadStats();
 
   } catch (err) {
     console.error('confirmBooking error:', err);
@@ -1158,6 +1364,225 @@ function handleQuickAction(action) {
 }
 
 // ────────────────────────────────────────────────────────────
+// GOOGLE MAPS
+// ────────────────────────────────────────────────────────────
+var mapInstance = null;
+var mapFilter = 'nearest';
+var allFacilities = [];
+
+function setMapFilter(filter, btn) {
+  mapFilter = filter;
+  document.querySelectorAll('.map-filter-toggle .toggle-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  if (btn) btn.classList.add('active');
+  renderFacilityList(allFacilities);
+}
+
+async function initMap() {
+  var mapCanvas    = document.getElementById('googleMap');
+  var loadingState = document.getElementById('mapLoadingState');
+  var errorState   = document.getElementById('mapErrorState');
+
+  if (!mapCanvas) return;
+
+  // Show loading
+  if (loadingState) loadingState.style.display = 'flex';
+  if (errorState)   errorState.style.display   = 'none';
+
+  try {
+    // Get API key from backend
+    var keyRes  = await fetch('https://sabyoni-devs-med-intel.vercel.app/api/maps-config');
+    var keyData = await keyRes.json();
+    var apiKey  = keyData.key;
+
+    if (!apiKey) throw new Error('Maps API key not configured');
+
+    // Load Google Maps script dynamically
+    if (!window.google || !window.google.maps) {
+      await loadGoogleMapsScript(apiKey);
+    }
+
+    // Get user location
+    var position = await getUserLocation();
+    var userLat  = position.coords.latitude;
+    var userLng  = position.coords.longitude;
+
+    // Hide loading
+    if (loadingState) loadingState.style.display = 'none';
+
+    // Init map
+    mapInstance = new window.google.maps.Map(mapCanvas, {
+      center:    { lat: userLat, lng: userLng },
+      zoom:      14,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: true,
+      styles: [
+        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
+      ]
+    });
+
+    // User location marker
+    new window.google.maps.Marker({
+      position: { lat: userLat, lng: userLng },
+      map: mapInstance,
+      title: 'Your Location',
+      icon: {
+        path: window.google.maps.SymbolPath.CIRCLE,
+        scale: 10,
+        fillColor: '#3b82f6',
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 3
+      }
+    });
+
+    // Search for nearby clinics and pharmacies
+    var service = new window.google.maps.places.PlacesService(mapInstance);
+    var request = {
+      location: new window.google.maps.LatLng(userLat, userLng),
+      radius:   5000,
+      type:     ['hospital', 'pharmacy', 'doctor']
+    };
+
+    service.nearbySearch(request, function(results, status) {
+      if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
+        allFacilities = results;
+        addFacilityMarkers(results, mapInstance);
+        renderFacilityList(results);
+        setEl('mapResultTitle', 'Facilities Near You');
+        setEl('mapResultCount', results.length + ' facilities found');
+      } else {
+        setEl('mapResultTitle', 'No facilities found');
+        setEl('mapResultCount', 'Try moving to a different area');
+      }
+    });
+
+  } catch (err) {
+    console.error('initMap error:', err);
+    if (loadingState) loadingState.style.display = 'none';
+    if (errorState) {
+      errorState.style.display = 'flex';
+      errorState.style.flexDirection = 'column';
+      errorState.style.alignItems = 'center';
+      var errMsg = document.getElementById('mapErrorMsg');
+      if (errMsg) {
+        errMsg.textContent = err.message.includes('denied')
+          ? 'Location access denied. Please allow location access and try again.'
+          : 'Could not load map. Please try again.';
+      }
+    }
+  }
+}
+
+function loadGoogleMapsScript(apiKey) {
+  return new Promise(function(resolve, reject) {
+    var script = document.createElement('script');
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&libraries=places';
+    script.async = true;
+    script.defer = true;
+    script.onload = resolve;
+    script.onerror = function() { reject(new Error('Failed to load Google Maps')); };
+    document.head.appendChild(script);
+  });
+}
+
+function getUserLocation() {
+  return new Promise(function(resolve, reject) {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation is not supported by your browser'));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(resolve, function(err) {
+      reject(new Error('Location access denied'));
+    }, { timeout: 10000 });
+  });
+}
+
+function addFacilityMarkers(places, map) {
+  places.forEach(function(place) {
+    var marker = new window.google.maps.Marker({
+      position: place.geometry.location,
+      map:      map,
+      title:    place.name,
+      icon: {
+        url: getMarkerIcon(place.types),
+        scaledSize: new window.google.maps.Size(32, 32)
+      }
+    });
+
+    var infoWindow = new window.google.maps.InfoWindow({
+      content: '<div style="font-family:inherit;padding:4px 2px;max-width:200px;">'
+        + '<strong style="font-size:13px;color:#111827;">' + place.name + '</strong>'
+        + (place.vicinity ? '<p style="font-size:12px;color:#6b7280;margin:4px 0 0;">' + place.vicinity + '</p>' : '')
+        + (place.rating   ? '<p style="font-size:12px;color:#f59e0b;margin:4px 0 0;">★ ' + place.rating + '</p>' : '')
+        + '</div>'
+    });
+
+    marker.addListener('click', function() {
+      infoWindow.open(map, marker);
+    });
+  });
+}
+
+function getMarkerIcon(types) {
+  if (types && types.includes('pharmacy')) {
+    return 'https://maps.google.com/mapfiles/ms/icons/green-dot.png';
+  } else if (types && types.includes('hospital')) {
+    return 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
+  }
+  return 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+}
+
+function renderFacilityList(places) {
+  var container = document.getElementById('facilityList');
+  if (!container || !places) return;
+
+  var sorted = places.slice();
+
+  if (mapFilter === 'top_rated') {
+    sorted.sort(function(a, b) {
+      return (b.rating || 0) - (a.rating || 0);
+    });
+  }
+
+  // Show top 6
+  sorted = sorted.slice(0, 6);
+
+  if (sorted.length === 0) {
+    container.innerHTML = '<div class="empty-list-msg">No facilities found nearby.</div>';
+    return;
+  }
+
+  container.innerHTML = sorted.map(function(place) {
+    var isOpen    = place.opening_hours ? place.opening_hours.isOpen() : null;
+    var typeLabel = place.types && place.types.includes('pharmacy') ? 'Pharmacy'
+                  : place.types && place.types.includes('hospital') ? 'Hospital'
+                  : 'Medical Facility';
+    var badgeClass = place.types && place.types.includes('pharmacy') ? 'nearby'
+                   : place.types && place.types.includes('hospital') ? 'far'
+                   : 'close';
+
+    return '<div class="facility-item-card" onclick="focusMapPlace(' + place.geometry.location.lat() + ',' + place.geometry.location.lng() + ')">'
+      + '<div class="card-top">'
+      + '<h5>' + place.name + '</h5>'
+      + '<span class="badge ' + badgeClass + '">' + typeLabel + '</span>'
+      + '</div>'
+      + (place.rating ? '<div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ' + place.rating + (place.user_ratings_total ? ' <span class="dot">•</span> ' + place.user_ratings_total + ' reviews' : '') + '</div>' : '')
+      + (place.vicinity ? '<p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> ' + place.vicinity + '</p>' : '')
+      + (isOpen !== null ? '<p class="card-detail" style="color:' + (isOpen ? '#16a34a' : '#dc2626') + ';">' + (isOpen ? '● Open now' : '● Closed') + '</p>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function focusMapPlace(lat, lng) {
+  if (!mapInstance) return;
+  mapInstance.panTo({ lat: lat, lng: lng });
+  mapInstance.setZoom(16);
+}
+
+// ────────────────────────────────────────────────────────────
 // INIT
 // ────────────────────────────────────────────────────────────
 window.onload = async function () {
@@ -1197,3 +1622,146 @@ window.onload = async function () {
     }
   });
 };
+
+async function saveChatHistory(message, response) {
+  if (!supabaseClient || !currentPatient) return;
+  try {
+    await supabaseClient.from('ai_chat_history').insert({
+      patient_id: currentPatient.patient_id,
+      message:    message,
+      response:   response,
+      timestamp:  new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('saveChatHistory error:', err);
+  }
+}
+
+async function loadChatHistory() {
+  if (!supabaseClient || !currentPatient) return;
+  var container = document.getElementById('ariaChatHistory');
+  if (!container) return;
+
+  try {
+    var result = await supabaseClient
+      .from('ai_chat_history')
+      .select('*')
+      .eq('patient_id', currentPatient.patient_id)
+      .order('timestamp', { ascending: false })
+      .limit(20);
+
+    if (result.error) throw result.error;
+
+    if (!result.data || result.data.length === 0) {
+      container.innerHTML = '<div class="chat-history-empty">'
+        + '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>'
+        + '<p>No previous ARIA sessions yet.<br>Your chat history will appear here.</p>'
+        + '</div>';
+      return;
+    }
+
+    container.innerHTML = result.data.map(function(chat) {
+      var date = new Date(chat.timestamp).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
+      var time = new Date(chat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      var shortMessage = chat.message.length > 100
+        ? chat.message.substring(0, 100) + '...'
+        : chat.message;
+
+      return '<div class="ch-item" id="chat-' + chat.chat_id + '">'
+
+        // ── Header row: date + delete ──
+        + '<div class="ch-header">'
+        + '<span class="ch-date">'
+        + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+        + date + ' · ' + time
+        + '</span>'
+        + '<button class="ch-delete" onclick="deleteChatHistory(\'' + chat.chat_id + '\')" title="Delete session">'
+        + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>'
+        + '</button>'
+        + '</div>'
+
+        // ── Patient message preview ──
+        + '<div class="ch-you-bubble">'
+        + '<span class="ch-label ch-label-you">You</span>'
+        + '<p class="ch-preview">' + shortMessage + '</p>'
+        + '</div>'
+
+        // ── Expandable ARIA response ──
+        + '<details class="ch-details">'
+        + '<summary class="ch-summary">'
+        + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>'
+        + 'ARIA\'s Response'
+        + '</summary>'
+        + '<div class="ch-aria-body">'
+        + '<div class="ch-full-symptoms">'
+        + '<span class="ch-label ch-label-you">Your symptoms</span>'
+        + '<p>' + chat.message + '</p>'
+        + '</div>'
+        + '<div class="ch-full-response">'
+        + '<span class="ch-label ch-label-aria">ARIA</span>'
+        + '<div class="aria-body">' + formatARIAResponse(chat.response) + '</div>'
+        + '</div>'
+        + '</div>'
+        + '</details>'
+
+        + '</div>';
+    }).join('');
+
+  } catch (err) {
+    console.error('loadChatHistory error:', err);
+  }
+}
+async function deleteChatHistory(chatId) {
+  if (!confirm('Delete this ARIA session from your history?')) return;
+  try {
+    var result = await supabaseClient
+      .from('ai_chat_history')
+      .delete()
+      .eq('chat_id', chatId)
+      .eq('patient_id', currentPatient.patient_id);
+
+    if (result.error) throw result.error;
+
+    var el = document.getElementById('chat-' + chatId);
+    if (el) el.remove();
+
+    addNotification('🗑️ ARIA session deleted from history.');
+
+    // Show empty state if no more chats
+    var container = document.getElementById('ariaChatHistory');
+    if (container && container.children.length === 0) {
+      loadChatHistory();
+    }
+
+  } catch (err) {
+    console.error('deleteChatHistory error:', err);
+    alert('Failed to delete. Please try again.');
+  }
+}
+
+function toggleChatExpand(chatId) {
+  var expanded = document.getElementById('chatExpand-' + chatId);
+  var btn = expanded ? expanded.previousElementSibling : null;
+  if (!expanded) return;
+  var isOpen = expanded.style.display !== 'none';
+  expanded.style.display = isOpen ? 'none' : 'block';
+  if (btn) btn.innerHTML = isOpen
+    ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg> View Full Response'
+    : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg> Hide Response';
+}
+
+function toggleChatHistoryPanel() {
+  var panel   = document.getElementById('ariaHistoryPanel');
+  var overlay = document.getElementById('ariaHistoryOverlay');
+  if (!panel) return;
+
+  var isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    panel.classList.remove('open');
+    overlay.classList.remove('open');
+  } else {
+    panel.classList.add('open');
+    overlay.classList.add('open');
+    loadChatHistory();
+  }
+}

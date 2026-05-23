@@ -1376,7 +1376,7 @@ function setMapFilter(filter, btn) {
     b.classList.remove('active');
   });
   if (btn) btn.classList.add('active');
-  renderFacilityList(allFacilities);
+  renderFacilityListNew(allFacilities);
 }
 
 async function initMap() {
@@ -1386,104 +1386,122 @@ async function initMap() {
 
   if (!mapCanvas) return;
 
-  // Show loading
   if (loadingState) loadingState.style.display = 'flex';
   if (errorState)   errorState.style.display   = 'none';
+  mapCanvas.style.height = '400px';
 
   try {
-    // Get API key from backend
-    var keyRes  = await fetch('https://sabyoni-devs-med-intel.vercel.app/api/maps-config');
+    // Step 1 — Get API key
+    var keyRes = await fetch('https://sabyoni-devs-med-intel.vercel.app/api/maps-config');
     var keyData = await keyRes.json();
-    var apiKey  = keyData.key;
+    var apiKey = keyData.key;
 
     if (!apiKey) throw new Error('Maps API key not configured');
 
-    // Load Google Maps script dynamically
+    console.log('Maps key loaded ✓');
+
+    // Step 2 — Load Google Maps if not already loaded
     if (!window.google || !window.google.maps) {
       await loadGoogleMapsScript(apiKey);
+      console.log('Google Maps script loaded ✓');
     }
 
-    // Get user location
+    // Step 3 — Get user location
     var position = await getUserLocation();
     var userLat  = position.coords.latitude;
     var userLng  = position.coords.longitude;
+    console.log('Location:', userLat, userLng);
 
-    // Hide loading
+    // Step 4 — Hide loading, init map
     if (loadingState) loadingState.style.display = 'none';
 
-    // Init map
     mapInstance = new window.google.maps.Map(mapCanvas, {
-      center:    { lat: userLat, lng: userLng },
-      zoom:      14,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: true,
-      styles: [
-        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
-      ]
+      center:             { lat: userLat, lng: userLng },
+      zoom:               14,
+      mapId:              'DEMO_MAP_ID',
+      mapTypeControl:     false,
+      streetViewControl:  false,
+      fullscreenControl:  true
     });
 
-    // User location marker
-    new window.google.maps.Marker({
+    console.log('Map initialized ✓');
+
+    // Step 5 — User location marker
+    var userMarkerEl = document.createElement('div');
+    userMarkerEl.style.cssText = 'width:16px;height:16px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(59,130,246,0.5);';
+    new window.google.maps.marker.AdvancedMarkerElement({
       position: { lat: userLat, lng: userLng },
-      map: mapInstance,
-      title: 'Your Location',
-      icon: {
-        path: window.google.maps.SymbolPath.CIRCLE,
-        scale: 10,
-        fillColor: '#3b82f6',
-        fillOpacity: 1,
-        strokeColor: '#ffffff',
-        strokeWeight: 3
-      }
+      map:      mapInstance,
+      title:    'Your Location',
+      content:  userMarkerEl
     });
 
-    // Search for nearby clinics and pharmacies
-    var service = new window.google.maps.places.PlacesService(mapInstance);
+    // Step 6 — Search nearby places using new Places API
+    var placesLib = await window.google.maps.importLibrary('places');
+    var Place     = placesLib.Place;
+
     var request = {
-      location: new window.google.maps.LatLng(userLat, userLng),
-      radius:   5000,
-      type:     ['hospital', 'pharmacy', 'doctor']
+      fields: [
+        'displayName',
+        'location',
+        'rating',
+        'userRatingCount',
+        'formattedAddress',
+        'types',
+        'regularOpeningHours',
+        'id'
+      ],
+      locationRestriction: {
+        center: { lat: userLat, lng: userLng },
+        radius: 5000
+      },
+      includedPrimaryTypes: ['hospital', 'pharmacy', 'doctor'],
+      maxResultCount: 12
     };
 
-    service.nearbySearch(request, function(results, status) {
-      if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-        allFacilities = results;
-        addFacilityMarkers(results, mapInstance);
-        renderFacilityList(results);
-        setEl('mapResultTitle', 'Facilities Near You');
-        setEl('mapResultCount', results.length + ' facilities found');
-      } else {
-        setEl('mapResultTitle', 'No facilities found');
-        setEl('mapResultCount', 'Try moving to a different area');
-      }
-    });
+    console.log('Searching nearby places...');
+    var response = await Place.searchNearby(request);
+    console.log('Places response:', response);
+
+    if (response && response.places && response.places.length > 0) {
+      allFacilities = response.places;
+      addFacilityMarkersNew(response.places, mapInstance);
+      renderFacilityListNew(response.places);
+      setEl('mapResultTitle', 'Facilities Near You');
+      setEl('mapResultCount', response.places.length + ' facilities found');
+    } else {
+      setEl('mapResultTitle', 'No facilities found nearby');
+      setEl('mapResultCount', 'Try expanding your search area');
+      document.getElementById('facilityList').innerHTML =
+        '<div class="empty-list-msg">No clinics or pharmacies found within 5km.</div>';
+    }
 
   } catch (err) {
     console.error('initMap error:', err);
     if (loadingState) loadingState.style.display = 'none';
     if (errorState) {
-      errorState.style.display = 'flex';
-      errorState.style.flexDirection = 'column';
-      errorState.style.alignItems = 'center';
+      errorState.style.display = 'block';
       var errMsg = document.getElementById('mapErrorMsg');
-      if (errMsg) {
-        errMsg.textContent = err.message.includes('denied')
-          ? 'Location access denied. Please allow location access and try again.'
-          : 'Could not load map. Please try again.';
-      }
+      if (errMsg) errMsg.textContent = err.message || 'Could not load map. Please try again.';
     }
   }
 }
 
+// Load Google Maps script - add marker library
 function loadGoogleMapsScript(apiKey) {
   return new Promise(function(resolve, reject) {
-    var script = document.createElement('script');
-    script.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&libraries=places';
-    script.async = true;
-    script.defer = true;
+    // Check if already loading
+    if (document.getElementById('gmaps-script')) {
+      resolve();
+      return;
+    }
+    var script    = document.createElement('script');
+    script.id     = 'gmaps-script';
+    script.src    = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&libraries=marker&loading=async&v=weekly';
+    script.async  = true;
+    script.defer  = true;
     script.onload = resolve;
-    script.onerror = function() { reject(new Error('Failed to load Google Maps')); };
+    script.onerror = function() { reject(new Error('Failed to load Google Maps script')); };
     document.head.appendChild(script);
   });
 }
@@ -1500,27 +1518,32 @@ function getUserLocation() {
   });
 }
 
-function addFacilityMarkers(places, map) {
+function addFacilityMarkersNew(places, map) {
   places.forEach(function(place) {
-    var marker = new window.google.maps.Marker({
-      position: place.geometry.location,
-      map:      map,
-      title:    place.name,
-      icon: {
-        url: getMarkerIcon(place.types),
-        scaledSize: new window.google.maps.Size(32, 32)
-      }
+    var types = place.types || [];
+    var color = types.includes('pharmacy') ? '#16a34a'
+              : types.includes('hospital') ? '#ef4444'
+              : '#3b82f6';
+
+    var markerEl = document.createElement('div');
+    markerEl.style.cssText = 'width:12px;height:12px;background:' + color + ';border:2px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.3);cursor:pointer;';
+
+    var marker = new window.google.maps.marker.AdvancedMarkerElement({
+      position: place.location,
+      map: map,
+      title: place.displayName,
+      content: markerEl
     });
 
     var infoWindow = new window.google.maps.InfoWindow({
       content: '<div style="font-family:inherit;padding:4px 2px;max-width:200px;">'
-        + '<strong style="font-size:13px;color:#111827;">' + place.name + '</strong>'
-        + (place.vicinity ? '<p style="font-size:12px;color:#6b7280;margin:4px 0 0;">' + place.vicinity + '</p>' : '')
-        + (place.rating   ? '<p style="font-size:12px;color:#f59e0b;margin:4px 0 0;">★ ' + place.rating + '</p>' : '')
+        + '<strong style="font-size:13px;color:#111827;">' + (place.displayName || '') + '</strong>'
+        + (place.formattedAddress ? '<p style="font-size:12px;color:#6b7280;margin:4px 0 0;">' + place.formattedAddress + '</p>' : '')
+        + (place.rating ? '<p style="font-size:12px;color:#f59e0b;margin:4px 0 0;">★ ' + place.rating + '</p>' : '')
         + '</div>'
     });
 
-    marker.addListener('click', function() {
+    marker.addListener('gmp-click', function() {
       infoWindow.open(map, marker);
     });
   });
@@ -1535,7 +1558,7 @@ function getMarkerIcon(types) {
   return 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png';
 }
 
-function renderFacilityList(places) {
+function renderFacilityListNew(places) {
   var container = document.getElementById('facilityList');
   if (!container || !places) return;
 
@@ -1547,7 +1570,6 @@ function renderFacilityList(places) {
     });
   }
 
-  // Show top 6
   sorted = sorted.slice(0, 6);
 
   if (sorted.length === 0) {
@@ -1556,22 +1578,91 @@ function renderFacilityList(places) {
   }
 
   container.innerHTML = sorted.map(function(place) {
-    var isOpen    = place.opening_hours ? place.opening_hours.isOpen() : null;
-    var typeLabel = place.types && place.types.includes('pharmacy') ? 'Pharmacy'
-                  : place.types && place.types.includes('hospital') ? 'Hospital'
-                  : 'Medical Facility';
-    var badgeClass = place.types && place.types.includes('pharmacy') ? 'nearby'
-                   : place.types && place.types.includes('hospital') ? 'far'
+    var types      = place.types || [];
+    var isOpen = null;
+    try {
+      if (place.regularOpeningHours) {
+        isOpen = place.regularOpeningHours.isOpen ? place.regularOpeningHours.isOpen() : null;
+      }
+    } catch(e) {
+      isOpen = null;
+    }
+    var typeLabel  = types.includes('pharmacy') ? 'Pharmacy'
+                   : types.includes('hospital') ? 'Hospital'
+                   : 'Medical Facility';
+    var badgeClass = types.includes('pharmacy') ? 'nearby'
+                   : types.includes('hospital') ? 'far'
                    : 'close';
+    var lat = place.location.lat();
+    var lng = place.location.lng();
 
-    return '<div class="facility-item-card" onclick="focusMapPlace(' + place.geometry.location.lat() + ',' + place.geometry.location.lng() + ')">'
-      + '<div class="card-top">'
-      + '<h5>' + place.name + '</h5>'
-      + '<span class="badge ' + badgeClass + '">' + typeLabel + '</span>'
+    // Category icon based on type
+    var categoryIcon = types.includes('pharmacy')
+      ? '<div class="facility-cat-icon facility-cat-pharmacy">'
+        + '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>'
+        + '</div>'
+      : types.includes('hospital')
+      ? '<div class="facility-cat-icon facility-cat-hospital">'
+        + '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+        + '</div>'
+      : '<div class="facility-cat-icon facility-cat-doctor">'
+        + '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>'
+        + '</div>';
+
+    // Star rating HTML
+    var starsHtml = '';
+    if (place.rating) {
+      var fullStars  = Math.floor(place.rating);
+      var halfStar   = place.rating % 1 >= 0.5;
+      starsHtml = '<div class="facility-stars">';
+      for (var i = 0; i < 5; i++) {
+        if (i < fullStars) {
+          starsHtml += '<svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+        } else if (i === fullStars && halfStar) {
+          starsHtml += '<svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" opacity="0.4"/></svg>';
+        } else {
+          starsHtml += '<svg width="12" height="12" viewBox="0 0 24 24" fill="#e5e7eb"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+        }
+      }
+      starsHtml += '<span class="facility-rating-num">' + place.rating.toFixed(1) + '</span>';
+      if (place.userRatingCount) {
+        starsHtml += '<span class="facility-rating-count">(' + place.userRatingCount + ')</span>';
+      }
+      starsHtml += '</div>';
+    }
+
+    // Google Maps directions URL
+    var directionsUrl = 'https://www.google.com/maps/dir/?api=1'
+      + '&destination=' + lat + ',' + lng
+      + '&destination_place_id=' + (place.id || '')
+      + '&travelmode=driving';
+
+    return '<div class="facility-card-new" onclick="focusMapPlace(' + lat + ',' + lng + ')">'
+      + categoryIcon
+      + '<div class="facility-card-body">'
+      + '<div class="facility-card-top">'
+      + '<div>'
+      + '<h5 class="facility-card-name">' + (place.displayName || 'Unknown') + '</h5>'
+      + '<span class="badge ' + badgeClass + '" style="font-size:10px;">' + typeLabel + '</span>'
       + '</div>'
-      + (place.rating ? '<div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ' + place.rating + (place.user_ratings_total ? ' <span class="dot">•</span> ' + place.user_ratings_total + ' reviews' : '') + '</div>' : '')
-      + (place.vicinity ? '<p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> ' + place.vicinity + '</p>' : '')
-      + (isOpen !== null ? '<p class="card-detail" style="color:' + (isOpen ? '#16a34a' : '#dc2626') + ';">' + (isOpen ? '● Open now' : '● Closed') + '</p>' : '')
+      + (isOpen !== null
+        ? '<span class="facility-open-badge ' + (isOpen ? 'open' : 'closed') + '">'
+          + (isOpen ? '● Open' : '● Closed')
+          + '</span>'
+        : '')
+      + '</div>'
+      + starsHtml
+      + (place.formattedAddress
+        ? '<p class="facility-address">'
+          + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>'
+          + place.formattedAddress
+          + '</p>'
+        : '')
+      + '<a class="facility-directions-btn" href="' + directionsUrl + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">'
+      + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>'
+      + 'Get Directions'
+      + '</a>'
+      + '</div>'
       + '</div>';
   }).join('');
 }
@@ -1580,6 +1671,129 @@ function focusMapPlace(lat, lng) {
   if (!mapInstance) return;
   mapInstance.panTo({ lat: lat, lng: lng });
   mapInstance.setZoom(16);
+}
+
+// ────────────────────────────────────────────────────────────
+// YOUTUBE VIDEO SEARCH
+// ────────────────────────────────────────────────────────────
+async function searchVideosByFeeling() {
+  var feeling = document.getElementById('feelingInput')
+    ? document.getElementById('feelingInput').value.trim()
+    : '';
+
+  if (!feeling) {
+    alert('Please describe how you are feeling first.');
+    return;
+  }
+
+  var grid         = document.getElementById('videoGrid');
+  var loadingState = document.getElementById('videoLoadingState');
+  var errorState   = document.getElementById('videoErrorState');
+  var resultLabel  = document.getElementById('videoResultLabel');
+  var resultText   = document.getElementById('videoResultText');
+  var searchBtn    = document.querySelector('.btn-feeling-search');
+
+  // Show loading
+  if (grid)         grid.style.display         = 'none';
+  if (loadingState) loadingState.style.display = 'flex';
+  if (errorState)   errorState.style.display   = 'none';
+  if (resultLabel)  resultLabel.style.display  = 'none';
+  if (searchBtn) {
+    searchBtn.disabled    = true;
+    searchBtn.textContent = 'Searching...';
+  }
+
+  try {
+    var res = await fetch(
+      'https://sabyoni-devs-med-intel.vercel.app/api/youtube?feeling=' + encodeURIComponent(feeling)
+    );
+
+    // Debug raw response
+    var rawText = await res.text();
+    console.log('YouTube raw response:', rawText.substring(0, 200));
+
+    var data;
+    try {
+      data = JSON.parse(rawText);
+    } catch(e) {
+      throw new Error('YouTube service unavailable. Please try again shortly.');
+    }
+
+    if (!res.ok || data.error) throw new Error(data.error || 'Failed to fetch videos');
+
+    if (!data.videos || data.videos.length === 0) {
+      throw new Error('No videos found for that feeling. Try describing it differently.');
+    }
+
+    // Render videos
+    if (grid) {
+      grid.style.display = 'grid';
+      grid.innerHTML = data.videos.map(function(video) {
+        return '<div class="video-card">'
+          + '<div class="video-wrapper">'
+          + '<iframe src="https://www.youtube.com/embed/' + video.id + '" frameborder="0" allowfullscreen loading="lazy"></iframe>'
+          + '</div>'
+          + '<div class="video-info">'
+          + '<h4>' + escapeHtml(video.title) + '</h4>'
+          + '<p>' + escapeHtml(video.channel) + '</p>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    // Show result label
+    if (resultLabel) resultLabel.style.display = 'flex';
+    if (resultText)  resultText.textContent    = 'Showing results for: "' + feeling + '" → ' + data.query;
+
+  } catch (err) {
+    console.error('searchVideosByFeeling error:', err);
+    if (grid) grid.style.display = 'none';
+    if (errorState) {
+      errorState.style.display = 'block';
+      var errMsg = document.getElementById('videoErrorMsg');
+      if (errMsg) errMsg.textContent = err.message || 'Could not load videos. Please try again.';
+    }
+  } finally {
+    if (loadingState) loadingState.style.display = 'none';
+    if (searchBtn) {
+      searchBtn.disabled  = false;
+      searchBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Find Videos';
+    }
+  }
+}
+
+function quickFeeling(feeling) {
+  var input = document.getElementById('feelingInput');
+  if (input) input.value = feeling;
+  searchVideosByFeeling();
+}
+
+function clearVideoSearch() {
+  var input       = document.getElementById('feelingInput');
+  var grid        = document.getElementById('videoGrid');
+  var resultLabel = document.getElementById('videoResultLabel');
+  var errorState  = document.getElementById('videoErrorState');
+
+  if (input)       input.value               = '';
+  if (resultLabel) resultLabel.style.display = 'none';
+  if (errorState)  errorState.style.display  = 'none';
+
+  if (grid) {
+    grid.style.display = 'grid';
+    grid.innerHTML = ''
+      + '<div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/inpok4MKVLM" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>5 Minute Meditation You Can Do Anywhere</h4><p>Goodful</p></div></div>'
+      + '<div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/COp7BR_Dvps" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>10 Minute Morning Yoga</h4><p>Yoga With Adriene</p></div></div>'
+      + '<div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/4pKly2JojMw" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Full Body Stretch for Beginners</h4><p>MommaStrong</p></div></div>'
+      + '<div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/O-6f5wQXSu8" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Anxiety Relief Breathing Exercise</h4><p>Headspace</p></div></div>'
+      + '<div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/1ZYbU82GVz4" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Guided Sleep Meditation</h4><p>Great Meditation</p></div></div>'
+      + '<div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sTANio_2E0Q" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>10 Minute Full Body Workout</h4><p>HASfit</p></div></div>';
+  }
+}
+
+function escapeHtml(text) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(text || ''));
+  return div.innerHTML;
 }
 
 // ────────────────────────────────────────────────────────────

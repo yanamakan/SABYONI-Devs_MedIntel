@@ -19,18 +19,30 @@ export default async function handler(req, res) {
 
     // Smart keyword mapping based on feeling
     const searchQuery = mapFeelingToQuery(feeling.toLowerCase().trim());
+    console.log('YouTube key length:', YOUTUBE_API_KEY.length);
+    console.log('Search query:', searchQuery);;
 
     const response = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=9&q=${encodeURIComponent(searchQuery)}&type=video&videoCategoryId=26&safeSearch=strict&relevanceLanguage=en&key=${YOUTUBE_API_KEY}`
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=9&q=${encodeURIComponent(searchQuery)}&type=video&safeSearch=strict&relevanceLanguage=en&key=${YOUTUBE_API_KEY}`
     );
 
     if (!response.ok) {
-      const errText = await response.text();
-      console.error('YouTube API error:', errText);
-      return res.status(502).json({ error: 'Could not fetch videos. Please try again.' });
+        const errText = await response.text();
+        console.error('YouTube API error status:', response.status);
+        console.error('YouTube API error body:', errText);
+        return res.status(502).json({ 
+            error: 'YouTube API error ' + response.status + ': ' + errText.substring(0, 300)
+        });
     }
 
     const data = await response.json();
+
+    // if (!YOUTUBE_API_KEY) {
+    // return res.status(500).json({ error: 'YouTube API not configured' });
+    // }
+    // console.log('YouTube key present, length:', YOUTUBE_API_KEY.length);
+    // console.log('Search query:', searchQuery);
+    
 
     if (!data.items || data.items.length === 0) {
       return res.status(200).json({ videos: [], query: searchQuery });
@@ -48,8 +60,8 @@ export default async function handler(req, res) {
     return res.status(200).json({ videos, query: searchQuery });
 
   } catch (err) {
-    console.error('YouTube handler error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('YouTube handler error:', err.message);
+    return res.status(500).json({ error: 'Internal server error' + err.message });
   }
 }
 

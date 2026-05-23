@@ -327,39 +327,69 @@
   <!-- ===== YOUTUBE VIDEOS ===== -->
   <section id="youtubeVideosSection" class="tab-content" style="display:none;">
     <div class="video-portal-container">
+
+      <!-- Header -->
       <div class="video-header">
-        <h3>YouTube Videos</h3>
-        <p>Watch educational videos about health and wellness</p>
+        <h3>Health & Wellness Videos</h3>
+        <p>Tell us how you're feeling and we'll find the right videos for you</p>
       </div>
-      <div class="video-search-wrapper">
-        <span class="search-icon">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </span>
-        <input type="text" placeholder="Search videos..." class="video-search-input">
+
+      <!-- Feeling input -->
+      <div class="video-feeling-box">
+        <div class="video-feeling-input-row">
+          <div class="video-search-wrapper" style="flex:1;margin-bottom:0;">
+            <span class="search-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </span>
+            <input type="text" id="feelingInput" placeholder="How are you feeling? e.g. stressed, muscle strain, can't sleep..." class="video-search-input" onkeydown="if(event.key==='Enter') searchVideosByFeeling()">
+          </div>
+          <button class="btn-feeling-search" onclick="searchVideosByFeeling()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Find Videos
+          </button>
+        </div>
+
+        <!-- Quick mood buttons -->
+        <div class="video-mood-chips">
+          <button class="mood-chip" onclick="quickFeeling('stressed')">😰 Stressed</button>
+          <button class="mood-chip" onclick="quickFeeling('muscle strain')">💪 Muscle Strain</button>
+          <button class="mood-chip" onclick="quickFeeling('anxious')">😟 Anxious</button>
+          <button class="mood-chip" onclick="quickFeeling('can\'t sleep')">😴 Can't Sleep</button>
+          <button class="mood-chip" onclick="quickFeeling('headache')">🤕 Headache</button>
+          <button class="mood-chip" onclick="quickFeeling('back pain')">🔙 Back Pain</button>
+          <button class="mood-chip" onclick="quickFeeling('tired')">😩 Tired</button>
+          <button class="mood-chip" onclick="quickFeeling('need to relax')">🧘 Need to Relax</button>
+        </div>
       </div>
-      <div class="video-filter-bar">
-        <button class="filter-item active" onclick="filterVideos('all',this)">All Videos</button>
-        <button class="filter-item" onclick="filterVideos('exercise',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="m12 8-4 4 4 4"/></svg>
-          Exercise
-        </button>
-        <button class="filter-item" onclick="filterVideos('relaxation',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          Relaxation
-        </button>
-        <button class="filter-item" onclick="filterVideos('meditation',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
-          Meditation
-        </button>
+
+      <!-- Results label -->
+      <div id="videoResultLabel" class="video-result-label" style="display:none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        <span id="videoResultText">Showing results for: </span>
+        <button class="video-clear-btn" onclick="clearVideoSearch()">✕ Clear</button>
       </div>
-      <div class="video-grid">
-        <div class="video-card exercise"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/ml6cT4AZdqI" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>10 Minute Full Body Workout</h4><p>FitnessBlender</p></div></div>
-        <div class="video-card exercise"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/v7AYKMP6rOE" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Morning Yoga for Beginners</h4><p>Yoga With Adriene</p></div></div>
-        <div class="video-card meditation"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/ZToicYcHIOU" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Guided Meditation for Relaxation</h4><p>Calm Meditation</p></div></div>
-        <div class="video-card relaxation"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/5Dq9efwhFIs" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>5 Minute Breathing Exercise</h4><p>Mindful Movement</p></div></div>
-        <div class="video-card exercise"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/5LogA_wYOnY" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Cardio HIIT Workout</h4><p>POPSUGAR Fitness</p></div></div>
-        <div class="video-card meditation"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/aEqlQvczauQ" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Sleep Meditation</h4><p>The Honest Guys</p></div></div>
+
+      <!-- Loading state -->
+      <div id="videoLoadingState" style="display:none;" class="video-loading">
+        <div class="map-loading-spinner"></div>
+        <p>Finding the best videos for you...</p>
       </div>
+
+      <!-- Error state -->
+      <div id="videoErrorState" style="display:none;" class="video-error">
+        <p id="videoErrorMsg">Could not load videos. Please try again.</p>
+      </div>
+
+      <!-- Video grid -->
+      <div class="video-grid" id="videoGrid">
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/inpok4MKVLM" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>5 Minute Meditation You Can Do Anywhere</h4><p>Goodful</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/COp7BR_Dvps" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>10 Minute Morning Yoga</h4><p>Yoga With Adriene</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/4pKly2JojMw" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Full Body Stretch for Beginners</h4><p>MommaStrong</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/O-6f5wQXSu8" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Anxiety Relief Breathing Exercise</h4><p>Headspace</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/1ZYbU82GVz4" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Guided Sleep Meditation</h4><p>Great Meditation</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sTANio_2E0Q" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>10 Minute Full Body Workout</h4><p>HASfit</p></div></div>
+      </div>
+
     </div>
   </section>
 

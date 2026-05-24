@@ -19,14 +19,102 @@ function switchTab(name, btn) {
 //  NOTIFICATIONS
 // ════════════════════════════════════════════════════════════
 function toggleNotif() {
-  document.getElementById('notifPopup').classList.toggle('show');
+  const popup = document.getElementById('notifPopup');
+  popup.classList.toggle('show');
+  if (popup.classList.contains('show')) {
+    loadAdminNotifications();
+    markAdminNotifsRead();
+  }
 }
 
-function clearNotifs() {
-  document.getElementById('notifList').innerHTML =
-    '<div class="notif-item" style="color:#9ca3af;">No new notifications</div>';
-  document.getElementById('notifCount').textContent = '0';
-  document.getElementById('notifCount').style.background = '#9ca3af';
+async function clearNotifs() {
+  try {
+    await db.from('admin_notifications').delete().neq('notification_id', '00000000-0000-0000-0000-000000000000');
+    document.getElementById('notifList').innerHTML =
+      '<div class="notif-item" style="color:#9ca3af;">No new notifications</div>';
+    document.getElementById('notifCount').textContent = '0';
+    document.getElementById('notifCount').style.display = 'none';
+  } catch (err) {
+    console.error('clearNotifs error:', err);
+  }
+}
+
+async function loadAdminNotifications() {
+  const listEl = document.getElementById('notifList');
+  if (!listEl) return;
+  listEl.innerHTML = '<div class="notif-item" style="color:#9ca3af;">Loading...</div>';
+
+  try {
+    const { data, error } = await db
+      .from('admin_notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(15);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      listEl.innerHTML = '<div class="notif-item" style="color:#9ca3af;">No new notifications</div>';
+      return;
+    }
+
+    listEl.innerHTML = data.map(n => `
+      <div class="notif-item${n.is_read ? '' : ' notif-unread'}" style="padding:10px 14px;border-bottom:1px solid #f3f4f6;">
+        <div style="font-size:13px;color:#111827;font-weight:${n.is_read ? '400' : '600'};">${escapeHtml(n.message)}</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:3px;">${getTimeAgo(n.created_at)}</div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error('loadAdminNotifications error:', err);
+    listEl.innerHTML = '<div class="notif-item" style="color:#ef4444;">Failed to load notifications.</div>';
+  }
+}
+
+async function markAdminNotifsRead() {
+  try {
+    await db.from('admin_notifications').update({ is_read: true }).eq('is_read', false);
+    document.getElementById('notifCount').style.display = 'none';
+  } catch (err) {
+    console.error('markAdminNotifsRead error:', err);
+  }
+}
+
+async function addAdminNotification(message, type = 'info') {
+  try {
+    await db.from('admin_notifications').insert({ message, type, is_read: false });
+    await refreshNotifCount();
+  } catch (err) {
+    console.error('addAdminNotification error:', err);
+  }
+}
+
+async function refreshNotifCount() {
+  try {
+    const { count } = await db
+      .from('admin_notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_read', false);
+
+    const badge = document.getElementById('notifCount');
+    if (count && count > 0) {
+      badge.textContent = count;
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch (err) {
+    console.error('refreshNotifCount error:', err);
+  }
+}
+
+function getTimeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (diff < 60)   return 'Just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  return Math.floor(diff / 86400) + 'd ago';
 }
 
 document.addEventListener('click', function (e) {
@@ -483,7 +571,7 @@ async function submitAddStaff() {
       if (error) throw error;
     }
 
-    showToast(`✓ ${role === 'doctor' ? 'Doctor' : 'Nurse'} account created for ${fullName}!`, 'success');
+    await addAdminNotification(`👤 New ${role} added: ${fullName} — ${dept}`, 'staff');
     closeModal('addStaffModal');
     ['staffName','staffEmail','staffSpec','staffPass'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('staffRole').value = '';
@@ -503,7 +591,7 @@ async function removeStaff(userId, name) {
   try {
     const { error } = await db.from('users').update({ is_active: false }).eq('id', userId);
     if (error) throw error;
-    showToast(`✓ ${name} has been deactivated.`, 'success');
+    await addAdminNotification(`🗑️ Staff removed: ${name}`, 'staff');
     await Promise.all([loadStats(), loadDoctors(), loadNurses()]);
   } catch (err) {
     showToast('Error: ' + err.message, 'error');
@@ -529,7 +617,7 @@ async function confirmAppt(btn, appointmentId) {
       row.cells[4].innerHTML = '<span class="badge-confirmed">Confirmed</span>';
       row.cells[6].innerHTML = '<span class="action-confirmed-text">Confirmed</span>';
     }
-    showToast('✓ Appointment confirmed!', 'success');
+    await addAdminNotification(`✅ Appointment confirmed for patient`, 'appointment');
     await loadStats();
   } catch (err) {
     showToast('Error: ' + err.message, 'error');
@@ -547,7 +635,7 @@ async function submitSchedule() {
   const status    = document.getElementById('apptStatus').value;
 
   if (!patientId || !doctorId || !date || !time) {
-    showToast('Please fill in all required fields.', 'error');
+    await addAdminNotification(`📅 New appointment scheduled`, 'appointment');
     return;
   }
 
@@ -628,6 +716,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadNurses(),
     loadAppointments(),
     loadPatientQueue(),
+    refreshNotifCount(),
   ]);
 
   setInterval(async () => {
@@ -637,6 +726,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       loadNurses(),
       loadAppointments(),
       loadPatientQueue(),
+      refreshNotifCount(),
     ]);
   }, 60000);
 });

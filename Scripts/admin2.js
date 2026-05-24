@@ -1,22 +1,25 @@
 /* ============================================================
-   admin.js — MedIntel Admin Dashboard
+   admin2.js — MedIntel Admin Dashboard (Supabase — real schema)
    ============================================================ */
 
-/* ── TAB SWITCHING ── */
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ════════════════════════════════════════════════════════════
 function switchTab(name, btn) {
-  // Hide all tab content
   document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-  // Deactivate all tabs
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-  // Show selected tab & activate button
   document.getElementById('tab-' + name).style.display = 'block';
   btn.classList.add('active');
 }
 
-/* ── NOTIFICATIONS ── */
+// ════════════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ════════════════════════════════════════════════════════════
 function toggleNotif() {
-  const popup = document.getElementById('notifPopup');
-  popup.classList.toggle('show');
+  document.getElementById('notifPopup').classList.toggle('show');
 }
 
 function clearNotifs() {
@@ -26,22 +29,23 @@ function clearNotifs() {
   document.getElementById('notifCount').style.background = '#9ca3af';
 }
 
-// Close popup when clicking outside
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
   const popup = document.getElementById('notifPopup');
-  const btn = e.target.closest('.header-btn');
-  if (!popup.contains(e.target) && !btn) {
-    popup.classList.remove('show');
-  }
+  const btn   = e.target.closest('.header-btn');
+  if (popup && !popup.contains(e.target) && !btn) popup.classList.remove('show');
 });
 
-/* ── MODALS ── */
+// ════════════════════════════════════════════════════════════
+//  MODALS
+// ════════════════════════════════════════════════════════════
 function openAddStaffModal() {
   clearModalErrors();
   document.getElementById('addStaffModal').classList.remove('hidden');
 }
 
 function openScheduleModal() {
+  populateDoctorDropdown();
+  populatePatientDropdown();
   document.getElementById('scheduleModal').classList.remove('hidden');
 }
 
@@ -49,14 +53,12 @@ function closeModal(id) {
   document.getElementById(id).classList.add('hidden');
 }
 
-// Close modal on backdrop click
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
   document.querySelectorAll('.modal:not(.hidden)').forEach(modal => {
     if (e.target === modal) modal.classList.add('hidden');
   });
 });
 
-/* ── ADD STAFF ── */
 function clearModalErrors() {
   ['errStaffName','errStaffEmail','errStaffRole','errStaffDept','errStaffPass'].forEach(id => {
     const el = document.getElementById(id);
@@ -64,218 +66,577 @@ function clearModalErrors() {
   });
 }
 
-function submitAddStaff() {
+// ════════════════════════════════════════════════════════════
+//  LOAD STATS
+// ════════════════════════════════════════════════════════════
+async function loadStats() {
+  try {
+    const [
+      { count: doctorCount },
+      { count: nurseCount },
+      { count: apptCount },
+      { count: atRiskCount },
+    ] = await Promise.all([
+      db.from('users').select('*', { count: 'exact', head: true }).eq('role', 'doctor').eq('is_active', true),
+      db.from('users').select('*', { count: 'exact', head: true }).eq('role', 'nurse').eq('is_active', true),
+      db.from('appointments').select('*', { count: 'exact', head: true }),
+      db.from('patients').select('*', { count: 'exact', head: true }).eq('at_risk', true),
+    ]);
+
+    document.getElementById('statDoctors').textContent      = doctorCount ?? 0;
+    document.getElementById('statNurses').textContent       = nurseCount  ?? 0;
+    document.getElementById('statAppointments').textContent = apptCount   ?? 0;
+    document.getElementById('statUrgent').textContent       = atRiskCount ?? 0;
+
+    document.querySelectorAll('.tab').forEach(t => {
+      if (t.textContent.startsWith('Doctors'))      t.textContent = `Doctors (${doctorCount ?? 0})`;
+      if (t.textContent.startsWith('Nurses'))       t.textContent = `Nurses (${nurseCount ?? 0})`;
+      if (t.textContent.startsWith('Appointments')) t.textContent = `Appointments (${apptCount ?? 0})`;
+    });
+  } catch (err) {
+    console.error('loadStats error:', err);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOAD DOCTORS
+// ════════════════════════════════════════════════════════════
+async function loadDoctors() {
+  const tbody = document.getElementById('doctorsTableBody');
+  tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;color:#9ca3af;text-align:center;">Loading doctors...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from('users')
+      .select('id, email, department, is_active, doctors(doctor_id, first_name, last_name, specialization)')
+      .eq('role', 'doctor')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;color:#9ca3af;text-align:center;">No doctors found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(u => {
+      const d        = u.doctors?.[0] ?? {};
+      const name     = [d.first_name, d.last_name].filter(Boolean).join(' ') || u.email.split('@')[0];
+      const dept     = u.department || 'Not assigned';
+      const spec     = d.specialization || '—';
+      const isActive = u.is_active !== false;
+
+      return `
+        <tr>
+          <td>
+            <div class="td-name">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+                <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+                <circle cx="20" cy="10" r="2"/>
+              </svg>
+              ${escapeHtml(name)}
+            </div>
+          </td>
+          <td>${escapeHtml(u.email)}</td>
+          <td><span class="badge-dept">${escapeHtml(dept)}</span></td>
+          <td>${escapeHtml(spec)}</td>
+          <td><span class="${isActive ? 'badge-active' : 'badge-pending'}">${isActive ? 'Active' : 'Inactive'}</span></td>
+          <td>
+            <button class="btn btn-red" onclick="removeStaff('${u.id}', '${escapeHtml(name)}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+              </svg>
+              Remove
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('loadDoctors error:', err);
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;color:#ef4444;text-align:center;">Failed to load doctors.</td></tr>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOAD NURSES
+// ════════════════════════════════════════════════════════════
+async function loadNurses() {
+  const tbody = document.getElementById('nursesTableBody');
+  tbody.innerHTML = `<tr><td colspan="5" style="padding:20px;color:#9ca3af;text-align:center;">Loading nurses...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from('users')
+      .select('id, email, department, is_active, nurses(first_name, last_name)')
+      .eq('role', 'nurse')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="padding:20px;color:#9ca3af;text-align:center;">No nurses found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(u => {
+      const n        = u.nurses?.[0] ?? {};
+      const name     = [n.first_name, n.last_name].filter(Boolean).join(' ') || u.email.split('@')[0];
+      const dept     = u.department || 'Not assigned';
+      const isActive = u.is_active !== false;
+
+      return `
+        <tr>
+          <td>
+            <div class="td-name">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              ${escapeHtml(name)}
+            </div>
+          </td>
+          <td>${escapeHtml(u.email)}</td>
+          <td><span class="badge-dept">${escapeHtml(dept)}</span></td>
+          <td><span class="${isActive ? 'badge-active' : 'badge-pending'}">${isActive ? 'Active' : 'Inactive'}</span></td>
+          <td>
+            <button class="btn btn-red" onclick="removeStaff('${u.id}', '${escapeHtml(name)}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+              </svg>
+              Remove
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('loadNurses error:', err);
+    tbody.innerHTML = `<tr><td colspan="5" style="padding:20px;color:#ef4444;text-align:center;">Failed to load nurses.</td></tr>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOAD APPOINTMENTS
+// ════════════════════════════════════════════════════════════
+async function loadAppointments() {
+  const tbody = document.getElementById('appointmentsTableBody');
+  tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;color:#9ca3af;text-align:center;">Loading appointments...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from('appointments')
+      .select(`
+        appointment_id,
+        date,
+        time,
+        status,
+        notes,
+        patients!appointments_patient_id_fkey(first_name, last_name, at_risk),
+        doctors!appointments_doctor_id_fkey(first_name, last_name)
+      `)
+      .order('date', { ascending: false })
+      .limit(50);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;color:#9ca3af;text-align:center;">No appointments found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(a => {
+      const p           = a.patients ?? {};
+      const d           = a.doctors  ?? {};
+      const patientName = [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const doctorName  = [d.first_name, d.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const timeDisplay = a.time ? a.time.substring(0, 5) : '--:--';
+
+      const urgencyBadge = p.at_risk
+        ? '<span class="badge-high">high</span>'
+        : '<span class="badge-low">low</span>';
+
+      const statusBadge = {
+        scheduled: '<span class="badge-scheduled">Scheduled</span>',
+        pending:   '<span class="badge-pending">Pending</span>',
+        confirmed: '<span class="badge-confirmed">Confirmed</span>',
+      }[a.status] || `<span class="badge-pending">${escapeHtml(a.status || 'Unknown')}</span>`;
+
+      const actionCell = a.status === 'confirmed'
+        ? '<span class="action-confirmed-text">Confirmed</span>'
+        : `<button class="btn btn-green" onclick="confirmAppt(this, '${a.appointment_id}')">
+             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+               <polyline points="20 6 9 17 4 12"/>
+             </svg>
+             Confirm
+           </button>`;
+
+      return `
+        <tr>
+          <td style="font-weight:700;color:#111827;">${escapeHtml(patientName)}</td>
+          <td>${escapeHtml(doctorName)}</td>
+          <td>${escapeHtml(a.date || '--')}</td>
+          <td>
+            <span class="td-time">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              ${timeDisplay}
+            </span>
+          </td>
+          <td>${statusBadge}</td>
+          <td>${urgencyBadge}</td>
+          <td>${actionCell}</td>
+        </tr>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('loadAppointments error:', err);
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;color:#ef4444;text-align:center;">Failed to load appointments.</td></tr>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOAD PATIENT QUEUE
+// ════════════════════════════════════════════════════════════
+async function loadPatientQueue() {
+  const container = document.querySelector('.queue-list');
+  if (!container) return;
+  container.innerHTML = `<div style="padding:28px;text-align:center;color:#9ca3af;">Loading queue...</div>`;
+
+  try {
+    const { data, error } = await db
+      .from('appointments')
+      .select(`
+        appointment_id,
+        date,
+        status,
+        notes,
+        patients!appointments_patient_id_fkey(patient_id, first_name, last_name, phone, at_risk, risk_reason)
+      `)
+      .in('status', ['pending', 'scheduled'])
+      .order('date', { ascending: true })
+      .limit(20);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      container.innerHTML = `<div style="padding:28px;text-align:center;color:#9ca3af;">No patients in queue.</div>`;
+      return;
+    }
+
+    data.sort((a, b) => (a.patients?.at_risk ? 0 : 1) - (b.patients?.at_risk ? 0 : 1));
+
+    container.innerHTML = data.map((a, i) => {
+      const p       = a.patients ?? {};
+      const name    = [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const phone   = escapeHtml(p.phone || 'N/A');
+      const date    = escapeHtml(a.date  || '--');
+      const isHigh  = p.at_risk === true;
+      const summary = escapeHtml(p.risk_reason || a.notes || 'No summary available.');
+
+      const cardClass = isHigh ? 'queue-high' : 'queue-low';
+      const badgeHtml = isHigh
+        ? '<span class="badge-high">HIGH</span><span class="urgent-circle">!</span>'
+        : '<span class="badge-low">LOW</span>';
+
+      return `
+        <div class="queue-card ${cardClass}">
+          <div class="queue-top">
+            <div class="queue-avatar">${i + 1}</div>
+            <div class="queue-info">
+              <div class="queue-name">${escapeHtml(name)}</div>
+              <div class="queue-condition">${isHigh ? 'At Risk' : 'Stable'}</div>
+              <div class="queue-phone">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12
+                           19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72
+                           12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6
+                           l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 17Z"/>
+                </svg>
+                ${phone}
+              </div>
+            </div>
+            <div class="queue-right">
+              <div class="queue-badges">${badgeHtml}</div>
+              <div class="queue-next">Next: ${date}</div>
+            </div>
+          </div>
+          <div class="queue-divider"></div>
+          <div class="queue-summary">
+            <span class="ai-label">AI Summary:</span> ${summary}
+          </div>
+        </div>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('loadPatientQueue error:', err);
+    container.innerHTML = `<div style="padding:28px;text-align:center;color:#ef4444;">Failed to load queue.</div>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  POPULATE DROPDOWNS
+// ════════════════════════════════════════════════════════════
+async function populateDoctorDropdown() {
+  const select = document.getElementById('apptDoctor');
+  if (!select) return;
+  select.innerHTML = '<option value="">Select doctor...</option>';
+
+  try {
+    const { data } = await db
+      .from('doctors')
+      .select('doctor_id, first_name, last_name, users!doctors_user_id_fkey(is_active)')
+      .order('first_name');
+
+    (data || []).forEach(d => {
+      if (d.users?.is_active === false) return;
+      const name = [d.first_name, d.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const opt  = document.createElement('option');
+      opt.value       = d.doctor_id;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.warn('populateDoctorDropdown error:', err);
+  }
+}
+
+async function populatePatientDropdown() {
+  const select = document.getElementById('apptPatient');
+  if (!select) return;
+  select.innerHTML = '<option value="">Select patient...</option>';
+
+  try {
+    const { data } = await db
+      .from('patients')
+      .select('patient_id, first_name, last_name')
+      .order('first_name');
+
+    (data || []).forEach(p => {
+      const name = [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const opt  = document.createElement('option');
+      opt.value       = p.patient_id;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.warn('populatePatientDropdown error:', err);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  ADD STAFF
+// ════════════════════════════════════════════════════════════
+async function submitAddStaff() {
   clearModalErrors();
-  const name  = document.getElementById('staffName').value.trim();
-  const email = document.getElementById('staffEmail').value.trim();
-  const role  = document.getElementById('staffRole').value;
-  const dept  = document.getElementById('staffDept').value;
-  const spec  = document.getElementById('staffSpec').value.trim();
-  const pass  = document.getElementById('staffPass').value;
+
+  const fullName = document.getElementById('staffName').value.trim();
+  const email    = document.getElementById('staffEmail').value.trim();
+  const role     = document.getElementById('staffRole').value;
+  const dept     = document.getElementById('staffDept').value;
+  const spec     = document.getElementById('staffSpec').value.trim();
+  const password = document.getElementById('staffPass').value;
 
   let valid = true;
-  if (!name)  { document.getElementById('errStaffName').textContent  = 'Name is required';     valid = false; }
-  if (!email) { document.getElementById('errStaffEmail').textContent = 'Email is required';    valid = false; }
-  if (!role)  { document.getElementById('errStaffRole').textContent  = 'Role is required';     valid = false; }
-  if (!dept)  { document.getElementById('errStaffDept').textContent  = 'Department required';  valid = false; }
-  if (!pass)  { document.getElementById('errStaffPass').textContent  = 'Password is required'; valid = false; }
+  if (!fullName) { document.getElementById('errStaffName').textContent  = 'Name is required';     valid = false; }
+  if (!email)    { document.getElementById('errStaffEmail').textContent = 'Email is required';    valid = false; }
+  if (!role)     { document.getElementById('errStaffRole').textContent  = 'Role is required';     valid = false; }
+  if (!dept)     { document.getElementById('errStaffDept').textContent  = 'Department required';  valid = false; }
+  if (!password) { document.getElementById('errStaffPass').textContent  = 'Password is required'; valid = false; }
   if (!valid) return;
 
-  if (role === 'doctor') {
-    addDoctorRow(name, email, dept, spec || 'Doctor');
-    updateStat('statDoctors', 1);
-    updateTabLabel('doctors');
-  } else {
-    addNurseRow(name, email, dept);
-    updateStat('statNurses', 1);
-    updateTabLabel('nurses');
-  }
+  const [firstName, ...rest] = fullName.split(' ');
+  const lastName = rest.join(' ');
 
-  closeModal('addStaffModal');
+  try {
+    const { data: authData, error: authError } = await db.auth.signUp({
+      email, password, options: { data: { role } }
+    });
+    if (authError) throw authError;
 
-  // Reset form
-  ['staffName','staffEmail','staffSpec','staffPass'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('staffRole').value = '';
-  document.getElementById('staffDept').value = '';
-}
+    const userId = authData.user?.id;
+    if (!userId) throw new Error('No user ID returned.');
 
-function addDoctorRow(name, email, dept, spec) {
-  const tbody = document.getElementById('doctorsTableBody');
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>
-      <div class="td-name">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
-          <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
-          <circle cx="20" cy="10" r="2"/>
-        </svg>
-        ${name}
-      </div>
-    </td>
-    <td>${email}</td>
-    <td><span class="badge-dept">${dept}</span></td>
-    <td>${spec}</td>
-    <td><span class="badge-active">Active</span></td>
-    <td>
-      <button class="btn btn-red" onclick="removeDoctor('${name}', this)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-          <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-        </svg>
-        Remove
-      </button>
-    </td>`;
-  tbody.appendChild(row);
-}
+    const { error: userError } = await db.from('users').insert({
+      id: userId, email, role, department: dept,
+    });
+    if (userError) throw userError;
 
-function addNurseRow(name, email, dept) {
-  const tbody = document.getElementById('nursesTableBody');
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>
-      <div class="td-name">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-        ${name}
-      </div>
-    </td>
-    <td>${email}</td>
-    <td><span class="badge-dept">${dept}</span></td>
-    <td><span class="badge-active">Active</span></td>
-    <td>
-      <button class="btn btn-red" onclick="removeNurse('${name}', this)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-          <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-        </svg>
-        Remove
-      </button>
-    </td>`;
-  tbody.appendChild(row);
-}
+    if (role === 'doctor') {
+      const { error } = await db.from('doctors').insert({
+        user_id: userId, first_name: firstName, last_name: lastName,
+        specialization: spec || dept,
+      });
+      if (error) throw error;
+    } else if (role === 'nurse') {
+      const { error } = await db.from('nurses').insert({
+        user_id: userId, first_name: firstName, last_name: lastName,
+      });
+      if (error) throw error;
+    }
 
-/* ── REMOVE STAFF ── */
-function removeDoctor(name, btn) {
-  if (!confirm(`Remove ${name} from the system?`)) return;
-  const row = (btn || document.querySelector(`#doctorsTableBody button[onclick*="${name}"]`)).closest('tr');
-  row.remove();
-  updateStat('statDoctors', -1);
-  updateTabLabel('doctors');
-}
+    showToast(`✓ ${role === 'doctor' ? 'Doctor' : 'Nurse'} account created for ${fullName}!`, 'success');
+    closeModal('addStaffModal');
+    ['staffName','staffEmail','staffSpec','staffPass'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('staffRole').value = '';
+    document.getElementById('staffDept').value = '';
+    await Promise.all([loadStats(), loadDoctors(), loadNurses()]);
 
-function removeNurse(name, btn) {
-  if (!confirm(`Remove ${name} from the system?`)) return;
-  const row = (btn || document.querySelector(`#nursesTableBody button[onclick*="${name}"]`)).closest('tr');
-  row.remove();
-  updateStat('statNurses', -1);
-  updateTabLabel('nurses');
-}
-
-/* ── CONFIRM APPOINTMENT ── */
-function confirmAppt(btn, patient) {
-  const row = btn.closest('tr');
-  // Update status badge
-  const statusCell = row.cells[4];
-  statusCell.innerHTML = '<span class="badge-confirmed">Confirmed</span>';
-  // Replace button with greyed text
-  btn.closest('td').innerHTML = '<span class="action-confirmed-text">Confirmed</span>';
-  // Update urgent count if high
-  const urgencyCell = row.cells[5];
-  if (urgencyCell.querySelector('.badge-high')) {
-    updateStat('statUrgent', -1);
+  } catch (err) {
+    showToast(err.message || 'Failed to create account.', 'error');
   }
 }
 
-/* ── SCHEDULE APPOINTMENT ── */
-function submitSchedule() {
-  const patient  = document.getElementById('apptPatient').value.trim();
-  const doctor   = document.getElementById('apptDoctor').value;
-  const date     = document.getElementById('apptDate').value;
-  const time     = document.getElementById('apptTime').value;
-  const urgency  = document.getElementById('apptUrgency').value;
-  const status   = document.getElementById('apptStatus').value;
+// ════════════════════════════════════════════════════════════
+//  REMOVE STAFF
+// ════════════════════════════════════════════════════════════
+async function removeStaff(userId, name) {
+  if (!confirm(`Remove ${name} from the system?`)) return;
+  try {
+    const { error } = await db.from('users').update({ is_active: false }).eq('id', userId);
+    if (error) throw error;
+    showToast(`✓ ${name} has been deactivated.`, 'success');
+    await Promise.all([loadStats(), loadDoctors(), loadNurses()]);
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
 
-  if (!patient || !doctor || !date || !time) {
-    alert('Please fill in all required fields.');
+function removeDoctor(userId, name) { return removeStaff(userId, name); }
+function removeNurse(userId, name)  { return removeStaff(userId, name); }
+
+// ════════════════════════════════════════════════════════════
+//  CONFIRM APPOINTMENT
+// ════════════════════════════════════════════════════════════
+async function confirmAppt(btn, appointmentId) {
+  try {
+    const { error } = await db
+      .from('appointments')
+      .update({ status: 'confirmed' })
+      .eq('appointment_id', appointmentId);
+    if (error) throw error;
+
+    const row = btn.closest('tr');
+    if (row) {
+      row.cells[4].innerHTML = '<span class="badge-confirmed">Confirmed</span>';
+      row.cells[6].innerHTML = '<span class="action-confirmed-text">Confirmed</span>';
+    }
+    showToast('✓ Appointment confirmed!', 'success');
+    await loadStats();
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SCHEDULE APPOINTMENT
+// ════════════════════════════════════════════════════════════
+async function submitSchedule() {
+  const patientId = document.getElementById('apptPatient').value;
+  const doctorId  = document.getElementById('apptDoctor').value;
+  const date      = document.getElementById('apptDate').value;
+  const time      = document.getElementById('apptTime').value;
+  const status    = document.getElementById('apptStatus').value;
+
+  if (!patientId || !doctorId || !date || !time) {
+    showToast('Please fill in all required fields.', 'error');
     return;
   }
 
-  const tbody = document.getElementById('appointmentsTableBody');
-  const fmtTime = time.substring(0,5);
+  try {
+    const { data: { user } } = await db.auth.getUser();
 
-  const urgencyBadge = {
-    high:   '<span class="badge-high">high</span>',
-    medium: '<span class="badge-medium">medium</span>',
-    low:    '<span class="badge-low">low</span>',
-  }[urgency];
+    const { error } = await db.from('appointments').insert({
+      patient_id: patientId,
+      doctor_id:  doctorId,
+      date,
+      time,
+      status,
+      created_by: user?.email || 'admin',
+    });
+    if (error) throw error;
 
-  const statusBadge = {
-    scheduled: '<span class="badge-scheduled">Scheduled</span>',
-    pending:   '<span class="badge-pending">Pending</span>',
-  }[status];
+    showToast('✓ Appointment scheduled!', 'success');
+    closeModal('scheduleModal');
+    document.getElementById('apptDate').value    = '';
+    document.getElementById('apptTime').value    = '';
+    document.getElementById('apptDoctor').value  = '';
+    document.getElementById('apptPatient').value = '';
+    await Promise.all([loadStats(), loadAppointments()]);
 
-  const actionBtn = status === 'pending'
-    ? `<button class="btn btn-green" onclick="confirmAppt(this, '${patient}')">
-         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-         Confirm
-       </button>`
-    : '';
-
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td style="font-weight:700;color:#111827;">${patient}</td>
-    <td>${doctor}</td>
-    <td>${date}</td>
-    <td>
-      <span class="td-time">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        ${fmtTime}
-      </span>
-    </td>
-    <td>${statusBadge}</td>
-    <td>${urgencyBadge}</td>
-    <td>${actionBtn}</td>`;
-  tbody.appendChild(row);
-
-  updateStat('statAppointments', 1);
-  if (urgency === 'high') updateStat('statUrgent', 1);
-
-  closeModal('scheduleModal');
-  // Reset
-  ['apptPatient','apptDate','apptTime'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('apptDoctor').value = '';
+  } catch (err) {
+    showToast(err.message || 'Failed to schedule appointment.', 'error');
+  }
 }
 
-/* ── STAT COUNTER HELPERS ── */
-function updateStat(id, delta) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const current = parseInt(el.textContent) || 0;
-  el.textContent = Math.max(0, current + delta);
+// ════════════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════════════
+function showToast(message, type = 'success') {
+  const existing = document.getElementById('admin-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'admin-toast';
+  toast.style.cssText = `
+    position:fixed;bottom:28px;right:28px;padding:14px 22px;
+    border-radius:12px;font-size:0.9rem;font-weight:600;color:#fff;
+    z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,0.15);
+    background:${type === 'success' ? '#16a34a' : '#ef4444'};
+    transition:opacity 0.3s;font-family:inherit;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
 }
 
-function updateTabLabel(type) {
-  const counts = {
-    doctors: document.getElementById('doctorsTableBody')?.rows.length || 0,
-    nurses:  document.getElementById('nursesTableBody')?.rows.length || 0,
-  };
-  const labels = { doctors: 'Doctors', nurses: 'Nurses' };
-  document.querySelectorAll('.tab').forEach(tab => {
-    const label = labels[type];
-    if (label && tab.textContent.startsWith(label)) {
-      tab.textContent = `${label} (${counts[type]})`;
-    }
-  });
+// ════════════════════════════════════════════════════════════
+//  ESCAPE HTML
+// ════════════════════════════════════════════════════════════
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* ── LOGOUT ── */
+// ════════════════════════════════════════════════════════════
+//  LOGOUT
+// ════════════════════════════════════════════════════════════
 function handleLogout() {
-  
-    window.location.href = 'login.html';
-  
+  if (typeof sessionLogout === 'function') sessionLogout();
+  else { sessionStorage.clear(); window.location.href = 'login.html'; }
 }
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  await Promise.all([
+    loadStats(),
+    loadDoctors(),
+    loadNurses(),
+    loadAppointments(),
+    loadPatientQueue(),
+  ]);
+
+  setInterval(async () => {
+    await Promise.all([
+      loadStats(),
+      loadDoctors(),
+      loadNurses(),
+      loadAppointments(),
+      loadPatientQueue(),
+    ]);
+  }, 60000);
+});

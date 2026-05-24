@@ -162,25 +162,31 @@
             <span class="i-bullet green">
               <svg viewBox="0 0 24 24" stroke="#22c55e"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
             </span>
-            <div><strong>Patient Growth</strong>Real-time patient registrations tracked from database</div>
+            <div><strong>Patient Growth</strong>Real-time patient registrations tracked from Supabase PostgreSQL. Includes full profile management, preferences, session history, and document storage via Supabase Storage.</div>
           </li>
           <li>
             <span class="i-bullet blue">
               <svg viewBox="0 0 24 24" stroke="#3b82f6"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             </span>
-            <div><strong>AI Performance</strong>OCTAVIA triage accuracy calculated from approved vs total reports</div>
+            <div><strong>AI Engines — OCTAVIA &amp; ARIA</strong>OCTAVIA (Sentinel) handles IoT device triage for clinical staff via Groq LLaMA. ARIA is the patient-facing health assistant — symptom analysis powered by the same Groq LLaMA stack, with full chat history saved to <code>ai_chat_history</code>.</div>
           </li>
           <li>
             <span class="i-bullet cyan">
               <svg viewBox="0 0 24 24" stroke="#06b6d4"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </span>
-            <div><strong>Appointments</strong>Live count of all scheduled appointments across departments</div>
+            <div><strong>Appointments &amp; Records</strong>Live count of all scheduled appointments across departments. Patients can self-book, cancel, request medical certificates, message doctors, upload documents, and request prescription refills — all routed through <code>nurse_notifications</code>.</div>
           </li>
           <li>
             <span class="i-bullet yellow">
               <svg viewBox="0 0 24 24" stroke="#eab308"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </span>
-            <div><strong>Critical Alerts</strong>Unresolved critical patient alerts monitored in real time</div>
+            <div><strong>Critical Alerts</strong>Unresolved critical patient alerts monitored in real time via OCTAVIA/Sentinel. Alert severity distribution tracked across low, medium, and critical thresholds in the <code>sentinel_alerts</code> table.</div>
+          </li>
+          <li>
+            <span class="i-bullet" style="background:rgba(99,102,241,0.15);">
+              <svg viewBox="0 0 24 24" stroke="#6366f1"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            </span>
+            <div><strong>Google Maps &amp; YouTube Integration</strong>Patient portal includes live clinic/pharmacy finder via Google Maps Places API (AdvancedMarkerElement). YouTube Data API v3 powers the wellness video tab — patients describe how they feel and receive curated health videos via <code>/api/youtube</code>.</div>
           </li>
         </ul>
       </div>
@@ -211,14 +217,22 @@
         </div>
       </div>
       <div class="chart-box">
-        <h3>System Information</h3>
-        <div class="info-table">
-          <div class="info-row"><span>Version</span><strong>2.1.5</strong></div>
-          <div class="info-row"><span>Database</span><strong>Supabase (PostgreSQL)</strong></div>
-          <div class="info-row"><span>Backend</span><strong>Vercel Serverless</strong></div>
-          <div class="info-row"><span>AI Engine</span><strong>OCTAVIA (Groq / LLaMA)</strong></div>
-          <div class="info-row"><span>Uptime</span><strong>99.7%</strong></div>
-          <div class="info-row"><span>Security</span><span class="badge-green">POPIA Compliant</span></div>
+        <div class="chart-box">
+          <h3>System Information</h3>
+          <div class="info-table">
+            <div class="info-row"><span>Version</span><strong>2.1.5</strong></div>
+            <div class="info-row"><span>Database</span><strong>Supabase (PostgreSQL)</strong></div>
+            <div class="info-row"><span>Storage</span><strong>Supabase Storage (medical-documents)</strong></div>
+            <div class="info-row"><span>Backend</span><strong>Vercel Serverless Functions</strong></div>
+            <div class="info-row"><span>Frontend</span><strong>Vanilla JS · Chart.js · CSS3</strong></div>
+            <div class="info-row"><span>AI Engine (Staff)</span><strong>OCTAVIA / Sentinel (Groq · LLaMA)</strong></div>
+            <div class="info-row"><span>AI Engine (Patient)</span><strong>ARIA Health Assistant (Groq · LLaMA)</strong></div>
+            <div class="info-row"><span>Mapping</span><strong>Google Maps API (Places + Marker)</strong></div>
+            <div class="info-row"><span>Video</span><strong>YouTube Data API v3</strong></div>
+            <div class="info-row"><span>Auth</span><strong>Supabase Auth + sessionStorage</strong></div>
+            <div class="info-row"><span>Uptime</span><strong>99.7%</strong></div>
+            <div class="info-row"><span>Security</span><span class="badge-green">POPIA Compliant</span></div>
+          </div>
         </div>
       </div>
     </div>

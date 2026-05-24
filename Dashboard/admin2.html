@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard — MedIntel</title>
   <link rel="stylesheet" href="admin2.css" />
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../Scripts/config.js"></script>
+<script src="../Scripts/session.js"></script>
 </head>
 <body>
 
@@ -60,8 +63,7 @@
     <button onclick="clearNotifs()">Clear All</button>
   </div>
   <div id="notifList">
-    <div class="notif-item">New appointment booked: James Wilson — 2026-03-20</div>
-    <div class="notif-item">Urgent case flagged: Robert Anderson — High priority</div>
+    <div class="notif-item" style="color:#9ca3af;">Loading notifications...</div>
   </div>
 </div>
 
@@ -72,23 +74,23 @@
   <div class="stats">
     <div class="stat-card stat-blue">
       <div class="stat-label">Total Doctors</div>
-      <div class="stat-num blue" id="statDoctors">2</div>
+      <div class="stat-num blue" id="statDoctors">--</div>
       <div class="stat-sub">Active medical staff</div>
     </div>
     <div class="stat-card stat-teal">
       <div class="stat-label">Total Nurses</div>
-      <div class="stat-num teal" id="statNurses">2</div>
+      <div class="stat-num teal" id="statNurses">--</div>
       <div class="stat-sub">Nursing staff</div>
     </div>
     <div class="stat-card stat-purple">
       <div class="stat-label">Total Appointments</div>
-      <div class="stat-num purple" id="statAppointments">5</div>
+      <div class="stat-num purple" id="statAppointments">--</div>
       <div class="stat-sub">Scheduled appointments</div>
     </div>
     <div class="stat-card stat-red">
       <div class="stat-label">Urgent Cases</div>
-      <div class="stat-num red" id="statUrgent">1</div>
-      <div class="stat-sub">Require immediate attention</div>
+      <div class="stat-num red" id="statUrgent">--</div>
+      <div class="stat-sub">At risk patients </div>
     </div>
   </div>
 
@@ -575,7 +577,9 @@
     <div class="form-grid">
       <div>
         <label>Patient Name *</label>
-        <input type="text" id="apptPatient" placeholder="Full name">
+        <select id="apptPatient">
+          <option value="">Select patient...</option>
+        </select>
       </div>
       <div>
         <label>Doctor *</label>
@@ -592,14 +596,6 @@
       <div>
         <label>Time *</label>
         <input type="time" id="apptTime">
-      </div>
-      <div>
-        <label>Urgency</label>
-        <select id="apptUrgency">
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-        </select>
       </div>
       <div>
         <label>Status</label>

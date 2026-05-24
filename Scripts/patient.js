@@ -207,6 +207,11 @@ function switchSettingsSubTab(event, subId) {
       if ((b.getAttribute('onclick') || '').includes(subId)) b.classList.add('active');
     });
   }
+
+  // Load data for each sub tab
+  if (subId === 'prefSub')     loadPreferences();
+  if (subId === 'notifSub')    loadPreferences();
+  if (subId === 'securitySub') loadActiveSessions();
 }
 
 // ── VIDEO FILTER ──────────────────────────────────────────────
@@ -243,16 +248,33 @@ function setVal(id, value) {
   if (el) el.value = value || '';
 }
 
-function getTimeAgo(dateStr) {
-  var diff = Date.now() - new Date(dateStr).getTime();
-  var mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return mins + ' minute' + (mins !== 1 ? 's' : '') + ' ago';
-  var hours = Math.floor(mins / 60);
-  if (hours < 24) return hours + ' hour' + (hours !== 1 ? 's' : '') + ' ago';
-  var days = Math.floor(hours / 24);
-  if (days < 7) return days + ' day' + (days !== 1 ? 's' : '') + ' ago';
-  return new Date(dateStr).toLocaleDateString();
+function getPatientTimezone() {
+  if (patientPreferences && patientPreferences.timezone) {
+    var tzMap = {
+      'Johannesburg (SAST)': 'Africa/Johannesburg',
+      'London (GMT)':        'Europe/London',
+      'New York (EST)':      'America/New_York',
+      'Dubai (GST)':         'Asia/Dubai'
+    };
+    return tzMap[patientPreferences.timezone] || 'Africa/Johannesburg';
+  }
+  return 'Africa/Johannesburg';
+}
+
+function formatDateWithTimezone(dateStr) {
+  if (!dateStr) return '—';
+  try {
+    return new Date(dateStr).toLocaleString('en-ZA', {
+      timeZone:    getPatientTimezone(),
+      day:         'numeric',
+      month:       'short',
+      year:        'numeric',
+      hour:        '2-digit',
+      minute:      '2-digit'
+    });
+  } catch (e) {
+    return new Date(dateStr).toLocaleString();
+  }
 }
 
 // ────────────────────────────────────────────────────────────
@@ -326,6 +348,7 @@ async function loadPatientProfile() {
     await loadStats();
     await loadRecentActivity();
     await loadNotifications();
+    await loadPreferences();
 
   } catch (err) {
     console.error('loadPatientProfile exception:', err);
@@ -474,7 +497,7 @@ async function loadRecentActivity() {
 
     // Get recent notifications (refill requests, messages, certificates)
     var notifRes = await supabaseClient
-      .from('nurse_notifications')
+      .from('patient_notifications')
       .select('notification_id, message, type, created_at')
       .eq('patient_id', pid)
       .order('created_at', { ascending: false })
@@ -1274,6 +1297,8 @@ function toggleRecordDetails(recordId) {
 // ────────────────────────────────────────────────────────────
 // SETTINGS
 // ────────────────────────────────────────────────────────────
+
+// ── PROFILE ──────────────────────────────────────────────────
 async function saveProfileChanges() {
   if (!supabaseClient || !currentPatient) return;
 
@@ -1287,13 +1312,18 @@ async function saveProfileChanges() {
   var firstName = parts[0] || '';
   var lastName  = parts.slice(1).join(' ') || '';
 
-  var btn = document.querySelector('.btn-save-changes');
+  var btn = document.querySelector('#profileSub .btn-save-changes');
   if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
 
   try {
     var result = await supabaseClient
       .from('patients')
-      .update({ first_name: firstName, last_name: lastName, phone: phone || null, dob: dob || null })
+      .update({
+        first_name: firstName,
+        last_name:  lastName,
+        phone:      phone || null,
+        dob:        dob   || null
+      })
       .eq('patient_id', currentPatient.patient_id);
 
     if (result.error) throw result.error;
@@ -1309,6 +1339,247 @@ async function saveProfileChanges() {
   }
 }
 
+// ── DELETE ACCOUNT ────────────────────────────────────────────
+async function deleteAccount() {
+  if (!supabaseClient || !currentPatient || !currentUser) return;
+
+  var confirmed = confirm(
+    'Are you absolutely sure you want to delete your account?\n\n' +
+    'This will permanently delete:\n' +
+    '• Your patient profile\n' +
+    '• All your medical records\n' +
+    '• All your appointments\n' +
+    '• Your login credentials\n\n' +
+    'This action CANNOT be undone.'
+  );
+  if (!confirmed) return;
+
+  // Double confirm
+  var typedConfirm = prompt('Type DELETE to confirm account deletion:');
+  if (!typedConfirm || typedConfirm.trim().toUpperCase() !== 'DELETE') {
+    alert('Account deletion cancelled.');
+    return;
+  }
+
+  var btn = document.querySelector('.btn-delete-account');
+  if (btn) { btn.disabled = true; btn.textContent = 'Deleting...'; }
+
+  try {
+    var pid    = currentPatient.patient_id;
+    var userId = currentUser.id || currentUser.user_id;
+
+    // 1. Delete patient preferences
+    await supabaseClient
+      .from('patient_preferences')
+      .delete()
+      .eq('patient_id', pid);
+
+    // 2. Delete nurse notifications
+    await supabaseClient
+      .from('nurse_notifications')
+      .delete()
+      .eq('patient_id', pid);
+
+    // 3. Delete AI chat history
+    await supabaseClient
+      .from('ai_chat_history')
+      .delete()
+      .eq('patient_id', pid);
+
+    // 4. Delete appointments
+    await supabaseClient
+      .from('appointments')
+      .delete()
+      .eq('patient_id', pid);
+
+    // 5. Delete medical records
+    await supabaseClient
+      .from('medical_records')
+      .delete()
+      .eq('patient_id', pid);
+
+    // 6. Delete patient row
+    var patientDelete = await supabaseClient
+      .from('patients')
+      .delete()
+      .eq('patient_id', pid);
+    if (patientDelete.error) throw patientDelete.error;
+
+    // 7. Delete user sessions
+    await supabaseClient
+      .from('user_sessions')
+      .delete()
+      .eq('user_id', userId);
+
+    // 8. Delete users row
+    var userDelete = await supabaseClient
+      .from('users')
+      .delete()
+      .eq('id', userId);
+    if (userDelete.error) throw userDelete.error;
+
+    // 9. Delete from Supabase Auth
+    var { error: authError } = await supabaseClient.auth.admin
+      ? await supabaseClient.auth.admin.deleteUser(userId)
+      : await supabaseClient.rpc('delete_user');
+
+    // 10. Sign out and clear session
+    await supabaseClient.auth.signOut();
+    sessionStorage.clear();
+
+    alert('Your account has been permanently deleted. Goodbye.');
+    window.location.href = 'login.html';
+
+  } catch (err) {
+    console.error('deleteAccount error:', err);
+    // Even if auth deletion fails, clear session
+    sessionStorage.clear();
+    alert('Account data deleted. Redirecting...');
+    window.location.href = 'login.html';
+  }
+}
+
+// ── PREFERENCES ───────────────────────────────────────────────
+var patientPreferences = null;
+
+async function loadPreferences() {
+  if (!supabaseClient || !currentPatient) return;
+
+  try {
+    var result = await supabaseClient
+      .from('patient_preferences')
+      .select('*')
+      .eq('patient_id', currentPatient.patient_id)
+      .single();
+
+    if (result.error || !result.data) {
+      // Create default preferences
+      var insertResult = await supabaseClient
+        .from('patient_preferences')
+        .insert({
+          patient_id:          currentPatient.patient_id,
+          dark_mode:           false,
+          language:            'English',
+          timezone:            'Johannesburg (SAST)',
+          email_notifications: true,
+          sms_notifications:   false
+        })
+        .select()
+        .single();
+
+      if (!insertResult.error) {
+        patientPreferences = insertResult.data;
+      }
+    } else {
+      patientPreferences = result.data;
+    }
+
+    if (patientPreferences) applyPreferences(patientPreferences);
+
+  } catch (err) {
+    console.error('loadPreferences error:', err);
+  }
+}
+
+function applyPreferences(prefs) {
+  var darkMode = prefs.dark_mode || false;
+
+  // Dark mode
+  var darkToggle = document.getElementById('darkToggle');
+  if (darkToggle) darkToggle.checked = darkMode;
+  document.body.classList.toggle('dark-theme', darkMode);
+  localStorage.setItem('medintel_dark_mode', darkMode);
+
+  // Language
+  var langSelect = document.getElementById('prefLanguage');
+  if (langSelect && prefs.language) langSelect.value = prefs.language;
+
+  // Timezone
+  var tzSelect = document.getElementById('prefTimezone');
+  if (tzSelect && prefs.timezone) tzSelect.value = prefs.timezone;
+
+  // Notification toggles
+  var emailToggle = document.getElementById('notifEmail');
+  var smsToggle   = document.getElementById('notifSms');
+  if (emailToggle) emailToggle.checked = prefs.email_notifications !== false;
+  if (smsToggle)   smsToggle.checked   = prefs.sms_notifications   || false;
+}
+
+async function savePreferences() {
+  if (!supabaseClient || !currentPatient) return;
+
+  var darkMode = document.getElementById('darkToggle')   ? document.getElementById('darkToggle').checked   : false;
+  var language = document.getElementById('prefLanguage') ? document.getElementById('prefLanguage').value   : 'English';
+  var timezone = document.getElementById('prefTimezone') ? document.getElementById('prefTimezone').value   : 'Johannesburg (SAST)';
+
+  var btn = document.querySelector('#prefSub .btn-save-pref');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  try {
+    var result = await supabaseClient
+      .from('patient_preferences')
+      .upsert({
+        patient_id: currentPatient.patient_id,
+        dark_mode:  darkMode,
+        language:   language,
+        timezone:   timezone,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'patient_id' });
+
+    if (result.error) throw result.error;
+
+    // Save to localStorage for instant apply on next load
+    localStorage.setItem('medintel_dark_mode', darkMode);
+    localStorage.setItem('medintel_language',  language);
+    localStorage.setItem('medintel_timezone',  timezone);
+
+    // Apply dark mode immediately
+    document.body.classList.toggle('dark-theme', darkMode);
+
+    addNotification('✅ Preferences saved successfully.');
+    alert('Preferences saved!');
+
+  } catch (err) {
+    console.error('savePreferences error:', err);
+    alert('Failed to save preferences: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Preferences'; }
+  }
+}
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────
+async function saveNotificationPreferences() {
+  if (!supabaseClient || !currentPatient) return;
+
+  var emailNotif = document.getElementById('notifEmail') ? document.getElementById('notifEmail').checked : true;
+  var smsNotif   = document.getElementById('notifSms')   ? document.getElementById('notifSms').checked   : false;
+
+  var btn = document.querySelector('#notifSub .btn-save-notif');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  try {
+    var result = await supabaseClient
+      .from('patient_preferences')
+      .upsert({
+        patient_id:          currentPatient.patient_id,
+        email_notifications: emailNotif,
+        sms_notifications:   smsNotif,
+        updated_at:          new Date().toISOString()
+      }, { onConflict: 'patient_id' });
+
+    if (result.error) throw result.error;
+    addNotification('✅ Notification preferences saved.');
+    alert('Notification preferences saved!');
+
+  } catch (err) {
+    console.error('saveNotificationPreferences error:', err);
+    alert('Failed to save notification preferences: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Preferences'; }
+  }
+}
+
+// ── SECURITY — CHANGE PASSWORD ────────────────────────────────
 function openChangePasswordModal() {
   var existing = document.getElementById('passwordModal');
   if (existing) existing.remove();
@@ -1320,31 +1591,280 @@ function openChangePasswordModal() {
     + '<div class="modal-header"><h3>Change Password</h3>'
     + '<button class="modal-close" onclick="closeModal(\'passwordModal\')">✕</button></div>'
     + '<div class="modal-body">'
+    + '<div class="input-group"><label>Current Password</label>'
+    + '<div class="input-wrapper"><input type="password" id="currentPassword" placeholder="Enter current password"></div></div>'
     + '<div class="input-group"><label>New Password</label>'
-    + '<div class="input-wrapper"><input type="password" id="newPassword" placeholder="Min 6 characters"></div></div>'
+    + '<div class="input-wrapper"><input type="password" id="newPassword" placeholder="Min 8 characters"></div></div>'
     + '<div class="input-group"><label>Confirm New Password</label>'
     + '<div class="input-wrapper"><input type="password" id="confirmPassword" placeholder="Confirm new password"></div></div>'
+    + '<div id="passwordStrength" style="margin-bottom:12px;"></div>'
     + '<button class="btn-save-changes" onclick="confirmPasswordChange()">Update Password</button>'
     + '</div></div>';
   document.body.appendChild(modal);
+
+  // Password strength checker
+  document.getElementById('newPassword').addEventListener('input', function() {
+    checkPasswordStrength(this.value);
+  });
+}
+
+function checkPasswordStrength(password) {
+  var strengthEl = document.getElementById('passwordStrength');
+  if (!strengthEl) return;
+
+  if (!password) { strengthEl.innerHTML = ''; return; }
+
+  var score = 0;
+  if (password.length >= 8)          score++;
+  if (password.match(/[A-Z]/))       score++;
+  if (password.match(/[0-9]/))       score++;
+  if (password.match(/[^A-Za-z0-9]/)) score++;
+
+  var labels = ['Weak', 'Fair', 'Good', 'Strong'];
+  var colors = ['#ef4444', '#f59e0b', '#3b82f6', '#16a34a'];
+  var label  = labels[score - 1] || 'Weak';
+  var color  = colors[score - 1] || '#ef4444';
+  var width  = (score / 4) * 100;
+
+  strengthEl.innerHTML = '<div style="margin-bottom:4px;font-size:12px;color:' + color + ';font-weight:600;">Password strength: ' + label + '</div>'
+    + '<div style="height:4px;background:#e5e7eb;border-radius:4px;overflow:hidden;">'
+    + '<div style="height:100%;width:' + width + '%;background:' + color + ';border-radius:4px;transition:width 0.3s;"></div>'
+    + '</div>';
 }
 
 async function confirmPasswordChange() {
+  var currentPass = document.getElementById('currentPassword') ? document.getElementById('currentPassword').value : '';
   var newPass     = document.getElementById('newPassword')     ? document.getElementById('newPassword').value     : '';
   var confirmPass = document.getElementById('confirmPassword') ? document.getElementById('confirmPassword').value : '';
 
-  if (!newPass || newPass.length < 6) { alert('Password must be at least 6 characters.'); return; }
-  if (newPass !== confirmPass)         { alert('Passwords do not match.');                  return; }
+  if (!currentPass)            { alert('Please enter your current password.'); return; }
+  if (!newPass || newPass.length < 8) { alert('New password must be at least 8 characters.'); return; }
+  if (newPass !== confirmPass) { alert('Passwords do not match.'); return; }
+
+  var btn = document.querySelector('#passwordModal .btn-save-changes');
+  if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
 
   try {
-    var result = await supabaseClient.auth.updateUser({ password: newPass });
-    if (result.error) throw result.error;
+    // Re-authenticate first
+    var email = currentUser.email;
+    var { error: signInError } = await supabaseClient.auth.signInWithPassword({
+      email:    email,
+      password: currentPass
+    });
+
+    if (signInError) {
+      alert('Current password is incorrect.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
+      return;
+    }
+
+    // Update password
+    var { error: updateError } = await supabaseClient.auth.updateUser({ password: newPass });
+    if (updateError) throw updateError;
+
     closeModal('passwordModal');
     addNotification('🔒 Password updated successfully.');
     alert('Password changed successfully.');
+
+    // Log session
+    await logSession('password_changed');
+
   } catch (err) {
     console.error('confirmPasswordChange error:', err);
     alert('Failed to update password: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
+  }
+}
+
+// ── ACTIVE SESSIONS ───────────────────────────────────────────
+async function logSession(action) {
+  if (!supabaseClient || !currentUser) return;
+  try {
+    var userId  = currentUser.id || currentUser.user_id;
+    var browser = getBrowserInfo();
+    var device  = getDeviceInfo();
+
+    if (action === 'login') {
+      // Mark previous sessions as inactive
+      await supabaseClient
+        .from('user_sessions')
+        .update({ is_active: false, logout_time: new Date().toISOString() })
+        .eq('user_id', userId)
+        .eq('is_active', true);
+
+      // Create new session
+      var insertResult = await supabaseClient
+        .from('user_sessions')
+        .insert({
+          user_id:     userId,
+          login_time:  new Date().toISOString(),
+          device_info: device,
+          browser:     browser,
+          is_active:   true
+        })
+        .select()
+        .single();
+
+      if (!insertResult.error && insertResult.data) {
+        // Store session ID so we can identify current session
+        sessionStorage.setItem('current_session_id', insertResult.data.session_id);
+      }
+    }
+  } catch (err) {
+    console.error('logSession error:', err);
+  }
+}
+
+function getBrowserInfo() {
+  var ua = navigator.userAgent;
+  if (ua.includes('Chrome'))  return 'Chrome';
+  if (ua.includes('Firefox')) return 'Firefox';
+  if (ua.includes('Safari'))  return 'Safari';
+  if (ua.includes('Edge'))    return 'Edge';
+  return 'Unknown Browser';
+}
+
+function getDeviceInfo() {
+  var ua = navigator.userAgent;
+  if (/Mobile|Android|iPhone/i.test(ua)) return 'Mobile';
+  if (/iPad|Tablet/i.test(ua))           return 'Tablet';
+  return 'Desktop';
+}
+
+async function loadActiveSessions(showAll) {
+  if (!supabaseClient || !currentUser) return;
+  var container = document.getElementById('activeSessionsList');
+  if (!container) return;
+
+  container.innerHTML = '<div class="loading-row">Loading sessions...</div>';
+
+  try {
+    var userId = currentUser.id || currentUser.user_id;
+    var limit  = showAll ? 30 : 3;
+
+    // Get sessions from last month
+    var oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    var result = await supabaseClient
+      .from('user_sessions')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('login_time', oneMonthAgo.toISOString())
+      .order('login_time', { ascending: false })
+      .limit(limit);
+
+    if (result.error) throw result.error;
+
+    if (!result.data || result.data.length === 0) {
+      container.innerHTML = '<div class="empty-list-msg">No session history found.</div>';
+      return;
+    }
+
+    var currentSessionId = sessionStorage.getItem('current_session_id');
+
+    var html = result.data.map(function(session) {
+      var loginTime  = formatDateWithTimezone(session.login_time);
+      var logoutTime = session.logout_time
+        ? formatDateWithTimezone(session.logout_time)
+        : '—';
+      var isCurrent = session.session_id === currentSessionId;
+
+      return '<div class="session-item' + (session.is_active ? ' session-active' : '') + '">'
+        + '<div class="session-info">'
+        + '<div class="session-device">'
+        + getDeviceIcon(session.device_info)
+        + '<span>' + (session.device_info || 'Unknown Device') + ' · ' + (session.browser || 'Unknown Browser') + '</span>'
+        + (session.is_active
+          ? '<span class="session-live-badge">' + (isCurrent ? '● Current' : '● Active') + '</span>'
+          : '')
+        + '</div>'
+        + '<div class="session-times">'
+        + '<small>Logged in: ' + loginTime + '</small>'
+        + (!session.is_active ? '<small>Logged out: ' + logoutTime + '</small>' : '')
+        + '</div>'
+        + '</div>'
+        + (session.is_active && !isCurrent
+          ? '<button class="btn-revoke-session" onclick="revokeSession(\'' + session.session_id + '\')">Revoke</button>'
+          : '')
+        + (isCurrent ? '<span style="font-size:11px;color:#16a34a;font-weight:600;white-space:nowrap;">This device</span>' : '')
+        + '</div>';
+    }).join('');
+
+    // Add view more / view less button
+    if (!showAll && result.data.length === 3) {
+      html += '<button class="btn-outline-wide" style="width:100%;margin-top:8px;justify-content:center;" onclick="loadActiveSessions(true)">'
+        + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'
+        + ' View More Sessions'
+        + '</button>';
+    } else if (showAll) {
+      html += '<button class="btn-outline-wide" style="width:100%;margin-top:8px;justify-content:center;" onclick="loadActiveSessions(false)">'
+        + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>'
+        + ' Show Less'
+        + '</button>';
+    }
+
+    container.innerHTML = html;
+
+  } catch (err) {
+    console.error('loadActiveSessions error:', err);
+    container.innerHTML = '<div class="empty-list-msg">Failed to load sessions.</div>';
+  }
+}
+
+function getDeviceIcon(device) {
+  if (device === 'Mobile') {
+    return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
+  }
+  if (device === 'Tablet') {
+    return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
+  }
+  return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+}
+
+async function revokeSession(sessionId) {
+  if (!confirm('Revoke this session? If this is your current session you will be logged out.')) return;
+  try {
+    var result = await supabaseClient
+      .from('user_sessions')
+      .update({ is_active: false, logout_time: new Date().toISOString() })
+      .eq('session_id', sessionId);
+
+    if (result.error) throw result.error;
+
+    addNotification('🔒 Session revoked.');
+
+    // Check if this was the current session — if so log out
+    var currentSessionId = sessionStorage.getItem('current_session_id');
+    if (currentSessionId === sessionId) {
+      await supabaseClient.auth.signOut();
+      sessionStorage.clear();
+      window.location.href = 'login.html';
+      return;
+    }
+
+    loadActiveSessions();
+  } catch (err) {
+    console.error('revokeSession error:', err);
+    alert('Failed to revoke session.');
+  }
+}
+
+async function revokeAllSessions() {
+  if (!confirm('Revoke all other sessions? Only your current session will remain active.')) return;
+  try {
+    var userId = currentUser.id || currentUser.user_id;
+    await supabaseClient
+      .from('user_sessions')
+      .update({ is_active: false, logout_time: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('is_active', true);
+
+    addNotification('🔒 All sessions revoked.');
+    loadActiveSessions();
+  } catch (err) {
+    console.error('revokeAllSessions error:', err);
+    alert('Failed to revoke sessions.');
   }
 }
 
@@ -1800,6 +2320,14 @@ function escapeHtml(text) {
 // INIT
 // ────────────────────────────────────────────────────────────
 window.onload = async function () {
+  // Apply dark mode immediately from localStorage to prevent flash
+  var savedDark = localStorage.getItem('medintel_dark_mode');
+  if (savedDark === 'true') {
+    document.body.classList.add('dark-theme');
+    var darkToggle = document.getElementById('darkToggle');
+    if (darkToggle) darkToggle.checked = true;
+  }
+
   if (!initSupabase()) {
     alert('System configuration error. Please contact support.');
     return;
@@ -1818,11 +2346,15 @@ window.onload = async function () {
   updateNotificationUI();
 
   await loadPatientProfile();
+  await logSession('login');
 
   var darkToggle = document.getElementById('darkToggle');
   if (darkToggle) {
-    darkToggle.addEventListener('change', function () {
-      document.body.classList.toggle('dark-theme', this.checked);
+    darkToggle.addEventListener('change', function (e) {
+      if (e.isTrusted) { // only fires on real user click
+        document.body.classList.toggle('dark-theme', this.checked);
+        localStorage.setItem('medintel_dark_mode', this.checked);
+      }
     });
   }
 

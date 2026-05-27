@@ -1,49 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedIntel - Login</title>
-    <link rel="stylesheet" href="login.css">
-  </head>
-  <body>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedIntel - Login</title>
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
 
-        <!-- Header -->
-    <header>
-        <div class="logo-wrapper">
-            <!-- Stethoscope icon in blue rounded square -->
-            <div class="logo-icon">
-                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="38" height="38">
-                    <!-- stethoscope earpieces -->
-                    <line x1="12" y1="8" x2="12" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-                    <line x1="28" y1="8" x2="28" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-                    <!-- arch connecting earpieces -->
-                    <path d="M12 14 Q12 20 20 20 Q28 20 28 14" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-                    <!-- tube going down -->
-                    <line x1="20" y1="20" x2="20" y2="26" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-                    <!-- chest piece circle -->
-                    <circle cx="20" cy="30" r="4" stroke="white" stroke-width="2.5" fill="none"/>
-                    <!-- small dot inside chest piece -->
-                    <circle cx="20" cy="30" r="1.2" fill="white"/>
-                </svg>
-            </div>
-            <div class="logo-text">
-                <h1>MedIntel</h1>
-                <p class="tagline">Intelligent Medical Support</p>
-            </div>
-        </div>
-        <p class="subtitle">Revolutionizing healthcare with AI-powered patient management and centralized medical records</p>
+  <!-- Header -->
+  <header>
+    <div class="logo-wrapper">
+      <div class="logo-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="38" height="38">
+          <line x1="12" y1="8" x2="12" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="28" y1="8" x2="28" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M12 14 Q12 20 20 20 Q28 20 28 14" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <line x1="20" y1="20" x2="20" y2="26" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="20" cy="30" r="4" stroke="white" stroke-width="2.5" fill="none"/>
+          <circle cx="20" cy="30" r="1.2" fill="white"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>MedIntel</h1>
+        <p class="tagline">Intelligent Medical Support</p>
+      </div>
+    </div>
+    <p class="subtitle">
+      Revolutionizing healthcare with AI-powered patient management and
+      centralized medical records
+    </p>
+  </header>
+
     </header>
-    <!-- Header Section -->
-    <!--<header>
-      <h1>MedIntel</h1>
-      <p><small>Intelligent Medical Support</small></p>
-      <p>
-        Revolutionizing healthcare with AI-powered patient management and
-        centralized medical records
-      </p>
-
-    </header>-->
 
     <!--<section class="features-grid">
         <div class="feature-card">
@@ -178,82 +167,130 @@
         </div>
     </div>
 
-    <div id="message"></div>
+    <div class="feature-card">
+      <div class="feature-icon cyan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="2,12 6,12 8,5 11,19 14,9 16,14 18,12 22,12"/>
+        </svg>
+      </div>
+      <h3>Centralized Records</h3>
+      <p>Secure cloud-based storage for complete patient histories and prescriptions</p>
+    </div>
 
-    <script>
-        function showLogin() {
-            document.getElementById("loginForm").style.display = "block";
-            document.getElementById("signupForm").style.display = "none";
-            document.getElementById("loginTab").classList.add("active");
-            document.getElementById("signupTab").classList.remove("active");
-        }
+    <div class="feature-card">
+      <div class="feature-icon navy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L4 6V12C4 16.8 7.6 21.2 12 22C16.4 21.2 20 16.8 20 12V6L12 2Z"/>
+          <polyline points="9,12 11,14 15,10"/>
+        </svg>
+      </div>
+      <h3>POPIA Compliant</h3>
+      <p>Enterprise-grade security with encrypted data and role-based access control</p>
+    </div>
+  </section>
 
-        function showSignUp() {
-            document.getElementById("loginForm").style.display = "none";
-            document.getElementById("signupForm").style.display = "block";
-            document.getElementById("signupTab").classList.add("active");
-            document.getElementById("loginTab").classList.remove("active");
-        }
+  <div class="access-card">
+    <h3>Access MedIntel</h3>
+    <p class="access-subtext">Staff: Login with credentials | Patients: Sign up to get started</p>
 
-        /*function handleLogin() {
-            // Add your login logic here (e.g., redirecting to dashboard)
-            window.location.href = 'super-admin.html';
-        }*/
-       function handleLogin() {
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
-    const messageEl = document.getElementById("message");
+    <div class="toggle-container">
+      <button id="loginTab" class="toggle-btn active" onclick="showLogin()">Login</button>
+      <button id="signupTab" class="toggle-btn" onclick="showSignUp()">Sign Up</button>
+    </div>
 
-    const users = {
-        "superadmin@medintel.com": { password: "super123",  redirect: "super-admin.html" },
-        "admin@medintel.com":      { password: "admin123",  redirect: "admin2.html" },
-        "doctor@medintel.com":     { password: "doctor123", redirect: "doctor-dash.html" },
-        "nurse@medintel.com":      { password: "nurse123",  redirect: "nurse.html" },
-        "patient@example.com":     { password: "patient123",redirect: "patient.html" }
-    };
+    <div id="loginForm" class="form-container">
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="your.email@example.com"/>
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••"/>
+      </div>
+      <button class="btn-primary" onclick="handleLogin()">Login</button>
+    </div>
 
-    if (!email || !password) {
-        messageEl.style.cssText = "color:#ef4444; text-align:center; margin-top:12px; font-size:14px;";
-        messageEl.textContent = "Please enter your email and password.";
-        return;
+    <div id="signupForm" class="form-container" style="display:none;">
+      <div class="input-group">
+        <label>Full Name</label>
+        <input type="text" id="signupName" placeholder="John Smith"/>
+      </div>
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="signupEmail" placeholder="your.email@example.com"/>
+      </div>
+      <div class="input-group">
+        <label>Phone Number</label>
+        <input type="tel" id="signupPhone" placeholder="+27 82 123 4567"/>
+      </div>
+      <div class="input-group">
+        <label>Date of Birth</label>
+        <input type="date" id="signupDob"/>
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="signupPassword" placeholder="••••••••"/>
+      </div>
+      <div class="input-group">
+        <label>Confirm Password</label>
+        <input type="password" id="Confirm_signupPassword" placeholder="••••••••"/>
+      </div>
+      <button class="btn-primary" onclick="handleSignUp()">Create Patient Account</button>
+      <p class="signup-note">Note: Only patients can self-register. Staff accounts are created by administrators.</p>
+    </div>
+
+    <div class="demo-box">
+      <h4>Demo Credentials:</h4>
+      <p><strong>Super Admin:</strong> superadmin@medintel.com / super123</p>
+      <p><strong>Admin:</strong> admin@medintel.com / admin123</p>
+      <p><strong>Doctor:</strong> doctor@medintel.com / doctor123</p>
+      <p><strong>Nurse:</strong> nurse@medintel.com / nurse123</p>
+      <p><strong>Patient:</strong> patient@example.com / patient123</p>
+    </div>
+  </div>
+
+  <div id="message"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../Scripts/config.js"></script>
+  <script src="../Scripts/auth.js"></script>
+
+  <script>
+    function showLogin() {
+      document.getElementById("loginForm").style.display = "block";
+      document.getElementById("signupForm").style.display = "none";
+      document.getElementById("loginTab").classList.add("active");
+      document.getElementById("signupTab").classList.remove("active");
     }
 
-    const user = users[email];
-
-    if (user && user.password === password) {
-        messageEl.style.cssText = "color:#16a34a; text-align:center; margin-top:12px; font-size:14px;";
-        messageEl.textContent = "Login successful! Redirecting...";
-        setTimeout(() => {
-            window.location.href = user.redirect;
-        }, 800);
-    } else {
-        messageEl.style.cssText = "color:#ef4444; text-align:center; margin-top:12px; font-size:14px;";
-        messageEl.textContent = "Invalid email or password. Please try again.";
+    function showSignUp() {
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("signupForm").style.display = "block";
+      document.getElementById("signupTab").classList.add("active");
+      document.getElementById("loginTab").classList.remove("active");
     }
-}
-    
 
-         // Floating bubbles
+    // Floating bubbles
     (function() {
-        const sizes  = [30, 50, 70, 90, 110, 140];
-        const lefts  = [5, 12, 22, 35, 48, 58, 68, 78, 88, 95];
-        const delays = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
-        const durations = [10, 13, 16, 19, 22];
+      const sizes     = [30, 50, 70, 90, 110, 140];
+      const lefts     = [5, 12, 22, 35, 48, 58, 68, 78, 88, 95];
+      const delays    = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
+      const durations = [10, 13, 16, 19, 22];
 
-        lefts.forEach((left, i) => {
-            const el = document.createElement('div');
-            el.className = 'bubble';
-            el.style.cssText = `
-                width: ${sizes[i % sizes.length]}px;
-                height: ${sizes[i % sizes.length]}px;
-                left: ${left}%;
-                animation-duration: ${durations[i % durations.length]}s;
-                animation-delay: ${delays[i]}s;
-            `;
-            document.body.appendChild(el);
-        });
+      lefts.forEach((left, i) => {
+        const el = document.createElement('div');
+        el.className = 'bubble';
+        el.style.cssText = `
+          width: ${sizes[i % sizes.length]}px;
+          height: ${sizes[i % sizes.length]}px;
+          left: ${left}%;
+          animation-duration: ${durations[i % durations.length]}s;
+          animation-delay: ${delays[i]}s;
+        `;
+        document.body.appendChild(el);
+      });
     })();
+  </script>
 
-    </script>
 </body>
 </html>

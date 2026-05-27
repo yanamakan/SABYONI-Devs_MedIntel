@@ -26,6 +26,17 @@ function getSession() {
     return null;
   }
 }
+//---------------------------------
+function getTimeAgo(iso) {
+  if (!iso) return '';
+  var diff = Date.now() - new Date(iso).getTime();
+  var mins = Math.floor(diff / 60000);
+  if (mins < 1)  return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  var hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
 
 // ── NOTIFICATIONS ─────────────────────────────────────────────
 // ── NOTIFICATIONS ─────────────────────────────────────────────
@@ -63,7 +74,7 @@ async function loadNotifications() {
   if (!supabaseClient || !currentPatient) return;
   try {
     var result = await supabaseClient
-      .from('nurse_notifications')
+      .from('patient_notifications')
       .select('*')
       .eq('patient_id', currentPatient.patient_id)
       .order('created_at', { ascending: false })
@@ -89,7 +100,7 @@ async function addNotificationToDB(message, type) {
   if (!supabaseClient || !currentPatient) return;
   try {
     var result = await supabaseClient
-      .from('nurse_notifications')
+      .from('patient_notifications')
       .insert({
         message:    message,
         patient_id: currentPatient.patient_id,
@@ -137,7 +148,7 @@ async function markAllNotificationsRead() {
   if (!supabaseClient || !currentPatient) return;
   try {
     await supabaseClient
-      .from('nurse_notifications')
+      .from('patient_notifications')
       .update({ is_read: true })
       .eq('patient_id', currentPatient.patient_id)
       .eq('is_read', false);
@@ -153,7 +164,7 @@ async function clearAllNotifications() {
   if (!supabaseClient || !currentPatient) return;
   try {
     await supabaseClient
-      .from('nurse_notifications')
+      .from('patient_notifications')
       .delete()
       .eq('patient_id', currentPatient.patient_id);
 
@@ -489,7 +500,7 @@ async function loadRecentActivity() {
         activities.push({
           type: 'record',
           text: 'Medical record added: ' + (r.diagnosis || 'General record'),
-          date: r.created_at,
+          date: r.date_created,  // <-- fixed
           color: 'purple'
         });
       });
@@ -844,17 +855,28 @@ async function confirmBooking() {
     : 'a doctor';
   var patientName = (currentPatient.first_name + ' ' + currentPatient.last_name).trim();
 
-  await supabaseClient.from('nurse_notifications').insert({
-    message: '📅 New appointment booked — Patient: ' + patientName
-      + ' | Doctor: ' + doctorName
-      + ' | Date: ' + date
-      + ' | Time: ' + time
-      + (notes ? ' | Reason: ' + notes : ''),
-    patient_id: currentPatient.patient_id,
-    type: 'new_appointment',
-    is_read: false
-  });
+  var notifMessage = '📅 New appointment booked — Patient: ' + patientName
+  + ' | Doctor: ' + doctorName
+  + ' | Date: ' + date
+  + ' | Time: ' + time
+  + (notes ? ' | Reason: ' + notes : '');
 
+  await supabaseClient.from('nurse_notifications').insert({
+    message: notifMessage, patient_id: currentPatient.patient_id,
+    type: 'new_appointment', is_read: false
+  }).then(r => { if (r.error) console.error('nurse_notifications error:', r.error.message); });
+
+  await supabaseClient.from('doctor_notifications').insert({
+    message: notifMessage, title: 'New Appointment Request',
+    patient_id: currentPatient.patient_id, doctor_id: doctorId,
+    type: 'new_appointment', is_read: false
+  }).then(r => { if (r.error) console.error('doctor_notifications error:', r.error.message); });
+
+  await supabaseClient.from('admin_notifications').insert({
+    message: notifMessage, patient_id: currentPatient.patient_id,
+    type: 'new_appointment', is_read: false
+  }).then(r => { if (r.error) console.error('admin_notifications error:', r.error.message); });
+  
   closeModal('bookingModal');
   addNotification('📅 Appointment booked for ' + date + ' at ' + time);
   loadAppointments();
@@ -949,6 +971,15 @@ async function confirmUpload() {
       notes:      noteText
     });
 
+    var patientName = (currentPatient.first_name + ' ' + currentPatient.last_name).trim();
+    await supabaseClient.from('doctor_notifications').insert({
+      message: '📎 ' + patientName + ' uploaded a medical document: ' + docType.replace(/_/g, ' ') + (desc ? ' — ' + desc : ''),
+      title: 'Document Uploaded',
+      patient_id: currentPatient.patient_id,
+      type: 'info',
+      is_read: false
+    }).then(r => { if (r.error) console.error('doctor_notifications error:', r.error.message); });
+
     closeModal('uploadModal');
     addNotification('📎 Document uploaded successfully.');
     alert('Document uploaded successfully.');
@@ -981,7 +1012,7 @@ async function openMessageDoctorModal() {
     + '<div class="input-group"><label>Subject</label>'
     + '<div class="input-wrapper"><input type="text" id="msgSubject" placeholder="e.g. Question about my medication..."></div></div>'
     + '<div class="input-group"><label>Message</label>'
-    + '<textarea id="msgBody" style="width:100%;min-height:120px;border-radius:12px;border:1.5px solid #e5e7eb;padding:12px 14px;font-size:14px;font-family:inherit;background:#f9fafb;outline:none;resize:vertical;" placeholder="Type your message here..."></textarea></div>'
+    + '<textarea id="msgBody" class="modal-textarea" style="width:100%;min-height:120px;border-radius:12px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;resize:vertical;" placeholder="Type your message here..."></textarea>'
     + '<button class="btn-save-changes" onclick="confirmSendMessage()">Send Message</button>'
     + '</div></div>';
   document.body.appendChild(modal);
@@ -1042,14 +1073,28 @@ async function confirmSendMessage() {
   try {
     var patientName = (currentPatient.first_name + ' ' + currentPatient.last_name).trim();
 
+    var notifMessage = '[MESSAGE TO DOCTOR] From: ' + patientName
+  + (subject ? ' | Subject: ' + subject : '')
+  + ' | ' + body;
+
     await supabaseClient.from('nurse_notifications').insert({
-      message: '[MESSAGE TO DOCTOR] From: ' + patientName
-        + (subject ? ' | Subject: ' + subject : '')
-        + ' | ' + body,
+      message: notifMessage, patient_id: currentPatient.patient_id,
+      type: 'patient_message', is_read: false
+    }).then(r => { if (r.error) console.error('nurse_notifications error:', r.error.message); });
+
+    await supabaseClient.from('doctor_notifications').insert({
+      message: notifMessage,
+      title: 'Patient Message',
       patient_id: currentPatient.patient_id,
-      type:       'patient_message',
-      is_read:    false
-    });
+      doctor_id: doctorId,
+      type: 'patient_message',
+      is_read: false
+    }).then(r => { if (r.error) console.error('doctor_notifications error:', r.error.message); });
+
+    await supabaseClient.from('admin_notifications').insert({
+      message: notifMessage, patient_id: currentPatient.patient_id,
+      type: 'patient_message', is_read: false
+    }).then(r => { if (r.error) console.error('admin_notifications error:', r.error.message); });
 
     closeModal('messageModal');
     addNotification('💬 Message sent to your doctor successfully.');
@@ -1091,7 +1136,7 @@ function openCertificateModal() {
     + '<div class="input-group"><label>Date Required To</label>'
     + '<div class="input-wrapper"><input type="date" id="certDateTo"></div></div>'
     + '<div class="input-group"><label>Reason / Additional Notes</label>'
-    + '<textarea id="certReason" style="width:100%;min-height:100px;border-radius:12px;border:1.5px solid #e5e7eb;padding:12px 14px;font-size:14px;font-family:inherit;background:#f9fafb;outline:none;resize:vertical;" placeholder="Provide any additional context for your doctor..."></textarea></div>'
+    + '<textarea id="certReason" class="modal-textarea" style="width:100%;min-height:100px;border-radius:12px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;resize:vertical;" placeholder="Provide any additional context for your doctor..."></textarea>'
     + '<button class="btn-save-changes" onclick="confirmCertificateRequest()">Submit Request</button>'
     + '</div></div>';
   document.body.appendChild(modal);
@@ -1118,16 +1163,33 @@ async function confirmCertificateRequest() {
     var patientName = (currentPatient.first_name + ' ' + currentPatient.last_name).trim();
     var certLabel   = certType.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
 
-    await supabaseClient.from('nurse_notifications').insert({
-      message: '[CERTIFICATE REQUEST] ' + certLabel
-        + ' | Patient: ' + patientName
-        + ' | Period: ' + dateFrom + (dateTo ? ' to ' + dateTo : '')
-        + (reason ? ' | Notes: ' + reason : ''),
-      patient_id: currentPatient.patient_id,
-      type:       'certificate_request',
-      is_read:    false
-    });
+    var notifMessage = '[CERTIFICATE REQUEST] ' + certLabel
+  + ' | Patient: ' + patientName
+  + ' | Period: ' + dateFrom + (dateTo ? ' to ' + dateTo : '')
+  + (reason ? ' | Notes: ' + reason : '');
 
+    await supabaseClient.from('nurse_notifications').insert({
+      message: notifMessage, patient_id: currentPatient.patient_id,
+      type: 'certificate_request', is_read: false
+    }).then(r => { if (r.error) console.error('nurse_notifications error:', r.error.message); });
+
+    await supabaseClient.from('doctor_notifications').insert({
+      message: notifMessage, title: 'Certificate Request',
+      patient_id: currentPatient.patient_id,
+      type: 'certificate_request', is_read: false
+    }).then(r => { if (r.error) console.error('doctor_notifications error:', r.error.message); });
+
+    await supabaseClient.from('admin_notifications').insert({
+      message: notifMessage, patient_id: currentPatient.patient_id,
+      type: 'certificate_request', is_read: false
+    }).then(r => { if (r.error) console.error('admin_notifications error:', r.error.message); });
+
+    await supabaseClient.from('patient_notifications').insert({
+      patient_id: currentPatient.patient_id,
+      message: '📋 Your ' + certLabel + ' request has been submitted. Your doctor will review it shortly.',
+      type: 'certificate_request',
+      is_read: false
+    });
     closeModal('certificateModal');
     addNotification('📋 Medical certificate request submitted.');
     alert('Your ' + certLabel + ' request has been submitted. Your doctor will review it shortly.');
@@ -1149,56 +1211,59 @@ async function loadPrescriptions() {
   container.innerHTML = '<div class="loading-row">Loading prescriptions...</div>';
 
   try {
-    // Try prescriptions table first, fall back to medical_records
     var result = await supabaseClient
       .from('prescriptions')
-      .select('*')
+      .select('prescription_id, medicine, dosage, instructions, pharmacy_name, date_issued, doctors:doctor_id(first_name, last_name)')
       .eq('patient_id', currentPatient.patient_id)
-      .order('created_at', { ascending: false });
-
-    if (result.error || !result.data || result.data.length === 0) {
-      // Fallback to medical_records with prescription field
-      result = await supabaseClient
-        .from('medical_records')
-        .select('*, doctors:doctor_id ( first_name, last_name )')
-        .eq('patient_id', currentPatient.patient_id)
-        .not('prescription', 'is', null)
-        .order('created_at', { ascending: false });
-    }
+      .order('date_issued', { ascending: false });
 
     if (result.error) throw result.error;
 
     if (!result.data || result.data.length === 0) {
-      container.innerHTML = '<div class="empty-list-msg"><p>No active prescriptions found.</p></div>';
+      container.innerHTML = '<div class="empty-list-msg"><p>No active prescriptions found. Prescriptions issued by your doctor will appear here.</p></div>';
       return;
     }
 
-    container.innerHTML = result.data.map(function(rec) {
-      var doctorName = rec.doctors
-        ? (rec.doctors.first_name + ' ' + rec.doctors.last_name).trim()
+    container.innerHTML = result.data.map(function(rx) {
+      var doctorName = rx.doctors
+        ? (rx.doctors.first_name + ' ' + rx.doctors.last_name).trim()
         : 'Unknown';
-      var date      = rec.created_at ? rec.created_at.split('T')[0] : '—';
-      var prescText = rec.prescription || rec.medication_name || rec.notes || '—';
-      if (typeof prescText === 'object') prescText = JSON.stringify(prescText);
-      var diagLabel = rec.diagnosis || rec.medication_name || 'Prescription';
+      var date = rx.date_issued || '—';
 
       return '<div class="prescription-card">'
         + '<div class="presc-content">'
         + '<div class="presc-header-row">'
-        + '<span class="presc-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg></span>'
-        + '<h4>' + diagLabel + '</h4>'
+        + '<span class="presc-icon">'
+        + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        + '<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/>'
+        + '<path d="m8.5 8.5 7 7"/>'
+        + '</svg>'
+        + '</span>'
+        + '<h4>' + (rx.medicine || 'Medication') + '</h4>'
         + '</div>'
         + '<div class="presc-details">'
-        + '<p>' + prescText + '</p>'
+        + (rx.dosage
+            ? '<p><strong>Dosage:</strong> ' + rx.dosage + '</p>'
+            : '')
+        + (rx.instructions
+            ? '<p><strong>Instructions:</strong> ' + rx.instructions + '</p>'
+            : '')
+        + (rx.pharmacy_name
+            ? '<p><strong>Pharmacy:</strong> ' + rx.pharmacy_name + '</p>'
+            : '')
         + '<p class="presc-meta">Prescribed by Dr. ' + doctorName + ' on ' + date + '</p>'
-        + '</div></div>'
-        + '<button class="btn-refill" onclick="requestRefill(\'' + (rec.id || rec.record_id || '') + '\', \'' + diagLabel + '\')">Request Refill</button>'
+        + '</div>'
+        + '</div>'
+        + '<button class="btn-refill" onclick="requestRefill(\''
+        + rx.prescription_id + '\', \'' + (rx.medicine || 'this medication') + '\')">'
+        + 'Request Refill'
+        + '</button>'
         + '</div>';
     }).join('');
 
   } catch (err) {
     console.error('loadPrescriptions error:', err);
-    container.innerHTML = '<div class="empty-list-msg">Failed to load prescriptions.</div>';
+    container.innerHTML = '<div class="empty-list-msg">Failed to load prescriptions. Please try again.</div>';
   }
 }
 
@@ -1206,12 +1271,24 @@ async function requestRefill(recordId, medicationName) {
   if (!confirm('Request a refill for: ' + medicationName + '?')) return;
   try {
     var patientName = (currentPatient.first_name + ' ' + currentPatient.last_name).trim();
+    var notifMessage = 'Refill request from ' + patientName + ' for: ' + medicationName;
+
     await supabaseClient.from('nurse_notifications').insert({
-      message:    'Refill request from ' + patientName + ' for: ' + medicationName,
+      message: notifMessage, patient_id: currentPatient.patient_id,
+      type: 'refill_request', is_read: false
+    }).then(r => { if (r.error) console.error('nurse_notifications error:', r.error.message); });
+
+    await supabaseClient.from('doctor_notifications').insert({
+      message: notifMessage, title: 'Refill Request',
       patient_id: currentPatient.patient_id,
-      type:       'refill_request',
-      is_read:    false
-    });
+      type: 'refill_request', is_read: false
+    }).then(r => { if (r.error) console.error('doctor_notifications error:', r.error.message); });
+
+    await supabaseClient.from('admin_notifications').insert({
+      message: notifMessage, patient_id: currentPatient.patient_id,
+      type: 'refill_request', is_read: false
+    }).then(r => { if (r.error) console.error('admin_notifications error:', r.error.message); });
+
     addNotification('💊 Refill request sent for ' + medicationName);
     alert('Refill request sent to your care team successfully.');
     loadStats();
@@ -1233,14 +1310,14 @@ async function loadMedicalRecords() {
   try {
     var result = await supabaseClient
       .from('medical_records')
-      .select('*, doctors:doctor_id ( first_name, last_name )')
+      .select('record_id, diagnosis, body_location, notes, date_created, doctors:doctor_id(first_name, last_name)')
       .eq('patient_id', currentPatient.patient_id)
-      .order('created_at', { ascending: false });
+      .order('date_created', { ascending: false });
 
     if (result.error) throw result.error;
 
     if (!result.data || result.data.length === 0) {
-      container.innerHTML = '<div class="empty-list-msg"><p>No medical records found.</p></div>';
+      container.innerHTML = '<div class="empty-list-msg"><p>No medical records found. Records added by your doctor will appear here.</p></div>';
       return;
     }
 
@@ -1248,14 +1325,8 @@ async function loadMedicalRecords() {
       var doctorName = rec.doctors
         ? (rec.doctors.first_name + ' ' + rec.doctors.last_name).trim()
         : 'Unknown';
-      var date      = rec.created_at ? rec.created_at.split('T')[0] : '—';
-      var prescStr  = rec.prescription
-        ? (typeof rec.prescription === 'object' ? JSON.stringify(rec.prescription) : rec.prescription)
-        : null;
-      var vitalsStr = rec.vitals
-        ? (typeof rec.vitals === 'object' ? JSON.stringify(rec.vitals) : rec.vitals)
-        : null;
-      var recId = rec.id || rec.record_id || '';
+      var date  = rec.date_created ? rec.date_created.split('T')[0] : '—';
+      var recId = rec.record_id;
 
       return '<div class="record-card" id="record-' + recId + '">'
         + '<div class="record-header">'
@@ -1263,23 +1334,34 @@ async function loadMedicalRecords() {
         + '<span class="record-date">' + date + '</span>'
         + '</div>'
         + '<p class="doctor-name">Dr. ' + doctorName + '</p>'
-        + '<p class="record-summary">' + (rec.notes || rec.treatment || 'No summary available.') + '</p>'
+        + '<p class="record-summary">' + (rec.notes || 'No summary available.') + '</p>'
         + '<button class="btn-view-report" onclick="toggleRecordDetails(\'' + recId + '\')">'
-        + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
-        + ' View Full Report</button>'
+        + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+        + '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'
+        + '<polyline points="14 2 14 8 20 8"/>'
+        + '</svg>'
+        + ' View Full Report'
+        + '</button>'
         + '<div id="recordDetails-' + recId + '" class="record-details" style="display:none;">'
         + '<hr style="margin:14px 0;border-color:#e9d5ff;">'
-        + (rec.diagnosis  ? '<p><strong>Diagnosis:</strong> '    + rec.diagnosis  + '</p>' : '')
-        + (rec.treatment  ? '<p><strong>Treatment:</strong> '    + rec.treatment  + '</p>' : '')
-        + (prescStr       ? '<p><strong>Prescription:</strong> ' + prescStr       + '</p>' : '')
-        + (rec.notes      ? '<p><strong>Notes:</strong> '        + rec.notes      + '</p>' : '')
-        + (vitalsStr      ? '<p><strong>Vitals:</strong> '       + vitalsStr      + '</p>' : '')
-        + '</div></div>';
+        + (rec.diagnosis
+            ? '<p><strong>Diagnosis:</strong> ' + rec.diagnosis + '</p>'
+            : '')
+        + (rec.body_location
+            ? '<p><strong>Body Location:</strong> ' + rec.body_location + '</p>'
+            : '')
+        + (rec.notes
+            ? '<p><strong>Notes:</strong> ' + rec.notes + '</p>'
+            : '')
+        + '<p><strong>Doctor:</strong> Dr. ' + doctorName + '</p>'
+        + '<p><strong>Date:</strong> ' + date + '</p>'
+        + '</div>'
+        + '</div>';
     }).join('');
 
   } catch (err) {
     console.error('loadMedicalRecords error:', err);
-    container.innerHTML = '<div class="empty-list-msg">Failed to load medical records.</div>';
+    container.innerHTML = '<div class="empty-list-msg">Failed to load medical records. Please try again.</div>';
   }
 }
 
@@ -1509,7 +1591,7 @@ async function savePreferences() {
   if (!supabaseClient || !currentPatient) return;
 
   var darkMode = document.getElementById('darkToggle')   ? document.getElementById('darkToggle').checked   : false;
-  var language = document.getElementById('prefLanguage') ? document.getElementById('prefLanguage').value   : 'English';
+  var language = 'English';
   var timezone = document.getElementById('prefTimezone') ? document.getElementById('prefTimezone').value   : 'Johannesburg (SAST)';
 
   var btn = document.querySelector('#prefSub .btn-save-pref');

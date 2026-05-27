@@ -1123,3 +1123,56 @@ body {
     font-size: 0.76rem;
   }
 }
+
+/* ===== CREATE APPOINTMENT BUTTON ===== */
+.btn-create-appt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background: #0ea5e9;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.btn-create-appt:hover {
+  background: #0284c7;
+}
+
+/* ===== APPOINTMENT ACTION BUTTONS ===== */
+.btn-edit-appt {
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #374151;
+  transition: background .15s;
+}
+
+.btn-edit-appt:hover {
+  background: #f3f4f6;
+}
+
+.btn-delete-appt {
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: none;
+  background: #fee2e2;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #dc2626;
+  transition: background .15s;
+}
+
+.btn-delete-appt:hover {
+  background: #fecaca;
+}

@@ -1,17 +1,28 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MedIntel - Login</title>
   <link rel="stylesheet" href="login.css" />
 </head>
+
 <body>
 
   <!-- Header -->
   <header>
     <div class="logo-wrapper">
       <div class="logo-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="38" height="38">
+          <line x1="12" y1="8" x2="12" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round" />
+          <line x1="28" y1="8" x2="28" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round" />
+          <path d="M12 14 Q12 20 20 20 Q28 20 28 14" stroke="white" stroke-width="2.5" stroke-linecap="round"
+            fill="none" />
+          <line x1="20" y1="20" x2="20" y2="26" stroke="white" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="20" cy="30" r="4" stroke="white" stroke-width="2.5" fill="none" />
+          <circle cx="20" cy="30" r="1.2" fill="white" />
+        </svg>
         <img src="MedIntel_logo.png" alt="MedIntel_logo" class="logo-img">
       </div>
       <div class="logo-text">
@@ -25,45 +36,83 @@
     </p>
   </header>
 
+  </header>
+
+  <!--<section class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon blue">🧠</div>
+            <h3>AI-Powered Triage</h3>
+            <p>Intelligent symptom analysis and urgency categorization to optimize patient flow</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon cyan">🧬</div>
+            <h3>Centralized Records</h3>
+            <p>Secure cloud-based storage for complete patient histories and prescriptions</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon navy">🛡️</div>
+            <h3>POPIA Compliant</h3>
+            <p>Enterprise-grade security with encrypted data and role-based access control</p>
+        </div>
+    </section>-->
+
+
   <!-- Feature Cards -->
   <section class="features-grid">
+
+    <!-- Card 1: Brain icon – blue #2563eb -->
     <div class="feature-card">
       <div class="feature-icon blue">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9.5 3C7 3 5 5 5 7.5C5 8.6 5.4 9.6 6.1 10.3C4.8 11 4 12.4 4 14C4 16.2 5.8 18 8 18H9V21H12V18"/>
-          <path d="M14.5 3C17 3 19 5 19 7.5C19 8.6 18.6 9.6 17.9 10.3C19.2 11 20 12.4 20 14C20 16.2 18.2 18 16 18H15V21H12V18"/>
-          <line x1="12" y1="3" x2="12" y2="18"/>
-          <path d="M6 11.5 Q7.5 13 9 11.5"/>
-          <path d="M5.5 8.5 Q7 10 8.5 8.5"/>
-          <path d="M18 11.5 Q16.5 13 15 11.5"/>
-          <path d="M18.5 8.5 Q17 10 15.5 8.5"/>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.6"
+          stroke-linecap="round" stroke-linejoin="round">
+          <!-- left hemisphere -->
+          <path d="M9.5 3C7 3 5 5 5 7.5C5 8.6 5.4 9.6 6.1 10.3C4.8 11 4 12.4 4 14C4 16.2 5.8 18 8 18H9V21H12V18" />
+          <!-- right hemisphere -->
+          <path
+            d="M14.5 3C17 3 19 5 19 7.5C19 8.6 18.6 9.6 17.9 10.3C19.2 11 20 12.4 20 14C20 16.2 18.2 18 16 18H15V21H12V18" />
+          <!-- centre divider -->
+          <line x1="12" y1="3" x2="12" y2="18" />
+          <!-- left details -->
+          <path d="M6 11.5 Q7.5 13 9 11.5" />
+          <path d="M5.5 8.5 Q7 10 8.5 8.5" />
+          <!-- right details -->
+          <path d="M18 11.5 Q16.5 13 15 11.5" />
+          <path d="M18.5 8.5 Q17 10 15.5 8.5" />
         </svg>
       </div>
       <h3>AI-Powered Triage</h3>
       <p>Intelligent symptom analysis and urgency categorization to optimize patient flow</p>
     </div>
 
+    <!-- Card 2: Pulse/heartbeat icon – teal #0891b2 -->
     <div class="feature-card">
       <div class="feature-icon cyan">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="2,12 6,12 8,5 11,19 14,9 16,14 18,12 22,12"/>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="2,12 6,12 8,5 11,19 14,9 16,14 18,12 22,12" />
         </svg>
       </div>
       <h3>Centralized Records</h3>
       <p>Secure cloud-based storage for complete patient histories and prescriptions</p>
     </div>
 
+    <!-- Card 3: Shield with checkmark – navy #3730a3 -->
     <div class="feature-card">
       <div class="feature-icon navy">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2L4 6V12C4 16.8 7.6 21.2 12 22C16.4 21.2 20 16.8 20 12V6L12 2Z"/>
-          <polyline points="9,12 11,14 15,10"/>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L4 6V12C4 16.8 7.6 21.2 12 22C16.4 21.2 20 16.8 20 12V6L12 2Z" />
+          <polyline points="9,12 11,14 15,10" />
         </svg>
       </div>
       <h3>POPIA Compliant</h3>
       <p>Enterprise-grade security with encrypted data and role-based access control</p>
     </div>
+
   </section>
+
 
   <div class="access-card">
     <h3>Access MedIntel</h3>
@@ -77,42 +126,44 @@
     <div id="loginForm" class="form-container">
       <div class="input-group">
         <label>Email</label>
-        <input type="email" id="loginEmail" placeholder="your.email@example.com"/>
+        <input type="email" id="loginEmail" placeholder="your.email@example.com">
       </div>
       <div class="input-group">
         <label>Password</label>
-        <input type="password" id="loginPassword" placeholder="••••••••"/>
+        <input type="password" id="loginPassword" placeholder="••••••••">
       </div>
       <button class="btn-primary" onclick="handleLogin()">Login</button>
     </div>
 
-    <div id="signupForm" class="form-container" style="display:none;">
+    <div id="signupForm" class="form-container" style="display: none;">
       <div class="input-group">
         <label>Full Name</label>
-        <input type="text" id="signupName" placeholder="John Smith"/>
+        <input type="text" id="signupName" placeholder="John Smith">
       </div>
       <div class="input-group">
         <label>Email</label>
-        <input type="email" id="signupEmail" placeholder="your.email@example.com"/>
+        <input type="email" id="signupEmail" placeholder="your.email@example.com">
       </div>
       <div class="input-group">
         <label>Phone Number</label>
-        <input type="tel" id="signupPhone" placeholder="+27 82 123 4567"/>
+        <input type="tel" id="signupPhone" placeholder="+27 82 123 4567">
       </div>
       <div class="input-group">
         <label>Date of Birth</label>
-        <input type="date" id="signupDob"/>
+        <input type="date" id="signupDob" placeholder="yyyy/mm/dd">
       </div>
       <div class="input-group">
         <label>Password</label>
-        <input type="password" id="signupPassword" placeholder="••••••••"/>
+        <input type="password" id="signupPassword" placeholder="••••••••">
       </div>
       <div class="input-group">
         <label>Confirm Password</label>
-        <input type="password" id="Confirm_signupPassword" placeholder="••••••••"/>
+        <input type="password" id="Confirm_signupPassword" placeholder="••••••••">
       </div>
       <button class="btn-primary" onclick="handleSignUp()">Create Patient Account</button>
       <p class="signup-note">Note: Only patients can self-register. Staff accounts are created by administrators.</p>
+      <p class="signup-note">By signing up, you agree to our <a href="terms_conditions.html" target="_blank">Terms and
+          Conditions</a></p>
     </div>
 
     <div class="demo-box">
@@ -124,7 +175,6 @@
       <p><strong>Patient:</strong> patient@example.com / patient123</p>
     </div>
   </div>
-
   <div id="message"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -147,10 +197,10 @@
     }
 
     // Floating bubbles
-    (function() {
-      const sizes     = [30, 50, 70, 90, 110, 140];
-      const lefts     = [5, 12, 22, 35, 48, 58, 68, 78, 88, 95];
-      const delays    = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
+    (function () {
+      const sizes = [30, 50, 70, 90, 110, 140];
+      const lefts = [5, 12, 22, 35, 48, 58, 68, 78, 88, 95];
+      const delays = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
       const durations = [10, 13, 16, 19, 22];
 
       lefts.forEach((left, i) => {
@@ -169,4 +219,5 @@
   </script>
 
 </body>
+
 </html>

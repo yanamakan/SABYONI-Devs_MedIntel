@@ -544,3 +544,30 @@ header .subtitle {
         text-align: center;
     }
 }
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.eye-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  color: #888;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.eye-toggle:hover { color: #333; }
+.eye-toggle svg { width: 18px; height: 18px; pointer-events: none; }

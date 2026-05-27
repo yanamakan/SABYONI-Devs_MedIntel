@@ -1340,7 +1340,7 @@ async function initDoctorMap() {
     const response = await Place.searchNearby({
       fields: ['displayName','location','rating','userRatingCount','formattedAddress','types','regularOpeningHours','id'],
       locationRestriction: { center: { lat: userLat, lng: userLng }, radius: 5000 },
-      includedPrimaryTypes: ['hospital', 'pharmacy', 'doctor'],
+      includedPrimaryTypes: ['pharmacy'],
       maxResultCount: 12,
     });
 
@@ -1397,9 +1397,7 @@ function getUserLocation() {
 function addDocFacilityMarkers(places, map) {
   places.forEach(place => {
     const types = place.types || [];
-    const color = types.includes('pharmacy') ? '#16a34a'
-                : types.includes('hospital') ? '#ef4444'
-                : '#3b82f6';
+    const color = '#16a34a'; // pharmacy only, always green
 
     const dot = document.createElement('div');
     dot.style.cssText = `width:12px;height:12px;background:${color};border:2px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.3);cursor:pointer;`;
@@ -1434,19 +1432,12 @@ function renderDocFacilityList(places) {
   sorted = sorted.slice(0, 6);
 
   if (sorted.length === 0) {
-    container.innerHTML = '<div style="padding:28px;color:#9ca3af;text-align:center;grid-column:1/-1;">No facilities found.</div>';
+    container.innerHTML = '<div style="padding:28px;color:#9ca3af;text-align:center;grid-column:1/-1;">No pharmacies found within 5km.</div>';
     return;
   }
 
   container.innerHTML = sorted.map(place => {
-    const types     = place.types || [];
-    const typeLabel = types.includes('pharmacy') ? 'Pharmacy'
-                    : types.includes('hospital') ? 'Hospital'
-                    : 'Medical Facility';
-    const tagCls    = types.includes('pharmacy') ? 'prox-nearby'
-                    : types.includes('hospital') ? 'prox-far'
-                    : 'prox-close';
-
+    const types = place.types || [];
     let isOpen = null;
     try {
       if (place.regularOpeningHours) {
@@ -1458,44 +1449,50 @@ function renderDocFacilityList(places) {
     const lng = place.location.lng();
     const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${place.id || ''}&travelmode=driving`;
 
-    const starsHtml = place.rating ? (() => {
+    const categoryIcon = '<div style="width:42px;height:42px;border-radius:10px;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'
+      + '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>'
+      + '</div>';
+
+    let starsHtml = '';
+    if (place.rating) {
       const full = Math.floor(place.rating);
       const half = place.rating % 1 >= 0.5;
-      let html = '<div style="display:flex;align-items:center;gap:2px;margin:5px 0;">';
+      starsHtml = '<div style="display:flex;align-items:center;gap:2px;margin:5px 0;">';
       for (let i = 0; i < 5; i++) {
         const fill = i < full ? '#f59e0b' : (i === full && half ? '#f59e0b' : '#e5e7eb');
-        const op   = i === full && half ? '0.5' : '1';
-        html += `<svg width="11" height="11" viewBox="0 0 24 24" fill="${fill}" opacity="${op}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+        const op   = (i === full && half) ? '0.4' : '1';
+        starsHtml += `<svg width="12" height="12" viewBox="0 0 24 24" fill="${fill}" opacity="${op}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
       }
-      html += `<span style="font-size:11px;color:#6b7280;margin-left:4px;">${place.rating.toFixed(1)}`;
-      if (place.userRatingCount) html += ` (${place.userRatingCount})`;
-      html += '</span></div>';
-      return html;
-    })() : '';
+      starsHtml += `<span style="font-size:11px;color:#6b7280;margin-left:4px;">${place.rating.toFixed(1)}`;
+      if (place.userRatingCount) starsHtml += ` (${place.userRatingCount})`;
+      starsHtml += '</span></div>';
+    }
 
     return `
-      <div class="facility-card" style="cursor:pointer;" onclick="focusDocMapPlace(${lat},${lng})">
-        <div class="facility-card-header">
-          <div>
-            <h4>${place.displayName || 'Unknown'}</h4>
-            <span class="facility-proximity ${tagCls}" style="font-size:.7rem;">${typeLabel}</span>
+      <div class="facility-card" style="cursor:pointer;display:flex;gap:12px;align-items:flex-start;" onclick="focusDocMapPlace(${lat},${lng})">
+        ${categoryIcon}
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+            <div>
+              <h4 style="font-size:.88rem;font-weight:700;color:#111827;margin:0 0 3px;">${place.displayName || 'Unknown'}</h4>
+              <span style="font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:99px;background:#dcfce7;color:#166534;">Pharmacy</span>
+            </div>
+            ${isOpen !== null
+              ? `<span style="font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap;background:${isOpen ? '#dcfce7' : '#fee2e2'};color:${isOpen ? '#166534' : '#b91c1c'};">${isOpen ? '● Open' : '● Closed'}</span>`
+              : ''}
           </div>
-          ${isOpen !== null
-            ? `<span style="font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:99px;background:${isOpen ? '#dcfce7' : '#fee2e2'};color:${isOpen ? '#166534' : '#b91c1c'};">${isOpen ? '● Open' : '● Closed'}</span>`
-            : ''}
+          ${starsHtml}
+          ${place.formattedAddress
+            ? `<p style="font-size:.78rem;color:#6b7280;margin:4px 0;display:flex;align-items:flex-start;gap:4px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                ${place.formattedAddress}
+              </p>` : ''}
+          <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()"
+            style="display:inline-flex;align-items:center;gap:5px;margin-top:6px;background:#eff6ff;color:#1d4ed8;padding:4px 10px;border-radius:99px;font-size:.75rem;font-weight:600;text-decoration:none;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            Get Directions
+          </a>
         </div>
-        ${starsHtml}
-        ${place.formattedAddress
-          ? `<p class="facility-info">
-               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-               ${place.formattedAddress}
-             </p>` : ''}
-        <a class="facility-tag" href="${directionsUrl}" target="_blank" rel="noopener noreferrer"
-           onclick="event.stopPropagation()"
-           style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;background:#eff6ff;color:#1d4ed8;padding:4px 10px;border-radius:99px;font-size:.75rem;font-weight:600;text-decoration:none;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-          Get Directions
-        </a>
       </div>
     `;
   }).join('');

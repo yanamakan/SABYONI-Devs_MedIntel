@@ -1591,7 +1591,7 @@ async function savePreferences() {
   if (!supabaseClient || !currentPatient) return;
 
   var darkMode = document.getElementById('darkToggle')   ? document.getElementById('darkToggle').checked   : false;
-  var language = document.getElementById('prefLanguage') ? document.getElementById('prefLanguage').value   : 'English';
+  var language = 'English';
   var timezone = document.getElementById('prefTimezone') ? document.getElementById('prefTimezone').value   : 'Johannesburg (SAST)';
 
   var btn = document.querySelector('#prefSub .btn-save-pref');

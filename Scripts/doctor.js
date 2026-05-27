@@ -1050,22 +1050,31 @@ function quickRecordFromRequest(patientId) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+function clearAnatomyForm() {
+  const sel = document.getElementById('body-part-select');
+  const txt = document.getElementById('anatomy-note-text');
+  if (sel) sel.value = '';
+  if (txt) txt.value = '';
+}
+
 // ── ANATOMY TAB ───────────────────────────────────────────────
 function renderAnatomyTab() {
-  if (!currentPatient) return;
+  if (!currentPatient && allPatients.length > 0) {
+    currentPatient = allPatients[0];
+  }
+  if (!currentPatient) {
+    document.getElementById('anatomy-patient-name').textContent = 'no patient selected';
+    document.getElementById('anatomy-viewer-name').textContent  = 'No patient selected';
+    document.getElementById('anatomy-notes-list').innerHTML = '<p class="anatomy-no-notes">Select a patient from the Patients tab first.</p>';
+    document.getElementById('anatomy-note-count').textContent = '0';
+    return;
+  }
   const name = `${currentPatient.first_name} ${currentPatient.last_name}`;
   document.getElementById('anatomy-patient-name').textContent = name;
   document.getElementById('anatomy-viewer-name').textContent  = name;
   clearAnatomyForm();
   renderAnatomyNotes(currentPatient.patient_id);
 }
-
-document.getElementById('anatomy-reset').addEventListener('click', () => {
-  const sel = document.getElementById('body-part-select');
-  const txt = document.getElementById('anatomy-note-text');
-  if (sel) sel.value = '';
-  if (txt) txt.value = '';
-});
 
 document.getElementById('anatomy-save-btn').addEventListener('click', async () => {
   const p    = currentPatient;
@@ -1120,20 +1129,89 @@ async function renderAnatomyNotes(patientId) {
       return;
     }
 
-    list.innerHTML = records.map(r => {
+    const PREVIEW_COUNT = 3;
+    const preview  = records.slice(0, PREVIEW_COUNT);
+    const overflow = records.slice(PREVIEW_COUNT);
+    const hasMore  = overflow.length > 0;
+
+    function renderNoteCard(r, hidden = false) {
       const part = r.body_location || r.diagnosis?.replace('Anatomical note — ', '') || 'Unknown';
       const date = formatDate(r.date_created);
       return `
-        <div class="anatomy-note-entry">
-          <div class="anatomy-note-part">${escapeHtml(part)}</div>
-          <p>${escapeHtml(r.notes || '—')}</p>
+        <div class="anatomy-note-entry" id="anote-${r.record_id}" style="${hidden ? 'display:none;' : ''}position:relative;">
+          <button onclick="deleteAnatomyNote('${r.record_id}', '${patientId}')"
+            title="Delete note"
+            style="position:absolute;top:6px;right:6px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:3px 7px;cursor:pointer;color:#dc2626;font-size:11px;font-weight:700;line-height:1;display:flex;align-items:center;gap:3px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Delete
+          </button>
+          <div class="anatomy-note-part" style="padding-right:56px;">${escapeHtml(part)}</div>
+          <p style="padding-right:56px;">${escapeHtml(r.notes || '—')}</p>
           <small>${date}</small>
         </div>
       `;
-    }).join('');
+    }
+
+    let html = preview.map(r => renderNoteCard(r)).join('');
+
+    if (hasMore) {
+      html += overflow.map(r => renderNoteCard(r, true)).join('');
+      html += `
+      <button id="anatomy-show-more-btn" onclick="toggleAnatomyOverflow()"
+        style="width:100%;margin-top:8px;padding:8px;background:none;border:1.5px dashed #d1d5db;border-radius:8px;color:#6b7280;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;">
+        Show more ▾
+      </button>
+    `;
+    }
+
+    list.innerHTML = html;
 
   } catch (err) {
     list.innerHTML = '<p style="color:#dc2626;font-size:.82rem;">Could not load notes.</p>';
+  }
+}
+
+function toggleAnatomyOverflow() {
+  const btn     = document.getElementById('anatomy-show-more-btn');
+  const entries = document.querySelectorAll('.anatomy-note-entry');
+  const expanded = [...entries].some(e => e.style.display === 'none');
+
+  [...entries].forEach((e, i) => {
+    if (i >= 3) e.style.display = expanded ? '' : 'none';
+  });
+  btn.textContent = expanded ? 'Show less ▴' : 'Show more ▾';
+}
+
+async function deleteAnatomyNote(recordId, patientId) {
+  if (!confirm('Delete this anatomy note?')) return;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/medical_records?record_id=eq.${recordId}`, {
+      method: 'DELETE',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        Prefer: 'return=minimal',
+      },
+    });
+    console.log('Delete status:', res.status);
+    const text = await res.text();
+    console.log('Delete response:', text);
+
+    if (!res.ok) throw new Error(`${res.status} — ${text}`);
+
+    const card = document.getElementById(`anote-${recordId}`);
+    if (card) {
+      card.style.transition = 'opacity .25s, transform .25s';
+      card.style.opacity    = '0';
+      card.style.transform  = 'translateX(10px)';
+      setTimeout(() => card.remove(), 250);
+    }
+    const count = document.getElementById('anatomy-note-count');
+    if (count) count.textContent = Math.max(0, parseInt(count.textContent) - 1);
+    showToast('✓ Note deleted');
+  } catch (err) {
+    showToast('Error deleting note: ' + err.message);
+    console.error('Delete error:', err);
   }
 }
 

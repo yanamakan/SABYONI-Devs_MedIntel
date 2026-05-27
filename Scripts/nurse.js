@@ -3,6 +3,20 @@ const SUPABASE_URL = "https://epuphcvapnqngdwgwpyu.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwdXBoY3ZhcG5xbmdkd2d3cHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Mjg4MDUsImV4cCI6MjA4OTUwNDgwNX0.1sdd1YzWfh0KbSENK8oZJ-iMHlrcjeKMcFCfFjRgXZ4";
 
+function formatRecordNotes(notes) {
+  if (!notes) return '—';
+  var urlMatch = notes.match(/\[File: (https?:\/\/[^\]]+)\]/);
+  if (urlMatch) {
+    var url = urlMatch[1];
+    var desc = notes.replace(/\[File: [^\]]+\]/, '').trim();
+    return (desc || 'Uploaded document')
+      + ' <a href="' + url + '" target="_blank" rel="noopener noreferrer" '
+      + 'style="display:inline-flex;align-items:center;gap:4px;color:#0ea5e9;font-size:.78rem;font-weight:600;text-decoration:none;padding:2px 8px;background:#f0f9ff;border-radius:4px;border:1px solid #bae6fd;margin-left:6px;">'
+      + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>'
+      + ' View Document</a>';
+  }
+  return notes;
+}
 // ======== SESSION ========
 function loadSession() {
   const raw = sessionStorage.getItem("medintel_user");
@@ -487,7 +501,7 @@ async function openPatientDetail(patientId) {
       <div style="background:#f9fafb;border-radius:10px;padding:16px;">
         <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;text-transform:uppercase;">Latest Diagnosis</div>
         <div style="font-size:14px;">${record?.diagnosis || "No diagnosis on record"}</div>
-        ${record?.notes ? `<div style="font-size:13px;color:#6b7280;margin-top:6px;">${record.notes}</div>` : ""}
+        ${record?.notes ? `<div style="font-size:13px;color:#6b7280;margin-top:6px;">${formatRecordNotes(record.notes)}</div>` : ""}
       </div>
       <div style="background:#f9fafb;border-radius:10px;padding:16px;">
         <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;text-transform:uppercase;">Next Appointment</div>

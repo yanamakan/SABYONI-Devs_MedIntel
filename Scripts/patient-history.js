@@ -58,11 +58,13 @@ async function fetchVitalsHistory() {
 
 async function fetchAlertHistory() {
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/sentinel_alerts?patient_id=eq.${patientId}&order=created_at.desc`,
+    `${SUPABASE_URL}/rest/v1/sentinel_alerts?patient_id=eq.${patientId}&order=created_at.desc&limit=20`,
     { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
   );
   if (!res.ok) return [];
-  return await res.json();
+  const data = await res.json();
+  console.log("Alert history:", data);
+  return data;
 }
 
 // ── SIMULATOR CONTROLS ─────────────────────────────
@@ -325,22 +327,57 @@ async function runAnalysis() {
 
 // ── ALERT HISTORY ─────────────────────────────────
 
+let alertsToShow = 3;
+
 async function loadAlertHistory() {
   const alerts = await fetchAlertHistory();
   const tbody = document.getElementById("alertHistory");
 
   if (alerts.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3" class="empty-row">No alerts recorded for this patient.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-row">No alerts recorded for this patient.</td></tr>`;
+    document.getElementById("showMoreBtn").style.display = "none";
     return;
   }
 
-  tbody.innerHTML = alerts.map((alert) => `
-    <tr>
-      <td>${new Date(alert.created_at).toLocaleString()}</td>
-      <td>${severityBadge(alert.severity)}</td>
-      <td>${alert.risk_reason}</td>
-    </tr>
-  `).join("");
+  const visible = alerts.slice(0, alertsToShow);
+
+  tbody.innerHTML = visible.map((alert) => {
+    const bp = alert.blood_pressure_systolic && alert.blood_pressure_diastolic
+      ? `${alert.blood_pressure_systolic}/${alert.blood_pressure_diastolic}`
+      : "--";
+
+    const resolvedBadge = alert.resolved
+      ? `<span style="color:#48C9A9;font-size:10px;">✔ Resolved</span>`
+      : `<span style="color:#E05C6A;font-size:10px;">● Active</span>`;
+
+    return `
+      <tr>
+        <td>${new Date(alert.created_at).toLocaleString()}</td>
+        <td>${severityBadge(alert.severity)}</td>
+        <td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,0.6)">
+          HR: ${alert.heart_rate ?? "--"} &nbsp;|&nbsp;
+          BP: ${bp} &nbsp;|&nbsp;
+          Temp: ${alert.temperature ?? "--"}°C &nbsp;|&nbsp;
+          O₂: ${alert.oxygen_saturation ?? "--"}%
+        </td>
+        <td>${alert.risk_reason ?? "--"}</td>
+        <td>${resolvedBadge}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const showMoreBtn = document.getElementById("showMoreBtn");
+  if (alerts.length > alertsToShow) {
+    showMoreBtn.style.display = "block";
+    showMoreBtn.textContent = `Show More (${alerts.length - alertsToShow} remaining)`;
+  } else {
+    showMoreBtn.style.display = "none";
+  }
+}
+
+function showMoreAlerts() {
+  alertsToShow += 5;
+  loadAlertHistory();
 }
 
 // ── REFRESH VITALS ────────────────────────────────

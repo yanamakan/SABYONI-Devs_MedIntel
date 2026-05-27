@@ -1,17 +1,18 @@
 // ======== SUPABASE CONFIG ========
 const SUPABASE_URL = "https://epuphcvapnqngdwgwpyu.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwdXBoY3ZhcG5xbmdkd2d3cHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Mjg4MDUsImV4cCI6MjA4OTUwNDgwNX0.1sdd1YzWfh0KbSENK8oZJ-iMHlrcjeKMcFCfFjRgXZ4";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwdXBoY3ZhcG5xbmdkd2d3cHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5Mjg4MDUsImV4cCI6MjA4OTUwNDgwNX0.1sdd1YzWfh0KbSENK8oZJ-iMHlrcjeKMcFCfFjRgXZ4";
 
 // ======== SESSION ========
 function loadSession() {
-  const raw = sessionStorage.getItem('medintel_user');
+  const raw = sessionStorage.getItem("medintel_user");
   if (!raw) return null;
   return JSON.parse(raw);
 }
 
 function applySessionToHeader() {
   const user = loadSession();
-  const nameEl = document.querySelector('.header-text p');
+  const nameEl = document.querySelector(".header-text p");
   if (nameEl && user) {
     nameEl.textContent = `${user.name} • ${user.department}`;
   }
@@ -21,7 +22,12 @@ function applySessionToHeader() {
 async function fetchPatients() {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/patients?select=patient_id,first_name,last_name,at_risk,risk_reason,dob`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    },
   );
   if (!res.ok) throw new Error("Failed to fetch patients");
   return await res.json();
@@ -30,7 +36,12 @@ async function fetchPatients() {
 async function fetchLatestVitals(patientId) {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/patient_vitals?patient_id=eq.${patientId}&order=timestamp.desc&limit=1`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    },
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -40,7 +51,12 @@ async function fetchLatestVitals(patientId) {
 async function fetchPendingDiagnoses() {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/ai_triage_reports?status=eq.pending&order=created_at.desc&select=*,patients(first_name,last_name)`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    },
   );
   if (!res.ok) throw new Error("Failed to fetch diagnoses");
   return await res.json();
@@ -49,7 +65,12 @@ async function fetchPendingDiagnoses() {
 async function fetchLatestMedicalRecord(patientId) {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/medical_records?patient_id=eq.${patientId}&order=date_created.desc&limit=1`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    },
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -59,7 +80,12 @@ async function fetchLatestMedicalRecord(patientId) {
 async function fetchLatestAppointment(patientId) {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/appointments?patient_id=eq.${patientId}&order=date.desc&limit=1`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    },
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -67,10 +93,15 @@ async function fetchLatestAppointment(patientId) {
 }
 
 async function fetchTodayAppointments() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/appointments?date=eq.${today}&order=time.asc&select=*,patients(first_name,last_name),doctors(first_name,last_name)`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    },
   );
   if (!res.ok) return [];
   return await res.json();
@@ -79,7 +110,12 @@ async function fetchTodayAppointments() {
 async function fetchDoctors() {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/doctors?select=doctor_id,first_name,last_name`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    },
   );
   if (!res.ok) return [];
   return await res.json();
@@ -92,7 +128,7 @@ let activePatientId = null;
 
 // ======== HELPER: CALCULATE AGE ========
 function calculateAge(dob) {
-  if (!dob) return '--';
+  if (!dob) return "--";
   const today = new Date();
   const birth = new Date(dob);
   let age = today.getFullYear() - birth.getFullYear();
@@ -103,36 +139,58 @@ function calculateAge(dob) {
 
 // ======== RENDER STATS ========
 async function renderStats(patientsData, pendingCount) {
-  document.getElementById('stat-total-patients').textContent = patientsData.length;
-  document.getElementById('stat-pending').textContent = pendingCount;
-  const atRisk = patientsData.filter(p => p.at_risk).length;
-  document.getElementById('stat-at-risk').textContent = atRisk;
+  document.getElementById("stat-total-patients").textContent =
+    patientsData.length;
+  document.getElementById("stat-pending").textContent = pendingCount;
+  const atRisk = patientsData.filter((p) => p.at_risk).length;
+  document.getElementById("stat-at-risk").textContent = atRisk;
   const appts = await fetchTodayAppointments();
-  document.getElementById('stat-schedule').textContent = appts.length;
+  document.getElementById("stat-schedule").textContent = appts.length;
 }
 
 // ======== RENDER PENDING DIAGNOSES ========
 async function renderPendingDiagnoses() {
-  const container = document.getElementById('diagnoses-list');
-  container.innerHTML = '<div style="padding:20px;color:#6b7280;">Loading diagnoses...</div>';
+  const container = document.getElementById("diagnoses-list");
+  container.innerHTML =
+    '<div style="padding:20px;color:#6b7280;">Loading diagnoses...</div>';
 
   try {
     const reports = await fetchPendingDiagnoses();
 
     if (!reports || reports.length === 0) {
-      container.innerHTML = '<div style="padding:20px;color:#6b7280;">No pending AI diagnoses.</div>';
+      container.innerHTML =
+        '<div style="padding:20px;color:#6b7280;">No pending AI diagnoses.</div>';
       return;
     }
 
-    container.innerHTML = reports.map(r => {
-      const patient = r.patients;
-      const name = patient ? `${patient.first_name} ${patient.last_name}` : 'Unknown Patient';
-      const suggestion = (() => { try { return JSON.parse(r.ai_suggestion || '{}'); } catch { return {}; } })();
-      const priority = r.priority || 'medium';
-      const priorityColor = priority === 'high' ? '#b91c1c' : priority === 'medium' ? '#92400e' : '#065f46';
-      const priorityBg = priority === 'high' ? '#fee2e2' : priority === 'medium' ? '#fef3c7' : '#d1fae5';
+    container.innerHTML = reports
+      .map((r) => {
+        const patient = r.patients;
+        const name = patient
+          ? `${patient.first_name} ${patient.last_name}`
+          : "Unknown Patient";
+        const suggestion = (() => {
+          try {
+            return JSON.parse(r.ai_suggestion || "{}");
+          } catch {
+            return {};
+          }
+        })();
+        const priority = r.priority || "medium";
+        const priorityColor =
+          priority === "high"
+            ? "#b91c1c"
+            : priority === "medium"
+              ? "#92400e"
+              : "#065f46";
+        const priorityBg =
+          priority === "high"
+            ? "#fee2e2"
+            : priority === "medium"
+              ? "#fef3c7"
+              : "#d1fae5";
 
-      return `
+        return `
         <div class="diag-card" id="diag-${r.report_id}">
           <div class="diag-header">
             <div>
@@ -145,7 +203,7 @@ async function renderPendingDiagnoses() {
           </div>
 
           <div class="symptoms-label">Patient Vitals</div>
-          <div class="symptoms-box">${r.symptoms || 'No vitals recorded'}</div>
+          <div class="symptoms-box">${r.symptoms || "No vitals recorded"}</div>
 
           <div class="ai-analysis-box">
             <div class="ai-title">
@@ -156,29 +214,40 @@ async function renderPendingDiagnoses() {
             </div>
             <div class="ai-row">
               <div class="ai-row-label">Overall Status</div>
-              <div class="ai-row-val">${suggestion.overall_status?.toUpperCase() || '--'}</div>
+              <div class="ai-row-val">${suggestion.overall_status?.toUpperCase() || "--"}</div>
             </div>
             <div class="ai-row">
               <div class="ai-row-label">Summary</div>
-              <div class="ai-row-val">${suggestion.summary || '--'}</div>
+              <div class="ai-row-val">${suggestion.summary || "--"}</div>
             </div>
             <div class="ai-row">
               <div class="ai-row-label">Recommendation</div>
-              <div class="ai-row-val">${suggestion.recommendation || '--'}</div>
+              <div class="ai-row-val">${suggestion.recommendation || "--"}</div>
             </div>
-            ${suggestion.vitals ? `
+            ${
+              suggestion.vitals
+                ? `
             <div class="ai-row">
               <div class="ai-row-label">Vital Breakdown</div>
               <ul class="ai-list">
-                ${Object.entries(suggestion.vitals).map(([key, v]) =>
-                  `<li><strong>${key.replace(/_/g, ' ')}:</strong> ${v.message} (${v.status})</li>`
-                ).join('')}
+                ${Object.entries(suggestion.vitals)
+                  .map(
+                    ([key, v]) =>
+                      `<li><strong>${key.replace(/_/g, " ")}:</strong> ${v.message} (${v.status})</li>`,
+                  )
+                  .join("")}
               </ul>
-            </div>` : ''}
-            ${r.ai_confidence ? `
+            </div>`
+                : ""
+            }
+            ${
+              r.ai_confidence
+                ? `
             <div class="ai-confidence-label">AI Confidence</div>
             <div class="conf-bar-wrap"><div class="conf-bar" style="width:${r.ai_confidence}%"></div></div>
-            <div class="conf-pct">${r.ai_confidence}%</div>` : ''}
+            <div class="conf-pct">${r.ai_confidence}%</div>`
+                : ""
+            }
           </div>
 
           <div class="nurse-notes-label">Nurse Notes (Optional)</div>
@@ -196,8 +265,8 @@ async function renderPendingDiagnoses() {
           </div>
         </div>
       `;
-    }).join('');
-
+      })
+      .join("");
   } catch (err) {
     container.innerHTML = `<div style="padding:20px;color:#dc2626;">Error loading diagnoses: ${err.message}</div>`;
   }
@@ -205,138 +274,158 @@ async function renderPendingDiagnoses() {
 
 // ======== APPROVE DIAGNOSIS ========
 async function handleApprove(reportId, patientName) {
-  const notes = document.getElementById(`notes-${reportId}`)?.value || '';
+  const notes = document.getElementById(`notes-${reportId}`)?.value || "";
 
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/ai_triage_reports?report_id=eq.${reportId}&select=*`,
-      { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+      {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      },
     );
     const data = await res.json();
     const report = data[0];
-    if (!report) throw new Error('Report not found');
+    if (!report) throw new Error("Report not found");
 
-    const suggestion = (() => { try { return JSON.parse(report.ai_suggestion || '{}'); } catch { return {}; } })();
+    const suggestion = (() => {
+      try {
+        return JSON.parse(report.ai_suggestion || "{}");
+      } catch {
+        return {};
+      }
+    })();
 
     await fetch(`${SUPABASE_URL}/rest/v1/medical_records`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         patient_id: report.patient_id,
-        diagnosis: suggestion.summary || 'AI diagnosis approved by nurse',
-        notes: notes || suggestion.recommendation || '',
+        diagnosis: suggestion.summary || "AI diagnosis approved by nurse",
+        notes: notes || suggestion.recommendation || "",
       }),
     });
 
-    await fetch(`${SUPABASE_URL}/rest/v1/ai_triage_reports?report_id=eq.${reportId}`, {
-      method: 'PATCH',
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/ai_triage_reports?report_id=eq.${reportId}`,
+      {
+        method: "PATCH",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({
+          status: "approved",
+          nurse_approved: true,
+          nurse_notes: notes,
+        }),
       },
-      body: JSON.stringify({ status: 'approved', nurse_approved: true, nurse_notes: notes }),
-    });
+    );
 
     const card = document.getElementById(`diag-${reportId}`);
-    card.style.transition = 'opacity .4s, transform .4s';
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(-10px)';
+    card.style.transition = "opacity .4s, transform .4s";
+    card.style.opacity = "0";
+    card.style.transform = "translateY(-10px)";
     setTimeout(() => {
       card.remove();
       showToast(`✓ ${patientName}'s diagnosis approved & forwarded to doctor`);
     }, 400);
-
   } catch (err) {
-    showToast('Error approving diagnosis: ' + err.message);
+    showToast("Error approving diagnosis: " + err.message);
   }
 }
 
 // ======== REJECT DIAGNOSIS ========
 async function handleReject(reportId, patientName) {
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/ai_triage_reports?report_id=eq.${reportId}`, {
-      method: 'PATCH',
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/ai_triage_reports?report_id=eq.${reportId}`,
+      {
+        method: "PATCH",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({ status: "rejected" }),
       },
-      body: JSON.stringify({ status: 'rejected' }),
-    });
+    );
 
     const card = document.getElementById(`diag-${reportId}`);
-    card.style.transition = 'opacity .4s, transform .4s';
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(-10px)';
+    card.style.transition = "opacity .4s, transform .4s";
+    card.style.opacity = "0";
+    card.style.transform = "translateY(-10px)";
     setTimeout(() => {
       card.remove();
       showToast(`✕ ${patientName}'s diagnosis rejected`);
     }, 400);
-
   } catch (err) {
-    showToast('Error rejecting diagnosis: ' + err.message);
+    showToast("Error rejecting diagnosis: " + err.message);
   }
 }
 
 // ======== NURSE MANUAL DIAGNOSIS ========
 async function saveNurseDiagnosis() {
-  const patientId = document.getElementById('nurse-diag-patient').value;
-  const diagnosis = document.getElementById('nurse-diag-text').value.trim();
-  const notes = document.getElementById('nurse-diag-notes').value.trim();
+  const patientId = document.getElementById("nurse-diag-patient").value;
+  const diagnosis = document.getElementById("nurse-diag-text").value.trim();
+  const notes = document.getElementById("nurse-diag-notes").value.trim();
 
   if (!patientId || !diagnosis) {
-    showToast('Please select a patient and enter a diagnosis.');
+    showToast("Please select a patient and enter a diagnosis.");
     return;
   }
 
   try {
     await fetch(`${SUPABASE_URL}/rest/v1/medical_records`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ patient_id: patientId, diagnosis, notes }),
     });
 
-    document.getElementById('nurse-diag-text').value = '';
-    document.getElementById('nurse-diag-notes').value = '';
-    document.getElementById('nurse-diag-patient').value = '';
-    showToast('✓ Diagnosis saved to patient record');
-
+    document.getElementById("nurse-diag-text").value = "";
+    document.getElementById("nurse-diag-notes").value = "";
+    document.getElementById("nurse-diag-patient").value = "";
+    showToast("✓ Diagnosis saved to patient record");
   } catch (err) {
-    showToast('Error saving diagnosis: ' + err.message);
+    showToast("Error saving diagnosis: " + err.message);
   }
 }
 
 // ======== RENDER PATIENT CARE ========
 async function renderPatientCare() {
-  const tbody = document.getElementById('patient-care-list');
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#6b7280;padding:20px;">Loading...</td></tr>';
+  const tbody = document.getElementById("patient-care-list");
+  tbody.innerHTML =
+    '<tr><td colspan="6" style="text-align:center;color:#6b7280;padding:20px;">Loading...</td></tr>';
 
   try {
     const [records, appointments] = await Promise.all([
-      Promise.all(patients.map(p => fetchLatestMedicalRecord(p.patient_id))),
-      Promise.all(patients.map(p => fetchLatestAppointment(p.patient_id))),
+      Promise.all(patients.map((p) => fetchLatestMedicalRecord(p.patient_id))),
+      Promise.all(patients.map((p) => fetchLatestAppointment(p.patient_id))),
     ]);
 
-    tbody.innerHTML = patients.map((p, i) => {
-      const record = records[i];
-      const appt = appointments[i];
-      const age = calculateAge(p.dob);
-      const condition = record?.diagnosis || 'No diagnosis on record';
-      const urgency = p.at_risk ? 'high' : 'low';
-      const lastVisit = appt?.date || '--';
+    tbody.innerHTML = patients
+      .map((p, i) => {
+        const record = records[i];
+        const appt = appointments[i];
+        const age = calculateAge(p.dob);
+        const condition = record?.diagnosis || "No diagnosis on record";
+        const urgency = p.at_risk ? "high" : "low";
+        const lastVisit = appt?.date || "--";
 
-      return `
+        return `
         <tr>
           <td>${p.first_name} ${p.last_name}</td>
           <td>${age}</td>
@@ -346,8 +435,8 @@ async function renderPatientCare() {
           <td><button class="view-btn" onclick="openPatientDetail('${p.patient_id}')">View Details</button></td>
         </tr>
       `;
-    }).join('');
-
+      })
+      .join("");
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="6" style="color:#dc2626;padding:20px;">Error: ${err.message}</td></tr>`;
   }
@@ -355,12 +444,14 @@ async function renderPatientCare() {
 
 // ======== PATIENT DETAIL MODAL ========
 async function openPatientDetail(patientId) {
-  const p = patients.find(x => x.patient_id === patientId);
+  const p = patients.find((x) => x.patient_id === patientId);
   if (!p) return;
 
-  document.getElementById('detail-modal-title').textContent = `${p.first_name} ${p.last_name}`;
-  document.getElementById('detail-modal-body').innerHTML = '<div style="color:#6b7280;">Loading...</div>';
-  showModal('patient-detail-modal');
+  document.getElementById("detail-modal-title").textContent =
+    `${p.first_name} ${p.last_name}`;
+  document.getElementById("detail-modal-body").innerHTML =
+    '<div style="color:#6b7280;">Loading...</div>';
+  showModal("patient-detail-modal");
 
   const [record, vitals, appt] = await Promise.all([
     fetchLatestMedicalRecord(patientId),
@@ -368,35 +459,39 @@ async function openPatientDetail(patientId) {
     fetchLatestAppointment(patientId),
   ]);
 
-  document.getElementById('detail-modal-body').innerHTML = `
+  document.getElementById("detail-modal-body").innerHTML = `
     <div style="display:grid;gap:16px;">
       <div style="background:#f9fafb;border-radius:10px;padding:16px;">
         <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;text-transform:uppercase;">Patient Info</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px;">
           <div><span style="color:#6b7280;">Age:</span> ${calculateAge(p.dob)}</div>
-          <div><span style="color:#6b7280;">DOB:</span> ${p.dob || '--'}</div>
+          <div><span style="color:#6b7280;">DOB:</span> ${p.dob || "--"}</div>
           <div><span style="color:#6b7280;">Status:</span> ${p.at_risk ? '<span style="color:#b91c1c;font-weight:700;">AT RISK</span>' : '<span style="color:#16a34a;font-weight:700;">Stable</span>'}</div>
-          <div><span style="color:#6b7280;">Risk Reason:</span> ${p.risk_reason || 'None'}</div>
+          <div><span style="color:#6b7280;">Risk Reason:</span> ${p.risk_reason || "None"}</div>
         </div>
       </div>
       <div style="background:#f9fafb;border-radius:10px;padding:16px;">
         <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;text-transform:uppercase;">Latest Vitals</div>
-        ${vitals ? `
+        ${
+          vitals
+            ? `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px;">
           <div><span style="color:#6b7280;">Heart Rate:</span> ${vitals.heart_rate} bpm</div>
           <div><span style="color:#6b7280;">Blood Pressure:</span> ${vitals.blood_pressure_systolic}/${vitals.blood_pressure_diastolic} mmHg</div>
           <div><span style="color:#6b7280;">Temperature:</span> ${vitals.temperature}°C</div>
           <div><span style="color:#6b7280;">O2 Saturation:</span> ${vitals.oxygen_saturation}%</div>
-        </div>` : '<div style="color:#6b7280;font-size:14px;">No vitals recorded</div>'}
+        </div>`
+            : '<div style="color:#6b7280;font-size:14px;">No vitals recorded</div>'
+        }
       </div>
       <div style="background:#f9fafb;border-radius:10px;padding:16px;">
         <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;text-transform:uppercase;">Latest Diagnosis</div>
-        <div style="font-size:14px;">${record?.diagnosis || 'No diagnosis on record'}</div>
-        ${record?.notes ? `<div style="font-size:13px;color:#6b7280;margin-top:6px;">${record.notes}</div>` : ''}
+        <div style="font-size:14px;">${record?.diagnosis || "No diagnosis on record"}</div>
+        ${record?.notes ? `<div style="font-size:13px;color:#6b7280;margin-top:6px;">${record.notes}</div>` : ""}
       </div>
       <div style="background:#f9fafb;border-radius:10px;padding:16px;">
         <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:10px;text-transform:uppercase;">Next Appointment</div>
-        <div style="font-size:14px;">${appt ? `${appt.date} at ${appt.time || '--'} — ${appt.status}` : 'No appointments scheduled'}</div>
+        <div style="font-size:14px;">${appt ? `${appt.date} at ${appt.time || "--"} — ${appt.status}` : "No appointments scheduled"}</div>
       </div>
     </div>
   `;
@@ -404,54 +499,62 @@ async function openPatientDetail(patientId) {
 
 // ======== RENDER VITALS LIST ========
 async function renderVitalsList() {
-  const list = document.getElementById('vitals-list');
-  list.innerHTML = '<div style="padding:20px;color:#6b7280;">Loading patients...</div>';
+  const list = document.getElementById("vitals-list");
+  list.innerHTML =
+    '<div style="padding:20px;color:#6b7280;">Loading patients...</div>';
 
   try {
     patients = await fetchPatients();
 
     if (!patients || patients.length === 0) {
-      list.innerHTML = '<div style="padding:20px;color:#6b7280;">No patients found.</div>';
+      list.innerHTML =
+        '<div style="padding:20px;color:#6b7280;">No patients found.</div>';
       return;
     }
 
     const vitalsArray = await Promise.all(
-      patients.map(p => fetchLatestVitals(p.patient_id))
+      patients.map((p) => fetchLatestVitals(p.patient_id)),
     );
 
     patients.forEach((p, i) => {
       const v = vitalsArray[i];
-      currentVitals[p.patient_id] = v ? {
-        bp: `${v.blood_pressure_systolic}/${v.blood_pressure_diastolic}`,
-        hr: v.heart_rate,
-        temp: v.temperature,
-        o2: v.oxygen_saturation
-      } : { bp: '--', hr: '--', temp: '--', o2: '--' };
+      currentVitals[p.patient_id] = v
+        ? {
+            bp: `${v.blood_pressure_systolic}/${v.blood_pressure_diastolic}`,
+            hr: v.heart_rate,
+            temp: v.temperature,
+            o2: v.oxygen_saturation,
+          }
+        : { bp: "--", hr: "--", temp: "--", o2: "--" };
     });
 
     const waveIcon = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`;
     const octaviaIcon = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`;
 
-    list.innerHTML = patients.map((p, i) => {
-      const v = vitalsArray[i];
-      const bp = v ? `${v.blood_pressure_systolic}/${v.blood_pressure_diastolic}` : '--';
-      const hr = v ? `${v.heart_rate} bpm` : '--';
-      const temp = v ? `${v.temperature}°C` : '--';
-      const o2 = v ? `${v.oxygen_saturation}%` : '--';
+    list.innerHTML = patients
+      .map((p, i) => {
+        const v = vitalsArray[i];
+        const bp = v
+          ? `${v.blood_pressure_systolic}/${v.blood_pressure_diastolic}`
+          : "--";
+        const hr = v ? `${v.heart_rate} bpm` : "--";
+        const temp = v ? `${v.temperature}°C` : "--";
+        const o2 = v ? `${v.oxygen_saturation}%` : "--";
 
-      return `
+        return `
         <div class="vital-card">
           <div class="vital-header">
             <div>
               <div class="vital-name">
                 ${p.first_name} ${p.last_name}
-                ${p.at_risk
-                  ? `<span style="background:#fee2e2;color:#b91c1c;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:8px;">AT RISK</span>`
-                  : `<span style="background:#f0fdf4;color:#16a34a;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:8px;">Stable</span>`
+                ${
+                  p.at_risk
+                    ? `<span style="background:#fee2e2;color:#b91c1c;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:8px;">AT RISK</span>`
+                    : `<span style="background:#f0fdf4;color:#16a34a;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:8px;">Stable</span>`
                 }
               </div>
               <div class="vital-condition">
-                ${p.at_risk && p.risk_reason ? p.risk_reason : 'No active alerts'}
+                ${p.at_risk && p.risk_reason ? p.risk_reason : "No active alerts"}
               </div>
             </div>
             <div class="vital-btns">
@@ -484,18 +587,18 @@ async function renderVitalsList() {
           </div>
         </div>
       `;
-    }).join('');
+      })
+      .join("");
 
     // Populate nurse diagnosis patient dropdown
-    const select = document.getElementById('nurse-diag-patient');
+    const select = document.getElementById("nurse-diag-patient");
     select.innerHTML = '<option value="">-- Select a patient --</option>';
-    patients.forEach(p => {
-      const opt = document.createElement('option');
+    patients.forEach((p) => {
+      const opt = document.createElement("option");
       opt.value = p.patient_id;
       opt.textContent = `${p.first_name} ${p.last_name}`;
       select.appendChild(opt);
     });
-
   } catch (err) {
     list.innerHTML = `<div style="padding:20px;color:#dc2626;">Error loading patients: ${err.message}</div>`;
   }
@@ -503,38 +606,45 @@ async function renderVitalsList() {
 
 // ======== RENDER SCHEDULE ========
 async function renderSchedule() {
-  const tbody = document.getElementById('schedule-list');
-  const today = new Date().toLocaleDateString('en-ZA', { dateStyle: 'full' });
-  document.getElementById('schedule-date').textContent = `Appointments for ${today}`;
+  const tbody = document.getElementById("schedule-list");
+  const today = new Date().toLocaleDateString("en-ZA", { dateStyle: "full" });
+  document.getElementById("schedule-date").textContent =
+    `Appointments for ${today}`;
 
   try {
     const appointments = await fetchTodayAppointments();
 
     if (!appointments || appointments.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#6b7280;padding:20px;">No appointments today.</td></tr>';
+      tbody.innerHTML =
+        '<tr><td colspan="6" style="text-align:center;color:#6b7280;padding:20px;">No appointments today.</td></tr>';
       return;
     }
 
-    tbody.innerHTML = appointments.map(a => {
-      const patientName = a.patients ? `${a.patients.first_name} ${a.patients.last_name}` : '--';
-      const doctorName = a.doctors ? `Dr. ${a.doctors.first_name} ${a.doctors.last_name}` : '--';
-      const status = a.status || 'scheduled';
+    tbody.innerHTML = appointments
+      .map((a) => {
+        const patientName = a.patients
+          ? `${a.patients.first_name} ${a.patients.last_name}`
+          : "--";
+        const doctorName = a.doctors
+          ? `Dr. ${a.doctors.first_name} ${a.doctors.last_name}`
+          : "--";
+        const status = a.status || "scheduled";
 
-      return `
+        return `
         <tr>
-          <td>${a.time || '--'}</td>
+          <td>${a.time || "--"}</td>
           <td>${patientName}</td>
           <td>${doctorName}</td>
           <td><span class="status-badge ${status}">${status}</span></td>
-          <td style="max-width:160px;font-size:13px;color:#6b7280;">${a.notes || '--'}</td>
+          <td style="max-width:160px;font-size:13px;color:#6b7280;">${a.notes || "--"}</td>
           <td style="display:flex;gap:6px;flex-wrap:wrap;">
             <button class="btn-edit-appt" onclick="openEditAppointment('${a.appointment_id}')">Edit</button>
             <button class="btn-delete-appt" onclick="deleteAppointment('${a.appointment_id}')">Delete</button>
           </td>
         </tr>
       `;
-    }).join('');
-
+      })
+      .join("");
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="6" style="color:#dc2626;padding:20px;">Error: ${err.message}</td></tr>`;
   }
@@ -542,63 +652,71 @@ async function renderSchedule() {
 
 // ======== OPEN APPOINTMENT MODAL (CREATE) ========
 async function openAppointmentModal() {
-  document.getElementById('appt-modal-title').textContent = 'Create Appointment';
-  document.getElementById('appt-editing-id').value = '';
-  document.getElementById('appt-patient').value = '';
-  document.getElementById('appt-doctor').value = '';
-  document.getElementById('appt-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('appt-time').value = '';
-  document.getElementById('appt-status').value = 'scheduled';
-  document.getElementById('appt-notes').value = '';
-  document.getElementById('appt-error').style.display = 'none';
+  document.getElementById("appt-modal-title").textContent =
+    "Create Appointment";
+  document.getElementById("appt-editing-id").value = "";
+  document.getElementById("appt-patient").value = "";
+  document.getElementById("appt-doctor").value = "";
+  document.getElementById("appt-date").value = new Date()
+    .toISOString()
+    .split("T")[0];
+  document.getElementById("appt-time").value = "";
+  document.getElementById("appt-status").value = "scheduled";
+  document.getElementById("appt-notes").value = "";
+  document.getElementById("appt-error").style.display = "none";
   await populateAppointmentDropdowns();
-  showModal('appointment-modal');
+  showModal("appointment-modal");
 }
 
 // ======== OPEN APPOINTMENT MODAL (EDIT) ========
 async function openEditAppointment(appointmentId) {
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/appointments?appointment_id=eq.${appointmentId}&select=*`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    },
   );
   const data = await res.json();
   const appt = data[0];
   if (!appt) return;
 
-  document.getElementById('appt-modal-title').textContent = 'Edit Appointment';
-  document.getElementById('appt-editing-id').value = appointmentId;
-  document.getElementById('appt-date').value = appt.date || '';
-  document.getElementById('appt-time').value = appt.time || '';
-  document.getElementById('appt-status').value = appt.status || 'scheduled';
-  document.getElementById('appt-notes').value = appt.notes || '';
-  document.getElementById('appt-error').style.display = 'none';
+  document.getElementById("appt-modal-title").textContent = "Edit Appointment";
+  document.getElementById("appt-editing-id").value = appointmentId;
+  document.getElementById("appt-date").value = appt.date || "";
+  document.getElementById("appt-time").value = appt.time || "";
+  document.getElementById("appt-status").value = appt.status || "scheduled";
+  document.getElementById("appt-notes").value = appt.notes || "";
+  document.getElementById("appt-error").style.display = "none";
 
   await populateAppointmentDropdowns();
 
-  document.getElementById('appt-patient').value = appt.patient_id || '';
-  document.getElementById('appt-doctor').value = appt.doctor_id || '';
+  document.getElementById("appt-patient").value = appt.patient_id || "";
+  document.getElementById("appt-doctor").value = appt.doctor_id || "";
 
-  showModal('appointment-modal');
+  showModal("appointment-modal");
 }
 
 // ======== POPULATE APPOINTMENT DROPDOWNS ========
 async function populateAppointmentDropdowns() {
   const [pts, docs] = await Promise.all([fetchPatients(), fetchDoctors()]);
 
-  const patientSelect = document.getElementById('appt-patient');
-  const doctorSelect = document.getElementById('appt-doctor');
+  const patientSelect = document.getElementById("appt-patient");
+  const doctorSelect = document.getElementById("appt-doctor");
 
   patientSelect.innerHTML = '<option value="">-- Select a patient --</option>';
-  pts.forEach(p => {
-    const opt = document.createElement('option');
+  pts.forEach((p) => {
+    const opt = document.createElement("option");
     opt.value = p.patient_id;
     opt.textContent = `${p.first_name} ${p.last_name}`;
     patientSelect.appendChild(opt);
   });
 
   doctorSelect.innerHTML = '<option value="">-- Select a doctor --</option>';
-  docs.forEach(d => {
-    const opt = document.createElement('option');
+  docs.forEach((d) => {
+    const opt = document.createElement("option");
     opt.value = d.doctor_id;
     opt.textContent = `Dr. ${d.first_name} ${d.last_name}`;
     doctorSelect.appendChild(opt);
@@ -607,20 +725,20 @@ async function populateAppointmentDropdowns() {
 
 // ======== SAVE APPOINTMENT ========
 async function saveAppointment() {
-  const editingId = document.getElementById('appt-editing-id').value;
-  const patientId = document.getElementById('appt-patient').value;
-  const doctorId = document.getElementById('appt-doctor').value;
-  const date = document.getElementById('appt-date').value;
-  const time = document.getElementById('appt-time').value;
-  const status = document.getElementById('appt-status').value;
-  const notes = document.getElementById('appt-notes').value.trim();
+  const editingId = document.getElementById("appt-editing-id").value;
+  const patientId = document.getElementById("appt-patient").value;
+  const doctorId = document.getElementById("appt-doctor").value;
+  const date = document.getElementById("appt-date").value;
+  const time = document.getElementById("appt-time").value;
+  const status = document.getElementById("appt-status").value;
+  const notes = document.getElementById("appt-notes").value.trim();
 
   if (!patientId || !date || !time) {
-    document.getElementById('appt-error').style.display = 'block';
+    document.getElementById("appt-error").style.display = "block";
     return;
   }
 
-  document.getElementById('appt-error').style.display = 'none';
+  document.getElementById("appt-error").style.display = "none";
 
   const body = {
     patient_id: patientId,
@@ -629,122 +747,197 @@ async function saveAppointment() {
     time,
     status,
     notes: notes || null,
-    created_by: 'nurse',
+    created_by: "nurse",
   };
 
   try {
     if (editingId) {
-      await fetch(`${SUPABASE_URL}/rest/v1/appointments?appointment_id=eq.${editingId}`, {
-        method: 'PATCH',
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal',
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/appointments?appointment_id=eq.${editingId}`,
+        {
+          method: "PATCH",
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal",
+          },
+          body: JSON.stringify(body),
         },
-        body: JSON.stringify(body),
-      });
-      showToast('✓ Appointment updated successfully');
+      );
+      showToast("✓ Appointment updated successfully");
     } else {
       await fetch(`${SUPABASE_URL}/rest/v1/appointments`, {
-        method: 'POST',
+        method: "POST",
         headers: {
           apikey: SUPABASE_ANON_KEY,
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(body),
       });
-      showToast('✓ Appointment created successfully');
+      showToast("✓ Appointment created successfully");
     }
 
     closeAppointmentModal();
     renderSchedule();
-
   } catch (err) {
-    showToast('Error saving appointment: ' + err.message);
+    showToast("Error saving appointment: " + err.message);
   }
 }
 
 // ======== DELETE APPOINTMENT ========
 async function deleteAppointment(appointmentId) {
-  if (!confirm('Are you sure you want to delete this appointment?')) return;
+  if (!confirm("Are you sure you want to delete this appointment?")) return;
 
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/appointments?appointment_id=eq.${appointmentId}`, {
-      method: 'DELETE',
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        'Prefer': 'return=minimal',
+    await fetch(
+      `${SUPABASE_URL}/rest/v1/appointments?appointment_id=eq.${appointmentId}`,
+      {
+        method: "DELETE",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Prefer: "return=minimal",
+        },
       },
-    });
-    showToast('✓ Appointment deleted');
+    );
+    showToast("✓ Appointment deleted");
     renderSchedule();
   } catch (err) {
-    showToast('Error deleting appointment: ' + err.message);
+    showToast("Error deleting appointment: " + err.message);
   }
 }
 
 // ======== CLOSE APPOINTMENT MODAL ========
 function closeAppointmentModal() {
-  closeModal('appointment-modal');
+  closeModal("appointment-modal");
 }
 
 // ======== RECORD MODAL ========
 function openRecordModal(patientId) {
   activePatientId = patientId;
-  const p = patients.find(x => x.patient_id === patientId);
+  const p = patients.find((x) => x.patient_id === patientId);
   const v = currentVitals[patientId];
-  document.getElementById('modal-record-title').textContent = `Record Vitals — ${p.first_name} ${p.last_name}`;
-  document.getElementById('modal-record-sub').textContent = 'Manual vital entry';
-  document.getElementById('inp-bp').value = v?.bp !== '--' ? v.bp : '';
-  document.getElementById('inp-hr').value = v?.hr !== '--' ? v.hr : '';
-  document.getElementById('inp-temp').value = v?.temp !== '--' ? v.temp : '';
-  document.getElementById('inp-o2').value = v?.o2 !== '--' ? v.o2 : '';
-  document.getElementById('inp-notes').value = '';
-  document.getElementById('record-error').style.display = 'none';
-  showModal('record-modal');
+  document.getElementById("modal-record-title").textContent =
+    `Record Vitals — ${p.first_name} ${p.last_name}`;
+  document.getElementById("modal-record-sub").textContent =
+    "Manual vital entry";
+  document.getElementById("inp-bp").value = v?.bp !== "--" ? v.bp : "";
+  document.getElementById("inp-hr").value = v?.hr !== "--" ? v.hr : "";
+  document.getElementById("inp-temp").value = v?.temp !== "--" ? v.temp : "";
+  document.getElementById("inp-o2").value = v?.o2 !== "--" ? v.o2 : "";
+  document.getElementById("inp-notes").value = "";
+  document.getElementById("record-error").style.display = "none";
+  showModal("record-modal");
 }
 
 async function saveVitals() {
-  const bp = document.getElementById('inp-bp').value.trim();
-  const hr = document.getElementById('inp-hr').value.trim();
-  const temp = document.getElementById('inp-temp').value.trim();
-  const o2 = document.getElementById('inp-o2').value.trim();
+  const bp = document.getElementById("inp-bp").value.trim();
+  const hr = document.getElementById("inp-hr").value.trim();
+  const temp = document.getElementById("inp-temp").value.trim();
+  const o2 = document.getElementById("inp-o2").value.trim();
 
   if (!bp || !hr || !temp || !o2) {
-    document.getElementById('record-error').style.display = 'block';
+    document.getElementById("record-error").style.display = "block";
+    document.getElementById("record-error").textContent =
+      "Please fill in all vital fields before saving.";
     return;
   }
 
-  const bpParts = bp.split('/');
+  // Validate BP format
+  const bpParts = bp.split("/");
+  if (bpParts.length !== 2 || !bpParts[0] || !bpParts[1]) {
+    document.getElementById("record-error").style.display = "block";
+    document.getElementById("record-error").textContent =
+      "Blood pressure must be in format: 120/80";
+    return;
+  }
+
+  const systolic = parseInt(bpParts[0]);
+  const diastolic = parseInt(bpParts[1]);
+  const heartRate = parseInt(hr);
+  const tempVal = parseFloat(temp);
+  const o2Val = parseInt(o2);
+
+  // Basic range validation
+  if (
+    isNaN(systolic) ||
+    isNaN(diastolic) ||
+    isNaN(heartRate) ||
+    isNaN(tempVal) ||
+    isNaN(o2Val)
+  ) {
+    document.getElementById("record-error").style.display = "block";
+    document.getElementById("record-error").textContent =
+      "Please enter valid numbers for all fields.";
+    return;
+  }
+
+  document.getElementById("record-error").style.display = "none";
+
+  // Disable save button to prevent double submit
+  const saveBtn = document.querySelector(
+    '#record-modal button[onclick="saveVitals()"]',
+  );
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving...";
+  }
 
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/patient_vitals`, {
-      method: 'POST',
+      method: "POST",
       headers: {
         apikey: SUPABASE_ANON_KEY,
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
       },
       body: JSON.stringify({
         patient_id: activePatientId,
-        heart_rate: parseInt(hr),
-        blood_pressure_systolic: parseInt(bpParts[0]),
-        blood_pressure_diastolic: parseInt(bpParts[1]),
-        temperature: parseFloat(temp),
-        oxygen_saturation: parseInt(o2),
+        heart_rate: heartRate,
+        blood_pressure_systolic: systolic,
+        blood_pressure_diastolic: diastolic,
+        temperature: tempVal,
+        oxygen_saturation: o2Val,
       }),
     });
 
-    if (!res.ok) throw new Error('Failed to save vitals');
-    closeModal('record-modal');
-    showToast('✓ Vitals saved successfully');
-    renderVitalsList();
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`${res.status} — ${errText}`);
+    }
 
+    closeModal("record-modal");
+    showToast("✓ Vitals saved successfully");
+
+    // Update the displayed vitals on the card immediately without full reload
+    document.getElementById(`disp-bp-${activePatientId}`).textContent = bp;
+    document.getElementById(`disp-hr-${activePatientId}`).textContent =
+      hr + " bpm";
+    document.getElementById(`disp-temp-${activePatientId}`).textContent =
+      temp + "°C";
+    document.getElementById(`disp-o2-${activePatientId}`).textContent =
+      o2 + "%";
+
+    // Update currentVitals cache
+    currentVitals[activePatientId] = {
+      bp,
+      hr: heartRate,
+      temp: tempVal,
+      o2: o2Val,
+    };
   } catch (err) {
-    showToast('Error saving vitals: ' + err.message);
+    console.error("saveVitals error:", err);
+    document.getElementById("record-error").style.display = "block";
+    document.getElementById("record-error").textContent =
+      "Failed to save vitals: " + err.message;
+  } finally {
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "✓ Save Vitals";
+    }
   }
 }
 
@@ -755,7 +948,12 @@ async function fetchNotifications() {
   const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const res = await fetch(
     `${SUPABASE_URL}/rest/v1/nurse_notifications?created_at=gte.${cutoff}&order=created_at.desc`,
-    { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    },
   );
   if (!res.ok) return [];
   return await res.json();
@@ -763,16 +961,16 @@ async function fetchNotifications() {
 
 async function renderNotifications() {
   const notifications = await fetchNotifications();
-  const list = document.getElementById('notif-list');
-  const badge = document.getElementById('notif-badge');
+  const list = document.getElementById("notif-list");
+  const badge = document.getElementById("notif-badge");
 
-  const unread = notifications.filter(n => !n.is_read).length;
+  const unread = notifications.filter((n) => !n.is_read).length;
 
   if (unread > 0) {
     badge.textContent = unread;
-    badge.style.display = 'inline-flex';
+    badge.style.display = "inline-flex";
   } else {
-    badge.style.display = 'none';
+    badge.style.display = "none";
   }
 
   if (!list) return;
@@ -787,102 +985,131 @@ async function renderNotifications() {
     return;
   }
 
-  const typeIcon = { diagnosis: '🧠', critical_alert: '⚠️', appointment: '📅' };
-  const typeColor = { diagnosis: '#7c3aed', critical_alert: '#dc2626', appointment: '#0ea5e9' };
+  const typeIcon = { diagnosis: "🧠", critical_alert: "⚠️", appointment: "📅" };
+  const typeColor = {
+    diagnosis: "#7c3aed",
+    critical_alert: "#dc2626",
+    appointment: "#0ea5e9",
+  };
 
-  list.innerHTML = notifications.map(n => {
-    const time = new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const date = new Date(n.created_at).toLocaleDateString();
-    const icon = typeIcon[n.type] || '🔔';
-    const color = typeColor[n.type] || '#6b7280';
-    const bg = n.is_read ? '#fff' : '#f8faff';
+  list.innerHTML = notifications
+    .map((n) => {
+      const time = new Date(n.created_at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const date = new Date(n.created_at).toLocaleDateString();
+      const icon = typeIcon[n.type] || "🔔";
+      const color = typeColor[n.type] || "#6b7280";
+      const bg = n.is_read ? "#fff" : "#f8faff";
 
-    return `
+      return `
       <div style="display:flex;gap:12px;padding:14px 20px;border-bottom:1px solid #f3f4f6;background:${bg};cursor:pointer;" onclick="markOneRead('${n.notification_id}')">
         <div style="font-size:20px;flex-shrink:0;margin-top:2px;">${icon}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;color:#111827;font-weight:${n.is_read ? '400' : '600'};line-height:1.45;">${n.message}</div>
+          <div style="font-size:13px;color:#111827;font-weight:${n.is_read ? "400" : "600"};line-height:1.45;">${n.message}</div>
           <div style="font-size:11px;color:#9ca3af;margin-top:4px;">${date} at ${time}</div>
         </div>
-        ${!n.is_read ? `<div style="width:8px;height:8px;border-radius:99px;background:${color};flex-shrink:0;margin-top:6px;"></div>` : ''}
+        ${!n.is_read ? `<div style="width:8px;height:8px;border-radius:99px;background:${color};flex-shrink:0;margin-top:6px;"></div>` : ""}
       </div>
     `;
-  }).join('');
+    })
+    .join("");
 }
 
 function toggleNotifications() {
-  const dropdown = document.getElementById('notif-dropdown');
+  const dropdown = document.getElementById("notif-dropdown");
   notificationsOpen = !notificationsOpen;
-  dropdown.style.display = notificationsOpen ? 'block' : 'none';
+  dropdown.style.display = notificationsOpen ? "block" : "none";
   if (notificationsOpen) renderNotifications();
 }
 
 async function markOneRead(notificationId) {
-  await fetch(`${SUPABASE_URL}/rest/v1/nurse_notifications?notification_id=eq.${notificationId}`, {
-    method: 'PATCH',
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal',
+  await fetch(
+    `${SUPABASE_URL}/rest/v1/nurse_notifications?notification_id=eq.${notificationId}`,
+    {
+      method: "PATCH",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({ is_read: true }),
     },
-    body: JSON.stringify({ is_read: true }),
-  });
+  );
   renderNotifications();
 }
 
 async function markAllRead() {
   const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  await fetch(`${SUPABASE_URL}/rest/v1/nurse_notifications?created_at=gte.${cutoff}&is_read=eq.false`, {
-    method: 'PATCH',
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal',
+  await fetch(
+    `${SUPABASE_URL}/rest/v1/nurse_notifications?created_at=gte.${cutoff}&is_read=eq.false`,
+    {
+      method: "PATCH",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({ is_read: true }),
     },
-    body: JSON.stringify({ is_read: true }),
-  });
+  );
   renderNotifications();
 }
 
 async function clearAllNotifications() {
-  if (!confirm('Clear all notifications?')) return;
+  if (!confirm("Clear all notifications?")) return;
   const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  await fetch(`${SUPABASE_URL}/rest/v1/nurse_notifications?created_at=gte.${cutoff}`, {
-    method: 'DELETE',
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      'Prefer': 'return=minimal',
+  await fetch(
+    `${SUPABASE_URL}/rest/v1/nurse_notifications?created_at=gte.${cutoff}`,
+    {
+      method: "DELETE",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        Prefer: "return=minimal",
+      },
     },
-  });
+  );
   renderNotifications();
   toggleNotifications();
 }
 
-document.addEventListener('click', function(e) {
-  const dropdown = document.getElementById('notif-dropdown');
-  const btn = document.querySelector('.notif-btn');
-  if (notificationsOpen && dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
-    dropdown.style.display = 'none';
+document.addEventListener("click", function (e) {
+  const dropdown = document.getElementById("notif-dropdown");
+  const btn = document.querySelector(".notif-btn");
+  if (
+    notificationsOpen &&
+    dropdown &&
+    btn &&
+    !dropdown.contains(e.target) &&
+    !btn.contains(e.target)
+  ) {
+    dropdown.style.display = "none";
     notificationsOpen = false;
   }
 });
 
 // ======== MODAL HELPERS ========
 function showModal(id) {
-  document.getElementById(id).style.display = 'flex';
+  document.getElementById(id).style.display = "flex";
 }
 
 function closeModal(id) {
-  document.getElementById(id).style.display = 'none';
+  document.getElementById(id).style.display = "none";
 }
 
-['record-modal', 'history-modal', 'patient-detail-modal', 'appointment-modal'].forEach(id => {
+[
+  "record-modal",
+  "history-modal",
+  "patient-detail-modal",
+  "appointment-modal",
+].forEach((id) => {
   const el = document.getElementById(id);
   if (el) {
-    el.addEventListener('click', function(e) {
+    el.addEventListener("click", function (e) {
       if (e.target === this) closeModal(id);
     });
   }
@@ -890,31 +1117,35 @@ function closeModal(id) {
 
 // ======== LOGOUT ========
 function handleLogout() {
-  if (confirm('Are you sure you want to logout?')) {
+  if (confirm("Are you sure you want to logout?")) {
     sessionStorage.clear();
-    window.location.href = 'login.html';
+    window.location.href = "login.html";
   }
 }
 
 // ======== TABS ========
 function switchTab(tabName) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById(`tab-${tabName}`).classList.add('active');
-  document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+  document
+    .querySelectorAll(".tab")
+    .forEach((t) => t.classList.remove("active"));
+  document
+    .querySelectorAll(".panel")
+    .forEach((p) => p.classList.remove("active"));
+  document.getElementById(`tab-${tabName}`).classList.add("active");
+  document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add("active");
 
-  if (tabName === 'patient') renderPatientCare();
-  if (tabName === 'schedule') renderSchedule();
+  if (tabName === "patient") renderPatientCare();
+  if (tabName === "schedule") renderSchedule();
 }
 
 // ======== TOAST ========
 let toastTimer;
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  const t = document.getElementById("toast");
   t.textContent = msg;
-  t.classList.add('show');
+  t.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2800);
 }
 
 // ======== INIT ========

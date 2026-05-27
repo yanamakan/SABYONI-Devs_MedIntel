@@ -3393,3 +3393,46 @@ body.dark-theme .modal-body textarea  { background: #0f172a; border-color: #3341
 body.dark-theme ::-webkit-scrollbar-track { background: #1e293b; }
 body.dark-theme ::-webkit-scrollbar-thumb { background: #334155; }
 body.dark-theme ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+body.dark-theme .modal-textarea {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+.modal-textarea {
+  width: 100%;
+  border: 1.5px solid #e5e7eb;
+  background: #f9fafb;
+  color: #111827;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s;
+}
+.modal-textarea:focus {
+  border-color: #7c3aed;
+  background: #ffffff;
+}
+
+body.dark-theme #notificationList > div {
+  color: #e2e8f0 !important;
+  border-bottom-color: #334155;
+}
+
+body.dark-theme .notif-item {
+  color: #e2e8f0 !important;
+  border-bottom-color: #334155;
+}
+
+body.dark-theme .notif-unread         { color: #f1f5f9; border-left-color: #60a5fa; }
+body.dark-theme #notificationList > div { color: #e2e8f0 !important; border-bottom-color: #334155; }
+body.dark-theme #notificationList span  { color: #e2e8f0; }
+body.dark-theme #notificationList small { color: #64748b; }
+
+body.dark-theme #notificationPopup .notif-popup-header strong {
+  color: #60a5fa;
+}

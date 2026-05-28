@@ -1,10 +1,17 @@
 {
   "version": 2,
   "installCommand": "cd BackEnd && npm install",
+  "rewrites": [
+    { "source": "/api/email", "destination": "/BackEnd/api/email.js" },
+    { "source": "/api/sentinel", "destination": "/BackEnd/api/sentinel.js" },
+    { "source": "/api/aria", "destination": "/BackEnd/api/aria.js" },
+    { "source": "/api/youtube", "destination": "/BackEnd/api/youtube.js" },
+    { "source": "/api/maps-config", "destination": "/BackEnd/api/maps-config.js" },
+    { "source": "/api/add-reading", "destination": "/BackEnd/api/add-reading.js" },
+    { "source": "/api/get-readings", "destination": "/BackEnd/api/get-readings.js" },
+    { "source": "/api/toggle-simulator", "destination": "/BackEnd/api/toggle-simulator.js" }
+  ],
   "redirects": [
     { "source": "/", "destination": "/Dashboard/login.html", "permanent": false }
-  ],
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/BackEnd/api/:path*" }
   ]
 }

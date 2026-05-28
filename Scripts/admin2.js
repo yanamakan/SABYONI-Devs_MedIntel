@@ -5,6 +5,12 @@
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+//GENERATE A RANDOM PASSWORD WHICH WILL ACT AS A TEMP PASSWORD
+function generateTempPassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
+  return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
 // ════════════════════════════════════════════════════════════
 //  TAB SWITCHING
 // ════════════════════════════════════════════════════════════
@@ -148,7 +154,7 @@ document.addEventListener('click', function (e) {
 });
 
 function clearModalErrors() {
-  ['errStaffName','errStaffEmail','errStaffRole','errStaffDept','errStaffPass'].forEach(id => {
+  ['errStaffName','errStaffEmail','errStaffRole','errStaffDept'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = '';
   });
@@ -531,14 +537,13 @@ async function submitAddStaff() {
   const role     = document.getElementById('staffRole').value;
   const dept     = document.getElementById('staffDept').value;
   const spec     = document.getElementById('staffSpec').value.trim();
-  const password = document.getElementById('staffPass').value;
+  const password = generateTempPassword();
 
   let valid = true;
   if (!fullName) { document.getElementById('errStaffName').textContent  = 'Name is required';     valid = false; }
   if (!email)    { document.getElementById('errStaffEmail').textContent = 'Email is required';    valid = false; }
   if (!role)     { document.getElementById('errStaffRole').textContent  = 'Role is required';     valid = false; }
   if (!dept)     { document.getElementById('errStaffDept').textContent  = 'Department required';  valid = false; }
-  if (!password) { document.getElementById('errStaffPass').textContent  = 'Password is required'; valid = false; }
   if (!valid) return;
 
   const [firstName, ...rest] = fullName.split(' ');
@@ -554,7 +559,7 @@ async function submitAddStaff() {
     if (!userId) throw new Error('No user ID returned.');
 
     const { error: userError } = await db.from('users').insert({
-      id: userId, email, role, department: dept,
+      id: userId, email, role, department: dept, must_reset_password: true
     });
     if (userError) throw userError;
 
@@ -571,9 +576,20 @@ async function submitAddStaff() {
       if (error) throw error;
     }
 
+    // Send first-login email
+    await fetch('https://sabyoni-devs-med-intel.vercel.app/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'first_login', email, name: fullName }),
+    });
+
     await addAdminNotification(`👤 New ${role} added: ${fullName} — ${dept}`, 'staff');
+    showToast(`✓ ${role.charAt(0).toUpperCase() + role.slice(1)} created! Reset email sent to ${email}.`, 'success');
     closeModal('addStaffModal');
-    ['staffName','staffEmail','staffSpec','staffPass'].forEach(id => document.getElementById(id).value = '');
+
+    ['staffName','staffEmail','staffSpec'].forEach(id =>
+      document.getElementById(id).value = ''
+    );
     document.getElementById('staffRole').value = '';
     document.getElementById('staffDept').value = '';
     await Promise.all([loadStats(), loadDoctors(), loadNurses()]);

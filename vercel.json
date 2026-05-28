@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd BackEnd && npm install",
+  "installCommand": "cd BackEnd && npm install",
   "functions": {
     "BackEnd/api/*.js": {
       "memory": 512,
@@ -8,25 +8,10 @@
     }
   },
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/BackEnd/api/$1"
-    },
-    {
-      "src": "/Dashboard/(.*)",
-      "dest": "/Dashboard/$1"
-    },
-    {
-      "src": "/Scripts/(.*)",
-      "dest": "/Scripts/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/Dashboard/login.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+    { "src": "/api/(.*)",       "dest": "/BackEnd/api/$1" },
+    { "src": "/Dashboard/(.*)", "dest": "/Dashboard/$1"   },
+    { "src": "/Scripts/(.*)",   "dest": "/Scripts/$1"     },
+    { "src": "/",               "dest": "/Dashboard/login.html" },
+    { "src": "/(.*)",           "dest": "/$1"             }
   ]
 }

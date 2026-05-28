@@ -1,11 +1,6 @@
 {
   "version": 2,
-  "functions": {
-    "BackEnd/api/*.js": {
-      "memory": 512,
-      "maxDuration": 30
-    }
-  },
+  "installCommand": "cd BackEnd && npm install",
   "rewrites": [
     { "source": "/api/:path*", "destination": "/BackEnd/api/:path*" },
     { "source": "/", "destination": "/Dashboard/login.html" },

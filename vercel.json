@@ -8,15 +8,8 @@
     }
   },
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/BackEnd/api/:path*" }
-  ],
-  "redirects": [
-    { "source": "/", "destination": "/Dashboard/login.html", "permanent": false }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
-    }
+    { "source": "/api/:path*", "destination": "/BackEnd/api/:path*" },
+    { "source": "/", "destination": "/Dashboard/login.html" },
+    { "source": "/:path*", "destination": "/:path*" }
   ]
 }

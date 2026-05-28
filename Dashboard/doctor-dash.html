@@ -1,11 +1,13 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MedIntel | Doctor Dashboard</title>
   <link rel="stylesheet" href="doctor.css" />
 </head>
+
 <body>
 
   <!-- HEADER -->
@@ -13,10 +15,12 @@
     <div class="left">
       <div class="logo">
         <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-          <rect width="36" height="36" rx="8" fill="#0ea5e9"/>
-          <path d="M10 12c0-1.1.9-2 2-2h4a2 2 0 0 1 2 2v6a4 4 0 0 1-8 0v-6z" stroke="white" stroke-width="1.8" fill="none"/>
-          <path d="M18 15h2a4 4 0 0 1 4 4v1a3 3 0 1 1-2 0v-1a2 2 0 0 0-2-2h-2" stroke="white" stroke-width="1.8" fill="none"/>
-          <circle cx="24" cy="22" r="1.5" fill="white"/>
+          <rect width="36" height="36" rx="8" fill="#0ea5e9" />
+          <path d="M10 12c0-1.1.9-2 2-2h4a2 2 0 0 1 2 2v6a4 4 0 0 1-8 0v-6z" stroke="white" stroke-width="1.8"
+            fill="none" />
+          <path d="M18 15h2a4 4 0 0 1 4 4v1a3 3 0 1 1-2 0v-1a2 2 0 0 0-2-2h-2" stroke="white" stroke-width="1.8"
+            fill="none" />
+          <circle cx="24" cy="22" r="1.5" fill="white" />
         </svg>
       </div>
       <div class="title">
@@ -28,19 +32,21 @@
       <div style="position:relative;">
         <button class="notif-btn" id="notif-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
           <span class="btn-text">Notifications</span>
           <span class="notif-badge" id="notif-count" style="display:none;">0</span>
         </button>
-        <div id="notif-dropdown" style="display:none;position:absolute;top:52px;right:0;width:360px;background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 12px 40px rgba(0,0,0,.15);z-index:2000;overflow:hidden;"></div>
+        <div id="notif-dropdown"
+          style="display:none;position:absolute;top:52px;right:0;width:360px;background:#fff;border-radius:16px;border:1px solid #e5e7eb;box-shadow:0 12px 40px rgba(0,0,0,.15);z-index:2000;overflow:hidden;">
+        </div>
       </div>
       <button class="logout-btn" id="logout-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
         </svg>
         <span class="btn-text">Logout</span>
       </button>
@@ -99,21 +105,38 @@
       <div class="ai-summary" id="ai-summary" style="display:none">
         <div class="ai-summary-title">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4M12 8h.01" />
           </svg>
           AI Clinical Summary
         </div>
         <p id="ai-summary-text"></p>
       </div>
       <div class="info-grid" id="info-grid" style="display:none">
-        <div><strong>Email</strong><p id="detail-email"></p></div>
-        <div><strong>Phone</strong><p id="detail-phone"></p></div>
-        <div><strong>Last Visit</strong><p id="detail-last-visit"></p></div>
-        <div><strong>Next Appointment</strong><p id="detail-next-appt"></p></div>
-        <div><strong>Blood Pressure</strong><p id="detail-bp"></p></div>
-        <div><strong>Heart Rate</strong><p id="detail-hr"></p></div>
-        <div><strong>Temperature</strong><p id="detail-temp"></p></div>
-        <div><strong>O2 Saturation</strong><p id="detail-o2"></p></div>
+        <div><strong>Email</strong>
+          <p id="detail-email"></p>
+        </div>
+        <div><strong>Phone</strong>
+          <p id="detail-phone"></p>
+        </div>
+        <div><strong>Last Visit</strong>
+          <p id="detail-last-visit"></p>
+        </div>
+        <div><strong>Next Appointment</strong>
+          <p id="detail-next-appt"></p>
+        </div>
+        <div><strong>Blood Pressure</strong>
+          <p id="detail-bp"></p>
+        </div>
+        <div><strong>Heart Rate</strong>
+          <p id="detail-hr"></p>
+        </div>
+        <div><strong>Temperature</strong>
+          <p id="detail-temp"></p>
+        </div>
+        <div><strong>O2 Saturation</strong>
+          <p id="detail-o2"></p>
+        </div>
       </div>
       <div class="history-section" id="history-section" style="display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -130,7 +153,12 @@
         <div id="prescriptions-list"></div>
       </div>
       <div class="empty-state" id="empty-state">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
         <p>Select a patient from the queue to view their details.</p>
       </div>
     </section>
@@ -146,7 +174,10 @@
         <p class="sub">Create and manage patient medical records</p>
       </div>
       <button class="btn-primary" id="btn-new-record">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
         New Record
       </button>
     </div>
@@ -154,7 +185,10 @@
     <!-- New Record Form -->
     <div class="form-card" id="record-form" style="display:none">
       <h3 class="form-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+        </svg>
         New Medical Record
       </h3>
       <div class="form-grid">
@@ -166,25 +200,29 @@
         </div>
         <div class="form-group">
           <label>Diagnosis <span class="req">*</span></label>
-          <input type="text" id="rec-diagnosis" placeholder="e.g. Type 2 Diabetes, Hypertension..."/>
+          <input type="text" id="rec-diagnosis" placeholder="e.g. Type 2 Diabetes, Hypertension..." />
         </div>
         <div class="form-group">
           <label>Body Location</label>
-          <input type="text" id="rec-location" placeholder="e.g. Chest, Left Arm..."/>
+          <input type="text" id="rec-location" placeholder="e.g. Chest, Left Arm..." />
         </div>
         <div class="form-group">
           <label>Treatment</label>
-          <input type="text" id="rec-treatment" placeholder="e.g. Lifestyle changes, medication..."/>
+          <input type="text" id="rec-treatment" placeholder="e.g. Lifestyle changes, medication..." />
         </div>
       </div>
       <div class="form-group" style="margin-top:14px;">
         <label>Clinical Notes</label>
-        <textarea id="rec-notes" rows="4" placeholder="Detailed notes, observations, follow-up instructions..."></textarea>
+        <textarea id="rec-notes" rows="4"
+          placeholder="Detailed notes, observations, follow-up instructions..."></textarea>
       </div>
       <div class="form-actions">
         <button class="btn-cancel" id="rec-cancel">Cancel</button>
         <button class="btn-save" id="rec-save">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+          </svg>
           Save &amp; Send to Patient
         </button>
       </div>
@@ -211,7 +249,10 @@
         <p class="sub">Issue and manage patient prescriptions</p>
       </div>
       <button class="btn-primary" id="btn-new-rx">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
         New Prescription
       </button>
     </div>
@@ -219,7 +260,10 @@
     <!-- New Prescription Form -->
     <div class="form-card" id="rx-form" style="display:none">
       <h3 class="form-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+        </svg>
         Issue Prescription
       </h3>
       <div class="form-grid">
@@ -231,25 +275,29 @@
         </div>
         <div class="form-group">
           <label>Medication <span class="req">*</span></label>
-          <input type="text" id="rx-medicine" placeholder="e.g. Metformin, Lisinopril..."/>
+          <input type="text" id="rx-medicine" placeholder="e.g. Metformin, Lisinopril..." />
         </div>
         <div class="form-group">
           <label>Dosage</label>
-          <input type="text" id="rx-dosage" placeholder="e.g. 500mg twice daily"/>
+          <input type="text" id="rx-dosage" placeholder="e.g. 500mg twice daily" />
         </div>
         <div class="form-group">
           <label>Pharmacy Name</label>
-          <input type="text" id="rx-pharmacy" placeholder="e.g. Clicks Pharmacy, Dis-Chem..."/>
+          <input type="text" id="rx-pharmacy" placeholder="e.g. Clicks Pharmacy, Dis-Chem..." />
         </div>
       </div>
       <div class="form-group" style="margin-top:14px;">
         <label>Instructions for Patient</label>
-        <textarea id="rx-instructions" rows="3" placeholder="e.g. Take with food. Avoid alcohol. Complete full course..."></textarea>
+        <textarea id="rx-instructions" rows="3"
+          placeholder="e.g. Take with food. Avoid alcohol. Complete full course..."></textarea>
       </div>
       <div class="form-actions">
         <button class="btn-cancel" id="rx-cancel">Cancel</button>
         <button class="btn-save green" id="rx-save">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13" />
+            <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+          </svg>
           Issue &amp; Send to Patient
         </button>
       </div>
@@ -274,7 +322,9 @@
           </tr>
         </thead>
         <tbody id="rx-tbody">
-          <tr><td colspan="6" class="loading-cell">Loading prescriptions…</td></tr>
+          <tr>
+            <td colspan="6" class="loading-cell">Loading prescriptions…</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -290,7 +340,10 @@
         <p class="sub">Messages, refill requests, certificate requests and appointment queries from your patients</p>
       </div>
       <button class="btn-outline" id="btn-refresh-requests">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.4"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1 4 1 10 7 10" />
+          <path d="M3.51 15a9 9 0 1 0 .49-3.4" />
+        </svg>
         Refresh
       </button>
     </div>
@@ -305,7 +358,8 @@
   <div id="tab-anatomy" class="tab-page" style="display:none">
     <div class="tab-content-header">
       <h2>Anatomy Medical Notes</h2>
-      <p class="sub">Click on the body diagram to add location-specific notes for <span id="anatomy-patient-name">the selected patient</span></p>
+      <p class="sub">Click on the body diagram to add location-specific notes for <span id="anatomy-patient-name">the
+          selected patient</span></p>
     </div>
     <div class="anatomy-layout">
       <div class="anatomy-viewer-card">
@@ -314,16 +368,10 @@
         </div>
         <div class="anatomy-canvas-wrap">
           <div style="width:100%;height:480px;border-radius:12px;overflow:hidden;">
-            <iframe
-              id="anatomy-iframe"
-              title="Ecorche - Anatomy study"
+            <iframe id="anatomy-iframe" title="Ecorche - Anatomy study"
               src="https://sketchfab.com/models/e402d3d541eb4b199c57d5410f5d3c57/embed?autostart=1&ui_theme=dark&camera=0"
-              frameborder="0"
-              allowfullscreen
-              mozallowfullscreen="true"
-              webkitallowfullscreen="true"
-              allow="autoplay; fullscreen; xr-spatial-tracking"
-              style="width:100%;height:100%;border:none;">
+              frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true"
+              allow="autoplay; fullscreen; xr-spatial-tracking" style="width:100%;height:100%;border:none;">
             </iframe>
           </div>
           <p class="anatomy-hint">Rotate the 3D model, then use the form to add location-specific notes</p>
@@ -348,15 +396,20 @@
             <option>Right Foot</option>
           </select>
           <label class="anatomy-label">Medical Note</label>
-          <textarea id="anatomy-note-text" class="anatomy-textarea" placeholder="Describe the complaint or observation for this area…"></textarea>
+          <textarea id="anatomy-note-text" class="anatomy-textarea"
+            placeholder="Describe the complaint or observation for this area…"></textarea>
           <button class="anatomy-save-btn" id="anatomy-save-btn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            </svg>
             Save Note to Record
           </button>
         </div>
         <div class="anatomy-existing-card">
           <h4>Existing Notes (<span id="anatomy-note-count">0</span>)</h4>
-          <div id="anatomy-notes-list"><p class="anatomy-no-notes">No notes recorded yet</p></div>
+          <div id="anatomy-notes-list">
+            <p class="anatomy-no-notes">No notes recorded yet</p>
+          </div>
         </div>
       </div>
     </div>
@@ -383,13 +436,15 @@
           </tr>
         </thead>
         <tbody id="appointments-tbody">
-          <tr><td colspan="6" class="loading-cell">Loading…</td></tr>
+          <tr>
+            <td colspan="6" class="loading-cell">Loading…</td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
- <!-- ═══════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════
      TAB: CLINIC MAP
   ═══════════════════════════════════════════ -->
   <div id="tab-map" class="tab-page" style="display:none">
@@ -407,13 +462,15 @@
         <div class="map-filter-btns">
           <button class="map-filter-btn active" data-filter="nearest">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
             </svg>
             Nearest
           </button>
           <button class="map-filter-btn" data-filter="toprated">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
             Top Rated
           </button>
@@ -422,7 +479,8 @@
 
       <!-- Map canvas -->
       <div id="doctor-google-map" style="height:400px;width:100%;background:#e8f4f8;">
-        <div id="map-loading-state" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#6b7280;">
+        <div id="map-loading-state"
+          style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#6b7280;">
           <div class="map-loading-spinner"></div>
           <p style="font-size:.9rem;">Getting your location…</p>
         </div>
@@ -430,9 +488,15 @@
 
       <!-- Error state -->
       <div id="map-error-state" style="display:none;padding:32px;text-align:center;color:#6b7280;">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-bottom:8px;"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"
+          style="margin-bottom:8px;">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
         <p id="map-error-msg" style="margin-bottom:12px;">Location access denied.</p>
-        <button onclick="initDoctorMap()" style="padding:8px 18px;border-radius:8px;border:1px solid #e5e7eb;background:white;font-size:.84rem;cursor:pointer;">Try Again</button>
+        <button onclick="initDoctorMap()"
+          style="padding:8px 18px;border-radius:8px;border:1px solid #e5e7eb;background:white;font-size:.84rem;cursor:pointer;">Try
+          Again</button>
       </div>
 
       <!-- Facility list -->
@@ -451,7 +515,11 @@
     <div class="settings-card">
       <div class="settings-title-row">
         <div class="settings-icon-wrap">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
         </div>
         <div>
           <h3>Doctor Account Settings</h3>
@@ -472,26 +540,38 @@
           <p class="sub">Update your professional details</p>
           <label class="settings-label">Full Name
             <div class="settings-input-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <input type="text" class="settings-input" id="profile-name" placeholder="Dr. Full Name"/>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <input type="text" class="settings-input" id="profile-name" placeholder="Dr. Full Name" />
             </div>
           </label>
           <label class="settings-label">Email
             <div class="settings-input-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
-              <input type="email" class="settings-input" id="profile-email" placeholder="doctor@medintel.com"/>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m22 7-10 7L2 7" />
+              </svg>
+              <input type="email" class="settings-input" id="profile-email" placeholder="doctor@medintel.com" />
             </div>
           </label>
           <label class="settings-label">Specialization
             <div class="settings-input-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-              <input type="text" class="settings-input" id="profile-specialization" placeholder="e.g. General Practice"/>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+              <input type="text" class="settings-input" id="profile-specialization"
+                placeholder="e.g. General Practice" />
             </div>
           </label>
           <label class="settings-label">Phone Number
             <div class="settings-input-wrap">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.12.96.34 1.9.65 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.02-1.02a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.65A2 2 0 0 1 22 16.92z"/></svg>
-              <input type="tel" class="settings-input" id="profile-phone" placeholder="+27 xx xxx xxxx"/>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2">
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.12.96.34 1.9.65 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.02-1.02a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.65A2 2 0 0 1 22 16.92z" />
+              </svg>
+              <input type="tel" class="settings-input" id="profile-phone" placeholder="+27 xx xxx xxxx" />
             </div>
           </label>
           <button class="settings-save-btn" id="save-profile-btn">Save Changes</button>
@@ -507,13 +587,15 @@
           <div class="settings-toggle-row">
             <div>
               <div class="settings-toggle-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
                 Dark Mode
               </div>
               <p class="sub">Enable dark theme across the dashboard</p>
             </div>
             <label class="toggle-switch">
-              <input type="checkbox" id="dark-mode-toggle"/>
+              <input type="checkbox" id="dark-mode-toggle" />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -549,13 +631,16 @@
           <div class="settings-toggle-row">
             <div>
               <div class="settings-toggle-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="m22 7-10 7L2 7" />
+                </svg>
                 Email Notifications
               </div>
               <p class="sub">Receive appointment reminders and updates via email</p>
             </div>
             <label class="toggle-switch">
-              <input type="checkbox" id="notif-email-toggle" checked/>
+              <input type="checkbox" id="notif-email-toggle" checked />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -563,13 +648,16 @@
           <div class="settings-toggle-row">
             <div>
               <div class="settings-toggle-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.12.96.34 1.9.65 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.02-1.02a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.65A2 2 0 0 1 22 16.92z"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.12.96.34 1.9.65 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.02-1.02a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.65A2 2 0 0 1 22 16.92z" />
+                </svg>
                 SMS Notifications
               </div>
               <p class="sub">Receive alerts via text message</p>
             </div>
             <label class="toggle-switch">
-              <input type="checkbox" id="notif-sms-toggle"/>
+              <input type="checkbox" id="notif-sms-toggle" />
               <span class="toggle-slider"></span>
             </label>
           </div>
@@ -577,18 +665,22 @@
           <div class="settings-toggle-row">
             <div>
               <div class="settings-toggle-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
                 Patient Request Alerts
               </div>
               <p class="sub">Notify me when patients submit requests</p>
             </div>
             <label class="toggle-switch">
-              <input type="checkbox" id="notif-request-toggle" checked/>
+              <input type="checkbox" id="notif-request-toggle" checked />
               <span class="toggle-slider"></span>
             </label>
           </div>
 
-          <button class="settings-save-btn" id="save-notif-btn" onclick="saveDoctorNotifPreferences()" style="margin-top:8px;">
+          <button class="settings-save-btn" id="save-notif-btn" onclick="saveDoctorNotifPreferences()"
+            style="margin-top:8px;">
             Save Preferences
           </button>
         </div>
@@ -603,7 +695,10 @@
             <strong>Password</strong>
             <p class="sub">Keep your account secure with a strong password</p>
             <button class="security-btn" onclick="showToast('Password reset link sent to your email.')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
               Change Password
             </button>
           </div>
@@ -625,4 +720,5 @@
   <script src="../Scripts/session.js"></script>
   <script src="../Scripts/doctor.js"></script>
 </body>
+
 </html>

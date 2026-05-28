@@ -1,7 +1,7 @@
 const { createClient } = supabase;
 const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const API_BASE = "https://sabyoni-devs-med-intel.vercel.app";
+const API_BASE = "";
 
 // ── Helper: send email via our API ──
 async function sendEmail(payload) {

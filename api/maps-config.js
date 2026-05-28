@@ -1,0 +1,1 @@
+export { default } from "../BackEnd/api/maps-config.js";

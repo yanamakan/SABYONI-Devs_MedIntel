@@ -6,6 +6,12 @@
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+//GENERATE A RANDOM PASSWORD WHICH WILL ACT AS A TEMP PASSWORD
+function generateTempPassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
+  return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
 // ════════════════════════════════════════════════════════════
 //  SESSION
 // ════════════════════════════════════════════════════════════
@@ -524,15 +530,32 @@ async function saveManageUser() {
 
 async function sendPasswordReset() {
   const email = document.getElementById('manage-email').value;
+  const name  = `${document.getElementById('manage-first-name').value} ${document.getElementById('manage-last-name').value}`.trim();
+
   try {
-    const { error } = await db.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/Dashboard/reset-password.html',
+    // Set must_reset_password flag
+    const { error: flagError } = await db
+      .from('users')
+      .update({ must_reset_password: true })
+      .eq('id', currentManageUserId);
+
+    if (flagError) throw flagError;
+
+    // Send reset email via our own email API
+    const res = await fetch('https://sabyoni-devs-med-intel.vercel.app/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'forgot_password', email, name }),
     });
-    if (error) throw error;
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Email failed');
+
     await logAction(`Password reset sent to: ${email}`);
-    showToast(`✓ Password reset link sent to ${email}`, 'success');
+    showToast(`✓ Password reset code sent to ${email}`, 'success');
+
   } catch (err) {
-    showToast('Error sending reset link: ' + err.message, 'error');
+    showToast('Error sending reset: ' + err.message, 'error');
   }
 }
 
@@ -590,9 +613,9 @@ async function deleteUserAccount() {
 async function createAdminAccount() {
   const fullName = document.getElementById('adminFullName').value.trim();
   const email    = document.getElementById('adminEmail').value.trim();
-  const password = document.getElementById('adminPassword').value;
+  const password = generateTempPassword();
 
-  if (!fullName || !email || !password) {
+  if (!fullName || !email) {
     showToast('Please fill in all fields.', 'error');
     return;
   }
@@ -601,24 +624,36 @@ async function createAdminAccount() {
   const lastName = rest.join(' ');
 
   try {
-    const { data: authData, error: authError } = await db.auth.signUp({ email, password, options: { data: { role: 'admin' } } });
+    const { data: authData, error: authError } = await db.auth.signUp({
+      email, password, options: { data: { role: 'admin' } }
+    });
     if (authError) throw authError;
 
     const userId = authData.user?.id;
     if (!userId) throw new Error('User creation returned no ID.');
 
-    const { error: userError } = await db.from('users').insert({ id: userId, email, role: 'admin' });
+    const { error: userError } = await db.from('users').insert({
+      id: userId, email, role: 'admin', must_reset_password: true
+    });
     if (userError) throw userError;
 
-    const { error: profileError } = await db.from('admins').update({ first_name: firstName, last_name: lastName }).eq('user_id', userId);
+    const { error: profileError } = await db.from('admins').insert({
+      user_id: userId, first_name: firstName, last_name: lastName
+    });
     if (profileError) throw profileError;
 
+    // Send first-login email
+    await fetch('https://sabyoni-devs-med-intel.vercel.app/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'first_login', email, name: fullName }),
+    });
+
     await logAction(`Created new admin account: ${email}`);
-    showToast(`✓ Admin account created for ${fullName}!`, 'success');
+    showToast(`✓ Admin account created for ${fullName}! Reset email sent.`, 'success');
 
     document.getElementById('adminFullName').value = '';
     document.getElementById('adminEmail').value    = '';
-    document.getElementById('adminPassword').value = '';
     await loadAdminList();
 
   } catch (err) {
@@ -632,12 +667,12 @@ async function createAdminAccount() {
 async function createStaffAccount() {
   const fullName = document.getElementById('staffFullName').value.trim();
   const email    = document.getElementById('staffEmail').value.trim();
-  const password = document.getElementById('staffPassword').value;
+  const password = generateTempPassword();
   const role     = document.getElementById('staffRole').value;
   const dept     = document.getElementById('staffDept').value;
   const spec     = document.getElementById('staffSpec').value.trim();
 
-  if (!fullName || !email || !password || !role) {
+  if (!fullName || !email || !role) {
     showToast('Please fill in all required fields.', 'error');
     return;
   }
@@ -646,27 +681,45 @@ async function createStaffAccount() {
   const lastName = rest.join(' ');
 
   try {
-    const { data: authData, error: authError } = await db.auth.signUp({ email, password, options: { data: { role } } });
+    const { data: authData, error: authError } = await db.auth.signUp({
+      email, password, options: { data: { role } }
+    });
     if (authError) throw authError;
 
     const userId = authData.user?.id;
     if (!userId) throw new Error('User creation returned no ID.');
 
-    const { error: userError } = await db.from('users').insert({ id: userId, email, role });
+    const { error: userError } = await db.from('users').insert({
+      id: userId, email, role, must_reset_password: true
+    });
     if (userError) throw userError;
 
     if (role === 'doctor') {
-      const { error } = await db.from('doctors').update({ first_name: firstName, last_name: lastName, specialization: spec || dept || null }).eq('user_id', userId);
+      const { error } = await db.from('doctors').insert({
+        user_id: userId, first_name: firstName, last_name: lastName,
+        specialization: spec || dept || null
+      });
       if (error) throw error;
     } else if (role === 'nurse') {
-      const { error } = await db.from('nurses').update({ first_name: firstName, last_name: lastName }).eq('user_id', userId);
+      const { error } = await db.from('nurses').insert({
+        user_id: userId, first_name: firstName, last_name: lastName
+      });
       if (error) throw error;
     }
 
-    await logAction(`Created new ${role} account: ${email}`);
-    showToast(`✓ ${role.charAt(0).toUpperCase() + role.slice(1)} account created for ${fullName}!`, 'success');
+    // Send first-login email
+    await fetch('https://sabyoni-devs-med-intel.vercel.app/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'first_login', email, name: fullName }),
+    });
 
-    ['staffFullName', 'staffEmail', 'staffPassword', 'staffSpec'].forEach(id => document.getElementById(id).value = '');
+    await logAction(`Created new ${role} account: ${email}`);
+    showToast(`✓ ${role.charAt(0).toUpperCase() + role.slice(1)} account created! Reset email sent.`, 'success');
+
+    ['staffFullName','staffEmail','staffSpec'].forEach(id =>
+      document.getElementById(id).value = ''
+    );
     document.getElementById('staffRole').selectedIndex = 0;
     document.getElementById('staffDept').selectedIndex = 0;
     await loadStaffList();

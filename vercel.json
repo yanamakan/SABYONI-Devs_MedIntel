@@ -1,32 +1,15 @@
 {
   "version": 2,
-  "installCommand": "cd BackEnd && npm install",
-  "builds": [
-    {
-      "src": "Dashboard/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "Scripts/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "BackEnd/api/*.js",
-      "use": "@vercel/node"
+  "functions": {
+    "BackEnd/api/*.js": {
+      "memory": 512,
+      "maxDuration": 30
     }
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/BackEnd/api/:path*" }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/BackEnd/api/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/Dashboard/login.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+  "redirects": [
+    { "source": "/", "destination": "/Dashboard/login.html", "permanent": false }
   ]
 }

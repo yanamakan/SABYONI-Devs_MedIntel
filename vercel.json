@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "installCommand": "cd BackEnd && npm install",
+  "installCommand": "cd BackEnd && npm install && cp -r node_modules ..",
   "redirects": [
     { "source": "/", "destination": "/Dashboard/login.html", "permanent": false }
   ]

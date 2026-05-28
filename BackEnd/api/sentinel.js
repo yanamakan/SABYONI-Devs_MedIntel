@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { runSentinelAnalysis } from "../src/services/sentinelService.js";
 import { fetchAllPatients } from "../src/models/patientModel.js";
 import { supabase } from "../src/models/supabase.js";

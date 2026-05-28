@@ -1,4 +1,3 @@
-import "dotenv/config";
 import nodemailer from "nodemailer";
 import { createClient } from "@supabase/supabase-js";
 

@@ -1500,10 +1500,12 @@ async function deleteAccount() {
       .eq('id', userId);
     if (userDelete.error) throw userDelete.error;
 
-    // 9. Delete from Supabase Auth
-    var { error: authError } = await supabaseClient.auth.admin
-      ? await supabaseClient.auth.admin.deleteUser(userId)
-      : await supabaseClient.rpc('delete_user');
+    // 9. Delete from Supabase Auth via server
+    await fetch('/api/delete-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: userId })
+    });
 
     // 10. Sign out and clear session
     await supabaseClient.auth.signOut();

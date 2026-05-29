@@ -1,4 +1,4 @@
-import { supabase } from "../SABYONI-Devs_MedIntel/BackEnd/src/models/supabase.js";
+import { supabase } from "../BackEnd/src/models/supabase.js";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

@@ -218,8 +218,20 @@ async function handleSignUp() {
 
   const { error: patientInsertError } = await client
     .from("patients")
-    .insert([{ user_id: userId, first_name: firstName, last_name: lastName, dob, phone }]);
+    .insert([{ user_id: userId, first_name: firstName, last_name: lastName, dob, phone }]);const { error: patientInsertError } = await client
+    .from("patients")
+    .insert([{ 
+      user_id: userId, 
+      first_name: firstName, 
+      last_name: lastName, 
+      dob: dob || null, 
+      phone: phone || null 
+    }]);
 
+  if (patientInsertError) {
+    showMessage(messageEl, "Error saving patient info: " + patientInsertError.message, "error");
+    return;
+  }
   if (patientInsertError) {
     showMessage(messageEl, "Error saving patient info: " + patientInsertError.message, "error");
     return;
@@ -232,12 +244,13 @@ async function handleSignUp() {
   sessionStorage.setItem("userEmail", email);
   sessionStorage.setItem("userId", userId);
   sessionStorage.setItem("userName", fullName);
-  sessionStorage.setItem("medintel_user", JSON.stringify({
+  sessionStorage.setItem('medintel_user', JSON.stringify({
     id: userId,
     email,
-    role: "patient",
+    role: 'patient',
     name: fullName,
-    department: "",
+    full_name: fullName,
+    department: '',
   }));
 
   showMessage(messageEl, "Account created! Redirecting...", "success");

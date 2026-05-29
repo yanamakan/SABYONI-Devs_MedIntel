@@ -1,6 +1,6 @@
-import { runSentinelAnalysis } from "../SABYONI-Devs_MedIntel/BackEnd/src/services/sentinelService.js";
-import { fetchAllPatients } from "../SABYONI-Devs_MedIntel/BackEnd/src/models/patientModel.js";
-import { supabase } from "../SABYONI-Devs_MedIntel/BackEnd/src/models/supabase.js";
+import { runSentinelAnalysis } from "../BackEnd/src/services/sentinelService.js";
+import { fetchAllPatients } from "../BackEnd/src/models/patientModel.js";
+import { supabase } from "../BackEnd/src/models/supabase.js";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");

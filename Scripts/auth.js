@@ -216,15 +216,29 @@ async function handleSignUp() {
     return;
   }
 
-  const { error: patientInsertError } = await client
+  // Check if patient row already exists before inserting
+  const { data: existingPatient } = await client
     .from("patients")
-    .insert([{ 
-      user_id: userId, 
-      first_name: firstName, 
-      last_name: lastName, 
-      dob: dob || null, 
-      phone: phone || null 
-    }]);
+    .select("patient_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (!existingPatient) {
+    const { error: patientInsertError } = await client
+      .from("patients")
+      .insert([{ 
+        user_id: userId, 
+        first_name: firstName, 
+        last_name: lastName, 
+        dob: dob || null, 
+        phone: phone || null 
+      }]);
+
+    if (patientInsertError) {
+      showMessage(messageEl, "Error saving patient info: " + patientInsertError.message, "error");
+      return;
+    }
+  }
 
   if (patientInsertError) {
     showMessage(messageEl, "Error saving patient info: " + patientInsertError.message, "error");

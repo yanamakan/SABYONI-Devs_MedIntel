@@ -225,19 +225,14 @@ async function handleSignUp() {
 
   if (!existingPatient) {
     const { error: patientInsertError } = await client
-      .from("patients")
-      .insert([{ 
-        user_id: userId, 
-        first_name: firstName, 
-        last_name: lastName, 
-        dob: dob || null, 
-        phone: phone || null 
-      }]);
-
-    if (patientInsertError) {
-      showMessage(messageEl, "Error saving patient info: " + patientInsertError.message, "error");
-      return;
-    }
+    .from("patients")
+    .insert([{ 
+      user_id: userId, 
+      first_name: firstName, 
+      last_name: lastName, 
+      dob: dob || null, 
+      phone: phone || null 
+    }]);
   }
 
   if (patientInsertError) {

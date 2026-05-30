@@ -326,7 +326,8 @@ async function loadPatientProfile() {
         .from('patients')
         .select('*, users:user_id ( id, email )')
         .eq('user_id', userResult.data.id)
-        .single();
+        .limit(1)
+        .maybeSingle();
     } else {
       console.error('No ID or email in session');
       renderFromSession();

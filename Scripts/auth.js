@@ -218,8 +218,6 @@ async function handleSignUp() {
 
   const { error: patientInsertError } = await client
     .from("patients")
-    .insert([{ user_id: userId, first_name: firstName, last_name: lastName, dob, phone }]);const { error: patientInsertError } = await client
-    .from("patients")
     .insert([{ 
       user_id: userId, 
       first_name: firstName, 
@@ -229,8 +227,7 @@ async function handleSignUp() {
     }]);
 
   if (patientInsertError) {
-    messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
-    messageEl.textContent = "Error saving patient info: " + patientInsertError.message;
+    showMessage(messageEl, "Error saving patient info: " + patientInsertError.message, "error");
     return;
   }
 

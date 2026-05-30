@@ -82,7 +82,11 @@ function loadSession() {
 function applySessionToHeader() {
   if (!sessionUser) return;
   const nameEl = document.getElementById('doctor-name');
-  if (nameEl) nameEl.textContent = sessionUser.name || sessionUser.email || 'Doctor';
+  if (nameEl) {
+    // Remove duplicate Dr. prefix if present
+    const name = (sessionUser.name || sessionUser.email || 'Doctor').replace(/^Dr\.\s+Dr\./i, 'Dr.');
+    nameEl.textContent = name;
+  }
 
   // Pre-fill settings
   const nameInput  = document.getElementById('profile-name');
@@ -1599,6 +1603,7 @@ document.querySelectorAll('.settings-subtab').forEach(btn => {
     if (target) target.style.display = 'block';
     if (btn.dataset.stab === 'preferences')   loadDoctorPreferences();
     if (btn.dataset.stab === 'notifications') loadDoctorPreferences();
+    if (btn.dataset.stab === 'security')      load2FAStatus();
   });
 });
 
@@ -1761,6 +1766,65 @@ document.getElementById('logout-btn').addEventListener('click', () => {
     window.location.href = 'login.html';
   }
 });
+
+// ── 2FA TOGGLE ────────────────────────────────────────────────
+async function load2FAStatus() {
+  if (!sessionUser) return;
+  try {
+    const data = await sbFetch(`users?id=eq.${sessionUser.id}&select=two_fa_enabled`);
+    const enabled = data[0]?.two_fa_enabled || false;
+    const toggle = document.getElementById('twofa-toggle');
+    const status = document.getElementById('twofa-status');
+    if (toggle) toggle.checked = enabled;
+    if (status) status.textContent = enabled ? '2FA is enabled' : '2FA is disabled';
+    if (status) status.style.color = enabled ? '#16a34a' : '#6b7280';
+  } catch (err) {
+    console.error('load2FAStatus error:', err);
+  }
+}
+
+async function toggleTwoFA(enabled) {
+  if (!sessionUser) return;
+  const status = document.getElementById('twofa-status');
+  try {
+    await sbPatch(`users?id=eq.${sessionUser.id}`, { two_fa_enabled: enabled });
+    if (status) status.textContent = enabled ? '2FA is enabled' : '2FA is disabled';
+    if (status) status.style.color = enabled ? '#16a34a' : '#6b7280';
+    showToast(enabled ? '✓ Two-Factor Authentication enabled' : '✓ Two-Factor Authentication disabled');
+
+    // Update session
+    sessionUser.two_fa_enabled = enabled;
+    sessionStorage.setItem('medintel_user', JSON.stringify(sessionUser));
+  } catch (err) {
+    showToast('Error updating 2FA: ' + err.message);
+    // Revert toggle on error
+    const toggle = document.getElementById('twofa-toggle');
+    if (toggle) toggle.checked = !enabled;
+  }
+}
+
+async function sendDoctorPasswordReset() {
+  if (!sessionUser) return;
+  try {
+    const res = await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'forgot_password',
+        email: sessionUser.email,
+        name: sessionUser.name
+      }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✓ Password reset code sent to your email');
+    } else {
+      showToast('Failed to send reset code: ' + data.error, 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
 
 // ── INIT ──────────────────────────────────────────────────────
 async function init() {

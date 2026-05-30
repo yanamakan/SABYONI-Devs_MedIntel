@@ -7,6 +7,24 @@ var supabaseClient = null;
 var currentUser = null;
 var currentPatient = null;
 
+//Helper to help load the uploaded document to access the supabase bucket for the medical-record
+function extractNoteText(notes) {
+  if (!notes) return 'No summary available.';
+  // Remove the file URL part from display
+  var cleaned = notes.replace(/\[File:.*?\]/g, '').replace(/\[Document:.*?\]/g, '').trim();
+  return cleaned || 'Document uploaded.';
+}
+
+function extractFileUrl(notes) {
+  if (!notes) return null;
+  // Extract URL from [File: url] pattern
+  var fileMatch = notes.match(/\[File:\s*(https?:\/\/[^\]]+)\]/);
+  if (fileMatch) return fileMatch[1].trim();
+  // Extract URL from [Document: url] pattern  
+  var docMatch = notes.match(/\[Document:\s*(https?:\/\/[^\]]+)\]/);
+  if (docMatch) return docMatch[1].trim();
+  return null;
+}
 // ── INIT SUPABASE ─────────────────────────────────────────────
 function initSupabase() {
   if (window.supabase && typeof SUPABASE_URL !== 'undefined' && typeof SUPABASE_ANON_KEY !== 'undefined') {
@@ -1335,7 +1353,13 @@ async function loadMedicalRecords() {
         + '<span class="record-date">' + date + '</span>'
         + '</div>'
         + '<p class="doctor-name">Dr. ' + doctorName + '</p>'
-        + '<p class="record-summary">' + (rec.notes || 'No summary available.') + '</p>'
+        + '<p class="record-summary">' + extractNoteText(rec.notes) + '</p>'
+        + (extractFileUrl(rec.notes) ? 
+          '<a href="' + extractFileUrl(rec.notes) + '" target="_blank" rel="noopener noreferrer" class="btn-view-report" style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;text-decoration:none;">'
+          + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'
+          + ' View Uploaded Document'
+          + '</a>'
+          : '')
         + '<button class="btn-view-report" onclick="toggleRecordDetails(\'' + recId + '\')">'
         + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
         + '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'

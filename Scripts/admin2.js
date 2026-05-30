@@ -577,10 +577,10 @@ async function submitAddStaff() {
     }
 
     // Send first-login email
-    await fetch('https://sabyoni-devs-med-intel.vercel.app/api/email', {
+    await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'first_login', email, name: fullName }),
+      body: JSON.stringify({ type: 'first_login', email, name: fullName, tempPassword: password }),
     });
 
     await addAdminNotification(`👤 New ${role} added: ${fullName} — ${dept}`, 'staff');

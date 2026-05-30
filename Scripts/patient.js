@@ -1475,64 +1475,63 @@ async function deleteAccount() {
     var pid    = currentPatient.patient_id;
     var userId = currentUser.id || currentUser.user_id;
 
-    // 1. Delete patient preferences
-    await supabaseClient
-      .from('patient_preferences')
-      .delete()
-      .eq('patient_id', pid);
+    if (btn) { btn.textContent = 'Deleting...'; }
 
-    // 2. Delete nurse notifications
-    await supabaseClient
-      .from('nurse_notifications')
-      .delete()
-      .eq('patient_id', pid);
+    // 1. Delete patient notifications
+    await supabaseClient.from('patient_notifications').delete().eq('patient_id', pid);
 
-    // 3. Delete AI chat history
-    await supabaseClient
-      .from('ai_chat_history')
-      .delete()
-      .eq('patient_id', pid);
+    // 2. Delete patient preferences
+    await supabaseClient.from('patient_preferences').delete().eq('patient_id', pid);
 
-    // 4. Delete appointments
-    await supabaseClient
-      .from('appointments')
-      .delete()
-      .eq('patient_id', pid);
+    // 3. Delete nurse notifications
+    await supabaseClient.from('nurse_notifications').delete().eq('patient_id', pid);
 
-    // 5. Delete medical records
-    await supabaseClient
-      .from('medical_records')
-      .delete()
-      .eq('patient_id', pid);
+    // 4. Delete doctor notifications
+    await supabaseClient.from('doctor_notifications').delete().eq('patient_id', pid);
 
-    // 6. Delete patient row
-    var patientDelete = await supabaseClient
-      .from('patients')
-      .delete()
-      .eq('patient_id', pid);
-    if (patientDelete.error) throw patientDelete.error;
+    // 5. Delete admin notifications
+    await supabaseClient.from('admin_notifications').delete().eq('patient_id', pid);
 
-    // 7. Delete user sessions
-    await supabaseClient
-      .from('user_sessions')
-      .delete()
-      .eq('user_id', userId);
+    // 6. Delete AI chat history
+    await supabaseClient.from('ai_chat_history').delete().eq('patient_id', pid);
 
-    // 8. Delete users row
-    var userDelete = await supabaseClient
-      .from('users')
-      .delete()
-      .eq('id', userId);
-    if (userDelete.error) throw userDelete.error;
+    // 7. Delete prescriptions
+    await supabaseClient.from('prescriptions').delete().eq('patient_id', pid);
 
-    // 9. Delete from Supabase Auth via server
-    await fetch('/api/delete-user', {
+    // 8. Delete medical records
+    await supabaseClient.from('medical_records').delete().eq('patient_id', pid);
+
+    // 9. Delete appointments
+    await supabaseClient.from('appointments').delete().eq('patient_id', pid);
+
+    // 10. Delete user sessions
+    await supabaseClient.from('user_sessions').delete().eq('user_id', userId);
+
+    // 11. Delete otp_codes
+    await supabaseClient.from('otp_codes').delete().eq('email', currentUser.email);
+
+    // 12. Delete patient row
+    const { error: patientDeleteError } = await supabaseClient
+      .from('patients').delete().eq('patient_id', pid);
+    if (patientDeleteError) throw patientDeleteError;
+
+    // 13. Delete users row
+    const { error: userDeleteError } = await supabaseClient
+      .from('users').delete().eq('id', userId);
+    if (userDeleteError) throw userDeleteError;
+
+    // 14. Delete from Supabase Auth via server
+    const authDeleteRes = await fetch('/api/delete-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: userId })
     });
+    const authDeleteData = await authDeleteRes.json();
+    if (!authDeleteData.success) {
+      console.error('Auth delete failed:', authDeleteData.error);
+    }
 
-    // 10. Sign out and clear session
+    // 15. Sign out and clear session
     await supabaseClient.auth.signOut();
     sessionStorage.clear();
 
@@ -1541,7 +1540,6 @@ async function deleteAccount() {
 
   } catch (err) {
     console.error('deleteAccount error:', err);
-    // Even if auth deletion fails, clear session
     sessionStorage.clear();
     alert('Account data deleted. Redirecting...');
     window.location.href = 'login.html';

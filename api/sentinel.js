@@ -158,9 +158,16 @@ export default async function handler(req, res) {
         .eq("patient_id", patientId)
         .order("timestamp", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (error) throw new Error(error.message);
+      if (!data) {
+        return res.status(200).json({
+          overall_status: "no_data",
+          summary: "No vitals recorded yet for this patient.",
+          recommendation: "Please record patient vitals using the IoT device or manual entry before running OCTAVIA analysis.",
+          vitals: {}
+        });
+      }
 
       const analysis = await runSentinelAnalysis(patientId, data);
       return res.status(200).json(analysis);
@@ -176,24 +183,37 @@ export default async function handler(req, res) {
 
     for (const patient of patients) {
       const { data, error } = await supabase
-        .from("patient_vitals")
-        .select("*")
-        .eq("patient_id", patient.patient_id)
-        .order("timestamp", { ascending: false })
-        .limit(1)
-        .single();
+      .from("patient_vitals")
+      .select("*")
+      .eq("patient_id", patient.patient_id)
+      .order("timestamp", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-      if (error) continue;
-
-      const analysis = await runSentinelAnalysis(patient.patient_id, data);
+    if (!data) {
       results.push({
         patient_id: patient.patient_id,
-        name:       `${patient.first_name} ${patient.last_name}`,
-        analysis,
+        name: `${patient.first_name} ${patient.last_name}`,
+        analysis: {
+          overall_status: "no_data",
+          summary: "No vitals recorded yet for this patient.",
+          recommendation: "Please record patient vitals using the IoT device or manual entry before running OCTAVIA analysis.",
+          vitals: {}
+        }
       });
+      continue;
     }
+    
 
-    return res.status(200).json(results);
+    const analysis = await runSentinelAnalysis(patient.patient_id, data);
+    results.push({
+      patient_id: patient.patient_id,
+      name:       `${patient.first_name} ${patient.last_name}`,
+      analysis,
+    });
+  }
+
+  return res.status(200).json(results);
 
   } catch (err) {
     console.error("OCTAVIA error:", err.message);

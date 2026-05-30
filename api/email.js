@@ -27,8 +27,22 @@ function getWelcomeEmail(name, email) {
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:32px;border-radius:12px;">
         <div style="text-align:center;margin-bottom:28px;">
-          <h1 style="color:#1e3a5f;font-size:28px;margin:0;">MedIntel</h1>
-          <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Intelligent Medical Support</p>
+          <div style="display:inline-flex;align-items:center;gap:12px;">
+            <div style="background:#1e3a5f;border-radius:10px;padding:8px;display:inline-flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="38" height="38">
+                <line x1="12" y1="8" x2="12" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="28" y1="8" x2="28" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M12 14 Q12 20 20 20 Q28 20 28 14" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                <line x1="20" y1="20" x2="20" y2="26" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="20" cy="30" r="4" stroke="white" stroke-width="2.5" fill="none"/>
+                <circle cx="20" cy="30" r="1.2" fill="white"/>
+              </svg>
+            </div>
+            <div style="text-align:left;">
+              <h1 style="color:#1e3a5f;font-size:28px;margin:0;">MedIntel</h1>
+              <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Intelligent Medical Support</p>
+            </div>
+          </div>
         </div>
         <div style="background:#ffffff;border-radius:10px;padding:28px;border:1px solid #e2e8f0;">
           <h2 style="color:#1e3a5f;margin-top:0;">Welcome, ${name}! 👋</h2>
@@ -39,7 +53,7 @@ function getWelcomeEmail(name, email) {
           <p style="color:#475569;line-height:1.6;">You can now log in and access your patient portal to view appointments, medical records, and chat with ARIA, your AI health assistant.</p>
           <p style="color:#94a3b8;font-size:13px;margin-top:28px;">If you did not create this account, please contact us immediately.</p>
         </div>
-        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2025 MedIntel · SABYONI Devs · POPIA Compliant</p>
+        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2026 MedIntel · SABYONI Devs · POPIA Compliant</p>
       </div>
     `,
   };
@@ -51,26 +65,37 @@ function getFirstLoginEmail(name, email, tempPassword) {
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:32px;border-radius:12px;">
         <div style="text-align:center;margin-bottom:28px;">
-          <h1 style="color:#1e3a5f;font-size:28px;margin:0;">MedIntel</h1>
-          <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Intelligent Medical Support</p>
+          <div style="display:inline-flex;align-items:center;gap:12px;">
+            <div style="background:#1e3a5f;border-radius:10px;padding:8px;display:inline-flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="38" height="38">
+                <line x1="12" y1="8" x2="12" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="28" y1="8" x2="28" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M12 14 Q12 20 20 20 Q28 20 28 14" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                <line x1="20" y1="20" x2="20" y2="26" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="20" cy="30" r="4" stroke="white" stroke-width="2.5" fill="none"/>
+                <circle cx="20" cy="30" r="1.2" fill="white"/>
+              </svg>
+            </div>
+            <div style="text-align:left;">
+              <h1 style="color:#1e3a5f;font-size:28px;margin:0;">MedIntel</h1>
+              <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Intelligent Medical Support</p>
+            </div>
+          </div>
         </div>
         <div style="background:#ffffff;border-radius:10px;padding:28px;border:1px solid #e2e8f0;">
           <h2 style="color:#1e3a5f;margin-top:0;">Welcome to MedIntel, ${name}! 👋</h2>
           <p style="color:#475569;line-height:1.6;">Your staff account has been created by an administrator. Use the credentials below to log in for the first time.</p>
-          
           <div style="background:#f0f9ff;border-left:4px solid #0ea5e9;padding:16px 18px;border-radius:6px;margin:20px 0;">
             <p style="margin:0 0 8px;color:#0369a1;font-size:14px;"><strong>📧 Email:</strong> ${email}</p>
             <p style="margin:0;color:#0369a1;font-size:14px;"><strong>🔑 Temporary Password:</strong> <span style="font-family:monospace;font-size:15px;background:#e0f2fe;padding:2px 8px;border-radius:4px;">${tempPassword}</span></p>
           </div>
-
           <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:14px 18px;border-radius:6px;margin:20px 0;">
             <p style="margin:0;color:#b91c1c;font-size:14px;">⚠️ You will be required to set a new password immediately after logging in. This temporary password will no longer work after your first login.</p>
           </div>
-
           <p style="color:#475569;line-height:1.6;">Please log in at <a href="https://sabyoni-devs-med-intel.vercel.app/Dashboard/login.html" style="color:#2563eb;">MedIntel Portal</a> and follow the prompts to secure your account.</p>
           <p style="color:#94a3b8;font-size:13px;margin-top:28px;">If you did not expect this email, contact your system administrator immediately.</p>
         </div>
-        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2025 MedIntel · SABYONI Devs · POPIA Compliant</p>
+        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2026 MedIntel · SABYONI Devs · POPIA Compliant</p>
       </div>
     `,
   };
@@ -82,8 +107,22 @@ function getForgotPasswordEmail(name, otp) {
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:32px;border-radius:12px;">
         <div style="text-align:center;margin-bottom:28px;">
-          <h1 style="color:#1e3a5f;font-size:28px;margin:0;">MedIntel</h1>
-          <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Intelligent Medical Support</p>
+          <div style="display:inline-flex;align-items:center;gap:12px;">
+            <div style="background:#1e3a5f;border-radius:10px;padding:8px;display:inline-flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="38" height="38">
+                <line x1="12" y1="8" x2="12" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="28" y1="8" x2="28" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M12 14 Q12 20 20 20 Q28 20 28 14" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                <line x1="20" y1="20" x2="20" y2="26" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="20" cy="30" r="4" stroke="white" stroke-width="2.5" fill="none"/>
+                <circle cx="20" cy="30" r="1.2" fill="white"/>
+              </svg>
+            </div>
+            <div style="text-align:left;">
+              <h1 style="color:#1e3a5f;font-size:28px;margin:0;">MedIntel</h1>
+              <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Intelligent Medical Support</p>
+            </div>
+          </div>
         </div>
         <div style="background:#ffffff;border-radius:10px;padding:28px;border:1px solid #e2e8f0;">
           <h2 style="color:#1e3a5f;margin-top:0;">Password Reset Request</h2>
@@ -98,7 +137,7 @@ function getForgotPasswordEmail(name, otp) {
           <p style="color:#475569;line-height:1.6;">Enter this code on the password reset page to set your new password.</p>
           <p style="color:#94a3b8;font-size:13px;margin-top:28px;">If you did not request this, you can safely ignore this email.</p>
         </div>
-        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2025 MedIntel · SABYONI Devs · POPIA Compliant</p>
+        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2026 MedIntel · SABYONI Devs · POPIA Compliant</p>
       </div>
     `,
   };
@@ -110,8 +149,22 @@ function get2FAEmail(name, otp) {
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:32px;border-radius:12px;">
         <div style="text-align:center;margin-bottom:28px;">
-          <h1 style="color:#1e3a5f;font-size:28px;margin:0;">MedIntel</h1>
-          <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Intelligent Medical Support</p>
+          <div style="display:inline-flex;align-items:center;gap:12px;">
+            <div style="background:#1e3a5f;border-radius:10px;padding:8px;display:inline-flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="38" height="38">
+                <line x1="12" y1="8" x2="12" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="28" y1="8" x2="28" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M12 14 Q12 20 20 20 Q28 20 28 14" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                <line x1="20" y1="20" x2="20" y2="26" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="20" cy="30" r="4" stroke="white" stroke-width="2.5" fill="none"/>
+                <circle cx="20" cy="30" r="1.2" fill="white"/>
+              </svg>
+            </div>
+            <div style="text-align:left;">
+              <h1 style="color:#1e3a5f;font-size:28px;margin:0;">MedIntel</h1>
+              <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Intelligent Medical Support</p>
+            </div>
+          </div>
         </div>
         <div style="background:#ffffff;border-radius:10px;padding:28px;border:1px solid #e2e8f0;">
           <h2 style="color:#1e3a5f;margin-top:0;">🔐 Two-Factor Authentication</h2>
@@ -125,7 +178,7 @@ function get2FAEmail(name, otp) {
           </div>
           <p style="color:#94a3b8;font-size:13px;margin-top:28px;">If this wasn't you, secure your account immediately by changing your password.</p>
         </div>
-        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2025 MedIntel · SABYONI Devs · POPIA Compliant</p>
+        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2026 MedIntel · SABYONI Devs · POPIA Compliant</p>
       </div>
     `,
   };

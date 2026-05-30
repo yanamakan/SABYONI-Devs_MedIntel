@@ -213,10 +213,10 @@ async function handleSignUp() {
     // 2. Insert into users table
     const { error: userInsertError } = await client
       .from("users")
-      .insert([{ id: userId, email, role: "patient", must_reset_password: false }]);
+      .upsert([{ id: userId, email, role: "patient", must_reset_password: false }], 
+      { onConflict: 'id' });
 
     if (userInsertError) {
-      console.error("users insert error:", userInsertError);
       showMessage(messageEl, "Error saving user: " + userInsertError.message, "error");
       return;
     }
@@ -225,13 +225,13 @@ async function handleSignUp() {
     // 3. Insert into patients table
     const { error: patientInsertError } = await client
       .from("patients")
-      .insert([{
+      .upsert([{
         user_id:    userId,
         first_name: firstName,
         last_name:  lastName,
         dob:        dob || null,
         phone:      phone || null
-      }]);
+      }], { onConflict: 'user_id' });
 
     if (patientInsertError) {
       console.error("patients insert error:", patientInsertError);

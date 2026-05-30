@@ -1803,6 +1803,29 @@ async function toggleTwoFA(enabled) {
   }
 }
 
+async function sendDoctorPasswordReset() {
+  if (!sessionUser) return;
+  try {
+    const res = await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'forgot_password',
+        email: sessionUser.email,
+        name: sessionUser.name
+      }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✓ Password reset code sent to your email');
+    } else {
+      showToast('Failed to send reset code: ' + data.error, 'error');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
 // ── INIT ──────────────────────────────────────────────────────
 async function init() {
   sessionUser = loadSession();

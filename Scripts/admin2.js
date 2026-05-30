@@ -603,12 +603,45 @@ async function submitAddStaff() {
 //  REMOVE STAFF
 // ════════════════════════════════════════════════════════════
 async function removeStaff(userId, name) {
-  if (!confirm(`Remove ${name} from the system?`)) return;
+  if (!confirm(`Permanently delete ${name} from the system? This cannot be undone.`)) return;
+
   try {
-    const { error } = await db.from('users').update({ is_active: false }).eq('id', userId);
+    // Get email first for otp cleanup
+    const { data: userData } = await db
+      .from('users')
+      .select('email, role')
+      .eq('id', userId)
+      .single();
+
+    const email = userData?.email;
+    const role  = userData?.role;
+
+    // 1. Delete profile row
+    if (role === 'doctor') await db.from('doctors').delete().eq('user_id', userId);
+    if (role === 'nurse')  await db.from('nurses').delete().eq('user_id', userId);
+
+    // 2. Delete notifications
+    await db.from('doctor_notifications').delete().eq('doctor_id', userId);
+    await db.from('nurse_notifications').delete().eq('user_id', userId);
+
+    // 3. Delete otp_codes
+    if (email) await db.from('otp_codes').delete().eq('email', email);
+
+    // 4. Delete users row
+    const { error } = await db.from('users').delete().eq('id', userId);
     if (error) throw error;
-    await addAdminNotification(`🗑️ Staff removed: ${name}`, 'staff');
+
+    // 5. Delete from Supabase Auth
+    await fetch('/api/delete-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+
+    await addAdminNotification(`🗑️ Staff deleted: ${name}`, 'staff');
+    showToast(`✓ ${name} deleted successfully`, 'success');
     await Promise.all([loadStats(), loadDoctors(), loadNurses()]);
+
   } catch (err) {
     showToast('Error: ' + err.message, 'error');
   }

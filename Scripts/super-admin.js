@@ -529,23 +529,22 @@ async function saveManageUser() {
 }
 
 async function sendPasswordReset() {
-  const email = document.getElementById('manage-email').value;
-  const name  = `${document.getElementById('manage-first-name').value} ${document.getElementById('manage-last-name').value}`.trim();
+  const email     = document.getElementById('manage-email').value;
+  const firstName = document.getElementById('manage-first-name').value.trim();
+  const lastName  = document.getElementById('manage-last-name').value.trim();
+  const name      = `${firstName} ${lastName}`.trim() || email.split('@')[0];
 
   try {
-    // Set must_reset_password flag
     const { error: flagError } = await db
       .from('users')
       .update({ must_reset_password: true })
       .eq('id', currentManageUserId);
-
     if (flagError) throw flagError;
 
-    // Send reset email via our own email API
     const res = await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'first_login', email, name: fullName, tempPassword: password }),
+      body: JSON.stringify({ type: 'forgot_password', email, name }),
     });
 
     const data = await res.json();
@@ -589,11 +588,32 @@ async function deleteUserAccount() {
   if (!confirm(`Are you sure you want to permanently delete ${email}? This cannot be undone.`)) return;
 
   try {
-    const { error } = await db
-      .from('users')
-      .delete()
-      .eq('id', currentManageUserId);
+    // 1. Delete profile row based on role
+    const tableMap = { admin: 'admins', doctor: 'doctors', nurse: 'nurses' };
+    const table = tableMap[currentManageUserRole];
+    if (table) {
+      await db.from(table).delete().eq('user_id', currentManageUserId);
+    }
+
+    // 2. Delete notifications
+    await db.from('doctor_notifications').delete().eq('doctor_id', currentManageUserId);
+    await db.from('nurse_notifications').delete().eq('user_id', currentManageUserId);
+
+    // 3. Delete otp_codes
+    await db.from('otp_codes').delete().eq('email', email);
+
+    // 4. Delete users row
+    const { error } = await db.from('users').delete().eq('id', currentManageUserId);
     if (error) throw error;
+
+    // 5. Delete from Supabase Auth via server
+    const authRes = await fetch('/api/delete-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: currentManageUserId })
+    });
+    const authData = await authRes.json();
+    if (!authData.success) console.error('Auth delete failed:', authData.error);
 
     await logAction(`Deleted account: ${email}`);
     showToast(`✓ Account deleted`, 'success');

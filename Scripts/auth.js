@@ -193,72 +193,77 @@ async function handleSignUp() {
 
   showMessage(messageEl, "Creating your account...", "info");
 
-  const { data, error } = await client.auth.signUp({ email, password });
+  try {
+    // 1. Create auth user
+    const { data, error } = await client.auth.signUp({ email, password });
 
-  if (error) {
-    showMessage(messageEl, error.message, "error");
-    return;
-  }
+    if (error) {
+      showMessage(messageEl, error.message, "error");
+      return;
+    }
 
-  if (!data.user || !data.user.id) {
-    showMessage(messageEl, "This email may already be registered. Please try logging in.", "error");
-    return;
-  }
+    if (!data.user || !data.user.id) {
+      showMessage(messageEl, "This email may already be registered. Please try logging in.", "error");
+      return;
+    }
 
-  const userId = data.user.id;
+    const userId = data.user.id;
+    console.log("Auth user created:", userId);
 
-  const { error: userInsertError } = await client
-    .from("users")
-    .insert([{ id: userId, email, role: "patient", must_reset_password: false }]);
+    // 2. Insert into users table
+    const { error: userInsertError } = await client
+      .from("users")
+      .insert([{ id: userId, email, role: "patient", must_reset_password: false }]);
 
-  if (userInsertError) {
-    showMessage(messageEl, "Error saving user: " + userInsertError.message, "error");
-    return;
-  }
+    if (userInsertError) {
+      console.error("users insert error:", userInsertError);
+      showMessage(messageEl, "Error saving user: " + userInsertError.message, "error");
+      return;
+    }
+    console.log("users row inserted");
 
-  // Check if patient row already exists before inserting
-// Check if patient row already exists before inserting
-  const { data: existingPatient } = await client
-    .from("patients")
-    .select("patient_id")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (!existingPatient) {
+    // 3. Insert into patients table
     const { error: patientInsertError } = await client
       .from("patients")
-      .insert([{ 
-        user_id: userId, 
-        first_name: firstName, 
-        last_name: lastName, 
-        dob: dob || null, 
-        phone: phone || null 
+      .insert([{
+        user_id:    userId,
+        first_name: firstName,
+        last_name:  lastName,
+        dob:        dob || null,
+        phone:      phone || null
       }]);
 
     if (patientInsertError) {
+      console.error("patients insert error:", patientInsertError);
       showMessage(messageEl, "Error saving patient info: " + patientInsertError.message, "error");
       return;
     }
+    console.log("patients row inserted with:", firstName, lastName, dob, phone);
+
+    // 4. Send welcome email
+    sendEmail({ type: "welcome", email, name: fullName });
+
+    // 5. Save session
+    sessionStorage.setItem("userRole", "patient");
+    sessionStorage.setItem("userEmail", email);
+    sessionStorage.setItem("userId", userId);
+    sessionStorage.setItem("userName", fullName);
+    sessionStorage.setItem("medintel_user", JSON.stringify({
+      id:         userId,
+      email,
+      role:       "patient",
+      name:       fullName,
+      full_name:  fullName,
+      department: "",
+    }));
+
+    showMessage(messageEl, "Account created! Redirecting...", "success");
+    setTimeout(() => window.location.href = "patient.html", 800);
+
+  } catch (err) {
+    console.error("handleSignUp exception:", err);
+    showMessage(messageEl, "Something went wrong. Please try again.", "error");
   }
-
-  // Send welcome email (non-blocking)
-  sendEmail({ type: "welcome", email, name: fullName });
-
-  sessionStorage.setItem("userRole", "patient");
-  sessionStorage.setItem("userEmail", email);
-  sessionStorage.setItem("userId", userId);
-  sessionStorage.setItem("userName", fullName);
-  sessionStorage.setItem('medintel_user', JSON.stringify({
-    id: userId,
-    email,
-    role: 'patient',
-    name: fullName,
-    full_name: fullName,
-    department: '',
-  }));
-
-  showMessage(messageEl, "Account created! Redirecting...", "success");
-  setTimeout(() => window.location.href = "patient.html", 800);
 }
 
 // ===== HELPERS =====

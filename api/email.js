@@ -45,9 +45,9 @@ function getWelcomeEmail(name, email) {
   };
 }
 
-function getFirstLoginEmail(name, email) {
+function getFirstLoginEmail(name, email, tempPassword) {
   return {
-    subject: "MedIntel — Action Required: Reset Your Password",
+    subject: "MedIntel — Your Account Has Been Created",
     html: `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:32px;border-radius:12px;">
         <div style="text-align:center;margin-bottom:28px;">
@@ -55,13 +55,19 @@ function getFirstLoginEmail(name, email) {
           <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Intelligent Medical Support</p>
         </div>
         <div style="background:#ffffff;border-radius:10px;padding:28px;border:1px solid #e2e8f0;">
-          <h2 style="color:#dc2626;margin-top:0;">⚠️ Password Reset Required</h2>
-          <p style="color:#475569;line-height:1.6;">Hello <strong>${name}</strong>,</p>
-          <p style="color:#475569;line-height:1.6;">Your MedIntel staff account (<strong>${email}</strong>) was created by an administrator with a temporary password.</p>
-          <p style="color:#475569;line-height:1.6;">For your security, you must set a new personal password before accessing the system.</p>
-          <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:14px 18px;border-radius:6px;margin:20px 0;">
-            <p style="margin:0;color:#b91c1c;font-size:14px;">You have been redirected to the password reset page. Please complete this step now.</p>
+          <h2 style="color:#1e3a5f;margin-top:0;">Welcome to MedIntel, ${name}! 👋</h2>
+          <p style="color:#475569;line-height:1.6;">Your staff account has been created by an administrator. Use the credentials below to log in for the first time.</p>
+          
+          <div style="background:#f0f9ff;border-left:4px solid #0ea5e9;padding:16px 18px;border-radius:6px;margin:20px 0;">
+            <p style="margin:0 0 8px;color:#0369a1;font-size:14px;"><strong>📧 Email:</strong> ${email}</p>
+            <p style="margin:0;color:#0369a1;font-size:14px;"><strong>🔑 Temporary Password:</strong> <span style="font-family:monospace;font-size:15px;background:#e0f2fe;padding:2px 8px;border-radius:4px;">${tempPassword}</span></p>
           </div>
+
+          <div style="background:#fef2f2;border-left:4px solid #dc2626;padding:14px 18px;border-radius:6px;margin:20px 0;">
+            <p style="margin:0;color:#b91c1c;font-size:14px;">⚠️ You will be required to set a new password immediately after logging in. This temporary password will no longer work after your first login.</p>
+          </div>
+
+          <p style="color:#475569;line-height:1.6;">Please log in at <a href="https://sabyoni-devs-med-intel.vercel.app/Dashboard/login.html" style="color:#2563eb;">MedIntel Portal</a> and follow the prompts to secure your account.</p>
           <p style="color:#94a3b8;font-size:13px;margin-top:28px;">If you did not expect this email, contact your system administrator immediately.</p>
         </div>
         <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2025 MedIntel · SABYONI Devs · POPIA Compliant</p>
@@ -156,7 +162,8 @@ export default async function handler(req, res) {
 
     // ── 2. FIRST LOGIN — staff password reset notification ──
     if (type === "first_login") {
-      const template = getFirstLoginEmail(name || email.split("@")[0], email);
+      const { tempPassword } = req.body;
+      const template = getFirstLoginEmail(name || email.split("@")[0], email, tempPassword || "Check with your administrator");
       await transporter.sendMail({
         from: `"MedIntel" <${process.env.GMAIL_USER}>`,
         to: email,

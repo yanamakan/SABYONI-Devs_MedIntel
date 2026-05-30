@@ -542,10 +542,10 @@ async function sendPasswordReset() {
     if (flagError) throw flagError;
 
     // Send reset email via our own email API
-    const res = await fetch('https://sabyoni-devs-med-intel.vercel.app/api/email', {
+    const res = await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'forgot_password', email, name }),
+      body: JSON.stringify({ type: 'first_login', email, name: fullName, tempPassword: password }),
     });
 
     const data = await res.json();
@@ -708,10 +708,10 @@ async function createStaffAccount() {
     }
 
     // Send first-login email
-    await fetch('https://sabyoni-devs-med-intel.vercel.app/api/email', {
+    await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'first_login', email, name: fullName }),
+      body: JSON.stringify({ type: 'first_login', email, name: fullName, tempPassword: password }),
     });
 
     await logAction(`Created new ${role} account: ${email}`);

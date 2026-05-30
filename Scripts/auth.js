@@ -229,11 +229,8 @@ async function handleSignUp() {
     }]);
 
   if (patientInsertError) {
-    showMessage(messageEl, "Error saving patient info: " + patientInsertError.message, "error");
-    return;
-  }
-  if (patientInsertError) {
-    showMessage(messageEl, "Error saving patient info: " + patientInsertError.message, "error");
+    messageEl.style.cssText = "color:#ef4444;text-align:center;margin-top:12px;font-size:14px;";
+    messageEl.textContent = "Error saving patient info: " + patientInsertError.message;
     return;
   }
 

@@ -25,7 +25,7 @@
       </div>
       <div class="title">
         <h2>Doctor Dashboard</h2>
-        <p id="doctor-name">Dr. —</p>
+        <p id="doctor-name"></p>
       </div>
     </div>
     <div class="header-right">
@@ -704,8 +704,14 @@
           </div>
           <div class="security-item">
             <strong>Two-Factor Authentication</strong>
-            <p class="sub">Add an extra layer of security to your account</p>
-            <button class="security-btn" onclick="showToast('2FA setup coming soon.')">Enable 2FA</button>
+            <p class="sub">When enabled, you will receive a 6-digit code to your email every time you log in.</p>
+            <div style="display:flex;align-items:center;gap:14px;margin-top:10px;">
+              <label class="toggle-switch">
+                <input type="checkbox" id="twofa-toggle" onchange="toggleTwoFA(this.checked)"/>
+                <span class="toggle-slider"></span>
+              </label>
+              <span id="twofa-status" style="font-size:13px;color:#6b7280;">Loading...</span>
+            </div>
           </div>
         </div>
       </div>

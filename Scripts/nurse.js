@@ -24,11 +24,34 @@ function loadSession() {
   return JSON.parse(raw);
 }
 
-function applySessionToHeader() {
+async function applySessionToHeader() {
   const user = loadSession();
+  if (!user) return;
+
   const nameEl = document.querySelector(".header-text p");
-  if (nameEl && user) {
-    nameEl.textContent = `${user.name} • ${user.department}`;
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/nurses?user_id=eq.${user.id}&select=first_name,last_name`,
+      {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+      }
+    );
+    const data = await res.json();
+    if (data && data[0]) {
+      const fullName = `${data[0].first_name} ${data[0].last_name}`.trim();
+      if (nameEl) nameEl.textContent = `${fullName} • ${user.department || 'Nursing'}`;
+      // Update session name too
+      user.name = fullName;
+      sessionStorage.setItem('medintel_user', JSON.stringify(user));
+    } else {
+      if (nameEl) nameEl.textContent = `${user.name} • ${user.department || 'Nursing'}`;
+    }
+  } catch (err) {
+    if (nameEl) nameEl.textContent = `${user.name} • ${user.department || 'Nursing'}`;
   }
 }
 

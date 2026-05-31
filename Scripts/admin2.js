@@ -203,7 +203,7 @@ async function loadDoctors() {
   try {
     const { data, error } = await db
       .from('users')
-      .select('id, email, department, is_active, doctors(doctor_id, first_name, last_name, specialization)')
+      .select('id, email, department, is_active')
       .eq('role', 'doctor')
       .order('created_at', { ascending: false });
 
@@ -214,11 +214,22 @@ async function loadDoctors() {
       return;
     }
 
-    tbody.innerHTML = data.map(u => {
-      const d        = u.doctors?.[0] ?? {};
-      const name     = [d.first_name, d.last_name].filter(Boolean).join(' ') || u.email.split('@')[0];
+    const doctorsWithNames = await Promise.all(data.map(async (u) => {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/doctors?user_id=eq.${u.id}&select=first_name,last_name,specialization`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        const profile = await res.json();
+        return { ...u, profile: profile[0] || null };
+      } catch {
+        return { ...u, profile: null };
+      }
+    }));
+
+    tbody.innerHTML = doctorsWithNames.map(u => {
+      const name     = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email.split('@')[0];
       const dept     = u.department || 'Not assigned';
-      const spec     = d.specialization || '—';
+      const spec     = u.profile?.specialization || '—';
       const isActive = u.is_active !== false;
 
       return `
@@ -266,7 +277,7 @@ async function loadNurses() {
   try {
     const { data, error } = await db
       .from('users')
-      .select('id, email, department, is_active, nurses(first_name, last_name)')
+      .select('id, email, department, is_active')
       .eq('role', 'nurse')
       .order('created_at', { ascending: false });
 
@@ -277,9 +288,20 @@ async function loadNurses() {
       return;
     }
 
-    tbody.innerHTML = data.map(u => {
-      const n        = u.nurses?.[0] ?? {};
-      const name     = [n.first_name, n.last_name].filter(Boolean).join(' ') || u.email.split('@')[0];
+    const nursesWithNames = await Promise.all(data.map(async (u) => {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/nurses?user_id=eq.${u.id}&select=first_name,last_name`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        const profile = await res.json();
+        return { ...u, profile: profile[0] || null };
+      } catch {
+        return { ...u, profile: null };
+      }
+    }));
+
+    tbody.innerHTML = nursesWithNames.map(u => {
+      const name     = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email.split('@')[0];
       const dept     = u.department || 'Not assigned';
       const isActive = u.is_active !== false;
 

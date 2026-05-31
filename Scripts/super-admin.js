@@ -329,25 +329,34 @@ async function loadAdminList() {
   try {
     const { data, error } = await db
       .from('users')
-      .select('id, email, created_at, is_active, admins(first_name, last_name)')
+      .select('id, email, created_at, is_active')
       .eq('role', 'admin')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-
     if (!data || data.length === 0) {
       container.innerHTML = `<div style="color:#64748b;padding:12px 0;font-size:0.85rem;">No admin accounts found.</div>`;
       return;
     }
 
-    container.innerHTML = data.map(u => {
-      const profileArr = Array.isArray(u.admins) ? u.admins : (u.admins ? [u.admins] : []);
-      const profile    = profileArr[0] ?? {};
-      const firstName  = profile.first_name || '';
-      const lastName   = profile.last_name  || '';
-      const fullName   = [firstName, lastName].filter(Boolean).join(' ') || u.email.split('@')[0];
-      const createdAt  = new Date(u.created_at).toISOString().split('T')[0];
-      const isActive   = u.is_active !== false;
+    const adminsWithNames = await Promise.all(data.map(async (u) => {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/admins?user_id=eq.${u.id}&select=first_name,last_name`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        const profile = await res.json();
+        return { ...u, profile: profile[0] || null };
+      } catch {
+        return { ...u, profile: null };
+      }
+    }));
+
+    container.innerHTML = adminsWithNames.map(u => {
+      const firstName = u.profile?.first_name || '';
+      const lastName  = u.profile?.last_name  || '';
+      const fullName  = [firstName, lastName].filter(Boolean).join(' ') || u.email.split('@')[0];
+      const createdAt = new Date(u.created_at).toISOString().split('T')[0];
+      const isActive  = u.is_active !== false;
 
       return `
         <div class="user-item">
@@ -379,37 +388,36 @@ async function loadStaffList() {
   try {
     const { data, error } = await db
       .from('users')
-      .select(`id, email, role, created_at, is_active,
-        doctors(first_name, last_name, specialization),
-        nurses(first_name, last_name)`)
+      .select('id, email, role, created_at, is_active')
       .in('role', ['doctor', 'nurse'])
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-
     if (!data || data.length === 0) {
       container.innerHTML = `<div style="color:#64748b;padding:12px 0;font-size:0.85rem;">No staff accounts found.</div>`;
       return;
     }
 
-    container.innerHTML = data.map(u => {
-      // Supabase may return the related row as an object OR an array depending on FK cardinality
-      const doctorArr = Array.isArray(u.doctors) ? u.doctors : (u.doctors ? [u.doctors] : []);
-      const nurseArr  = Array.isArray(u.nurses)  ? u.nurses  : (u.nurses  ? [u.nurses]  : []);
-
-      let firstName = '', lastName = '', extra = '';
-
-      if (u.role === 'doctor' && doctorArr[0]) {
-        firstName = doctorArr[0].first_name    || '';
-        lastName  = doctorArr[0].last_name     || '';
-        extra     = doctorArr[0].specialization || '';
-      } else if (u.role === 'nurse' && nurseArr[0]) {
-        firstName = nurseArr[0].first_name || '';
-        lastName  = nurseArr[0].last_name  || '';
+    // Fetch profiles directly like nurse.js and doctor.js do
+    const staffWithNames = await Promise.all(data.map(async (u) => {
+      try {
+        const table = u.role === 'doctor' ? 'doctors' : 'nurses';
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?user_id=eq.${u.id}&select=first_name,last_name,specialization`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        const profile = await res.json();
+        return { ...u, profile: profile[0] || null };
+      } catch {
+        return { ...u, profile: null };
       }
+    }));
 
+    container.innerHTML = staffWithNames.map(u => {
+      const firstName = u.profile?.first_name || '';
+      const lastName  = u.profile?.last_name  || '';
       const fullName  = [firstName, lastName].filter(Boolean).join(' ') || u.email.split('@')[0];
       const roleLabel = u.role.charAt(0).toUpperCase() + u.role.slice(1);
+      const extra     = u.profile?.specialization || '';
       const subtitle  = extra ? `${roleLabel} · ${extra}` : roleLabel;
       const createdAt = new Date(u.created_at).toISOString().split('T')[0];
       const isActive  = u.is_active !== false;

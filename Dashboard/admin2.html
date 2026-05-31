@@ -101,6 +101,7 @@
       <button class="tab" onclick="switchTab('nurses', this)">Nurses (2)</button>
       <button class="tab" onclick="switchTab('appointments', this)">Appointments (5)</button>
       <button class="tab" onclick="switchTab('queue', this)">Patient Queue</button>
+      <button class="tab" onclick="switchTab('settings', this)">Settings</button>
     </nav>
     <button class="btn btn-blue" onclick="openAddStaffModal()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -501,6 +502,177 @@
     </div>
   </div>
 
+  <!-- ══ SETTINGS TAB ══ -->
+<div id="tab-settings" class="tab-content" style="display:none;">
+  <div class="section-card">
+
+    <div style="padding:22px 26px 16px;">
+      <div class="section-title">Admin Account Settings</div>
+      <div class="section-sub">Manage your profile, preferences and security</div>
+    </div>
+
+    <!-- Sub-tabs -->
+    <div style="padding:0 26px 24px;">
+      <div style="display:flex;gap:4px;background:#f3f4f6;border-radius:10px;padding:4px;margin-bottom:24px;">
+        <button class="admin-stab active" data-stab="profile" onclick="adminStabSwitch(this)"
+          style="flex:1;padding:8px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,.1);">Profile</button>
+        <button class="admin-stab" data-stab="preferences" onclick="adminStabSwitch(this)"
+          style="flex:1;padding:8px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">Preferences</button>
+        <button class="admin-stab" data-stab="notifications" onclick="adminStabSwitch(this)"
+          style="flex:1;padding:8px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">Notifications</button>
+        <button class="admin-stab" data-stab="security" onclick="adminStabSwitch(this)"
+          style="flex:1;padding:8px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">Security</button>
+      </div>
+
+      <!-- PROFILE -->
+      <div id="admin-stab-profile">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">Personal Information</div>
+        <div style="font-size:13px;color:#6b7280;margin-bottom:16px;">Update your admin account details</div>
+        <div style="display:grid;gap:14px;">
+          <div>
+            <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Full Name</label>
+            <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #e5e7eb;border-radius:9px;padding:0 12px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input type="text" id="admin-profile-name" placeholder="Full Name"
+                style="flex:1;border:none;outline:none;padding:10px 0;font-size:14px;font-family:inherit;background:transparent;"/>
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Email</label>
+            <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #e5e7eb;border-radius:9px;padding:0 12px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+              <input type="email" id="admin-profile-email" placeholder="Email"
+                style="flex:1;border:none;outline:none;padding:10px 0;font-size:14px;font-family:inherit;background:transparent;opacity:0.6;cursor:not-allowed;" readonly/>
+            </div>
+          </div>
+          <div>
+            <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Phone Number</label>
+            <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #e5e7eb;border-radius:9px;padding:0 12px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.12.96.34 1.9.65 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.02-1.02a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.65A2 2 0 0 1 22 16.92z"/></svg>
+              <input type="tel" id="admin-profile-phone" placeholder="+27 xx xxx xxxx"
+                style="flex:1;border:none;outline:none;padding:10px 0;font-size:14px;font-family:inherit;background:transparent;"/>
+            </div>
+          </div>
+          <button onclick="saveAdminProfile()"
+            style="padding:11px 24px;border-radius:9px;border:none;background:#3b82f6;color:#fff;font-size:14px;font-weight:600;cursor:pointer;width:fit-content;">
+            Save Changes
+          </button>
+        </div>
+      </div>
+
+      <!-- PREFERENCES -->
+      <div id="admin-stab-preferences" style="display:none;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">Display &amp; Language</div>
+        <div style="font-size:13px;color:#6b7280;margin-bottom:16px;">Customize your dashboard experience</div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f3f4f6;margin-bottom:14px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#374151;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              Dark Mode
+            </div>
+            <p style="font-size:12px;color:#9ca3af;margin-top:2px;">Enable dark theme across the dashboard</p>
+          </div>
+          <label style="position:relative;display:inline-block;width:44px;height:24px;">
+            <input type="checkbox" id="admin-dark-mode-toggle" onchange="document.body.classList.toggle('dark-mode',this.checked);localStorage.setItem('medintel_admin_dark',this.checked);"
+              style="opacity:0;width:0;height:0;"/>
+            <span style="position:absolute;cursor:pointer;inset:0;background:#d1d5db;border-radius:99px;transition:.3s;"></span>
+          </label>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Language</label>
+          <select disabled style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:14px;font-family:inherit;opacity:0.6;cursor:not-allowed;">
+            <option>English</option>
+          </select>
+          <p style="font-size:12px;color:#9ca3af;margin-top:4px;">Only English is currently supported.</p>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Time Zone</label>
+          <select id="admin-pref-timezone" style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:14px;font-family:inherit;outline:none;">
+            <option value="Johannesburg (SAST)">Johannesburg (SAST)</option>
+            <option value="London (GMT)">London (GMT)</option>
+            <option value="New York (EST)">New York (EST)</option>
+            <option value="Dubai (GST)">Dubai (GST)</option>
+          </select>
+        </div>
+        <button onclick="saveAdminPreferences()"
+          style="padding:11px 24px;border-radius:9px;border:none;background:#3b82f6;color:#fff;font-size:14px;font-weight:600;cursor:pointer;width:fit-content;">
+          Save Preferences
+        </button>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div id="admin-stab-notifications" style="display:none;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">Notification Preferences</div>
+        <div style="font-size:13px;color:#6b7280;margin-bottom:16px;">Choose how you want to be notified</div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f3f4f6;">
+          <div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#374151;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+              Email Notifications
+            </div>
+            <p style="font-size:12px;color:#9ca3af;margin-top:2px;">Receive system alerts and updates via email</p>
+          </div>
+          <label style="position:relative;display:inline-block;width:44px;height:24px;">
+            <input type="checkbox" id="admin-notif-email" checked style="opacity:0;width:0;height:0;"/>
+            <span style="position:absolute;cursor:pointer;inset:0;background:#d1d5db;border-radius:99px;transition:.3s;"></span>
+          </label>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #f3f4f6;margin-bottom:20px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#374151;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.12.96.34 1.9.65 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.02-1.02a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.65A2 2 0 0 1 22 16.92z"/></svg>
+              SMS Notifications
+            </div>
+            <p style="font-size:12px;color:#9ca3af;margin-top:2px;">Receive alerts via text message</p>
+          </div>
+          <label style="position:relative;display:inline-block;width:44px;height:24px;">
+            <input type="checkbox" id="admin-notif-sms" style="opacity:0;width:0;height:0;"/>
+            <span style="position:absolute;cursor:pointer;inset:0;background:#d1d5db;border-radius:99px;transition:.3s;"></span>
+          </label>
+        </div>
+
+        <button onclick="saveAdminNotifPreferences()"
+          style="padding:11px 24px;border-radius:9px;border:none;background:#3b82f6;color:#fff;font-size:14px;font-weight:600;cursor:pointer;width:fit-content;">
+          Save Preferences
+        </button>
+      </div>
+
+      <!-- SECURITY -->
+      <div id="admin-stab-security" style="display:none;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">Security Settings</div>
+        <div style="font-size:13px;color:#6b7280;margin-bottom:16px;">Manage your account security</div>
+
+        <div style="padding:16px 0;border-bottom:1px solid #f3f4f6;margin-bottom:16px;">
+          <strong style="font-size:13px;color:#111827;">Password</strong>
+          <p style="font-size:12px;color:#6b7280;margin:4px 0 12px;">Keep your account secure with a strong password</p>
+          <button onclick="sendAdminPasswordReset()"
+            style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:9px;border:1.5px solid #e5e7eb;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#374151;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Reset Password via Email
+          </button>
+        </div>
+
+        <div style="padding:16px 0;">
+          <strong style="font-size:13px;color:#111827;">Two-Factor Authentication</strong>
+          <p style="font-size:12px;color:#6b7280;margin:4px 0 12px;">When enabled, you will receive a 6-digit code to your email every time you log in.</p>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <label style="position:relative;display:inline-block;width:44px;height:24px;">
+              <input type="checkbox" id="admin-twofa-toggle" onchange="toggleAdmin2FA(this.checked)" style="opacity:0;width:0;height:0;"/>
+              <span style="position:absolute;cursor:pointer;inset:0;background:#d1d5db;border-radius:99px;transition:.3s;"></span>
+            </label>
+            <span id="admin-twofa-status" style="font-size:13px;color:#6b7280;">Loading...</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /padding wrapper -->
+  </div><!-- /section-card -->
+</div><!-- /tab-settings -->
+
 </main>
 
 <!-- ══ ADD STAFF MODAL ══ -->
@@ -735,9 +907,6 @@
     </div>
   </div>
 </div>
-
-<!-- Help button -->
-<button class="help-btn" title="Help">?</button>
 
 <script src="../Scripts/admin2.js"></script>
 </body>

@@ -341,16 +341,19 @@ async function loadAdminList() {
     }
 
     container.innerHTML = data.map(u => {
-      const profile  = u.admins?.[0] ?? {};
-      const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ') || u.email.split('@')[0];
-      const createdAt = new Date(u.created_at).toISOString().split('T')[0];
-      const isActive = u.is_active !== false;
+      const profileArr = Array.isArray(u.admins) ? u.admins : (u.admins ? [u.admins] : []);
+      const profile    = profileArr[0] ?? {};
+      const firstName  = profile.first_name || '';
+      const lastName   = profile.last_name  || '';
+      const fullName   = [firstName, lastName].filter(Boolean).join(' ') || u.email.split('@')[0];
+      const createdAt  = new Date(u.created_at).toISOString().split('T')[0];
+      const isActive   = u.is_active !== false;
 
       return `
         <div class="user-item">
           <div class="user-info">
             <strong>${escapeHtml(fullName)}</strong>
-            <span>${escapeHtml(u.email)}</span>
+            <span>${escapeHtml(u.email)} · Admin</span>
           </div>
           <div class="user-meta">
             <small>Created: ${createdAt}</small>
@@ -390,14 +393,19 @@ async function loadStaffList() {
     }
 
     container.innerHTML = data.map(u => {
+      // Supabase may return the related row as an object OR an array depending on FK cardinality
+      const doctorArr = Array.isArray(u.doctors) ? u.doctors : (u.doctors ? [u.doctors] : []);
+      const nurseArr  = Array.isArray(u.nurses)  ? u.nurses  : (u.nurses  ? [u.nurses]  : []);
+
       let firstName = '', lastName = '', extra = '';
-      if (u.role === 'doctor' && u.doctors?.[0]) {
-        firstName = u.doctors[0].first_name || '';
-        lastName  = u.doctors[0].last_name  || '';
-        extra     = u.doctors[0].specialization || '';
-      } else if (u.role === 'nurse' && u.nurses?.[0]) {
-        firstName = u.nurses[0].first_name || '';
-        lastName  = u.nurses[0].last_name  || '';
+
+      if (u.role === 'doctor' && doctorArr[0]) {
+        firstName = doctorArr[0].first_name    || '';
+        lastName  = doctorArr[0].last_name     || '';
+        extra     = doctorArr[0].specialization || '';
+      } else if (u.role === 'nurse' && nurseArr[0]) {
+        firstName = nurseArr[0].first_name || '';
+        lastName  = nurseArr[0].last_name  || '';
       }
 
       const fullName  = [firstName, lastName].filter(Boolean).join(' ') || u.email.split('@')[0];

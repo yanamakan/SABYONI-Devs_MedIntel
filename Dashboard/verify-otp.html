@@ -10,6 +10,12 @@
       margin: 0;
       padding: 0;
     }
+    .logo-text h1 {
+    margin: 0;
+    }
+    .logo-text p {
+      margin: 0;
+    }
     body {
     display: flex;
     flex-direction: column;
@@ -19,11 +25,11 @@
       margin: 0%;
       padding: 10px 0 5px 0;
       margin-top: 15px;
-      margin-bottom: 15px;
+      margin-bottom: 5px;
     }
 
     .otp-card {
-      margin-top: 5px; 
+      margin: 0 auto 10px auto; 
     }
     .logo-img {
     width: 200px;
@@ -82,7 +88,7 @@
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.18);
     border: 2px solid rgba(59, 130, 246, 0.35);
-    color: #ffffff;
+    color: #6175a1;
     transition: all 0.25s ease;
     }
     .otp-input-wrapper input:focus {
@@ -95,7 +101,7 @@
       width: 100%;
       padding: 13px;
       background: #1e3a5f;
-      color: #fff;
+      color: #ffffff;
       border: none;
       border-radius: 8px;
       font-size: 15px;
@@ -258,7 +264,7 @@
     document.getElementById("emailDisplay").textContent = email || "your email";
 
     // Guard — if no email in session, go back to login
-    if (!email) window.location.href = "login.html";
+    //if (!email) window.location.href = "login.html";
 
     startTimer();
 

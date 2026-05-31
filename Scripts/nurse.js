@@ -1162,17 +1162,22 @@ function handleLogout() {
 
 // ======== TABS ========
 function switchTab(tabName) {
-  document
-    .querySelectorAll(".tab")
-    .forEach((t) => t.classList.remove("active"));
-  document
-    .querySelectorAll(".panel")
-    .forEach((p) => p.classList.remove("active"));
-  document.getElementById(`tab-${tabName}`).classList.add("active");
-  document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add("active");
+  document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach((p) => {
+    p.classList.remove("active");
+    p.style.display = "none";
+  });
+
+  var target = document.getElementById("tab-" + tabName);
+  if (target) {
+    target.classList.add("active");
+    target.style.display = "block";
+  }
+  document.querySelector('.tab[data-tab="' + tabName + '"]').classList.add("active");
 
   if (tabName === "patient") renderPatientCare();
   if (tabName === "schedule") renderSchedule();
+  if (tabName === "settings") loadNurseSettingsData();
 }
 
 // ======== TOAST ========
@@ -1187,6 +1192,10 @@ function showToast(msg) {
 
 // ======== INIT ========
 async function init() {
+  var savedDark = localStorage.getItem('medintel_nurse_dark');
+  if (savedDark === 'true') {
+    document.body.classList.add('dark-mode');
+  }
   applySessionToHeader();
   await renderVitalsList();
   const reports = await fetchPendingDiagnoses();
@@ -1198,6 +1207,224 @@ async function init() {
   setInterval(async () => {
     await renderNotifications();
   }, 30000);
+}
+
+// ── NURSE SETTINGS ────────────────────────────────────────────
+
+function nurseStabSwitch(btn) {
+  var stab = btn.dataset.stab;
+  document.querySelectorAll('.nurse-stab').forEach(function(b) {
+    b.style.background = 'transparent';
+    b.style.color = '#6b7280';
+    b.style.boxShadow = 'none';
+  });
+  btn.style.background = '#fff';
+  btn.style.color = '#111827';
+  btn.style.boxShadow = '0 1px 3px rgba(0,0,0,.1)';
+
+  ['profile','preferences','notifications','security'].forEach(function(s) {
+    var el = document.getElementById('nurse-stab-' + s);
+    if (el) el.style.display = 'none';
+  });
+  var target = document.getElementById('nurse-stab-' + stab);
+  if (target) target.style.display = 'block';
+
+  if (stab === 'preferences' || stab === 'notifications') loadNursePreferences();
+  if (stab === 'security') loadNurseTwoFAStatus();
+}
+
+async function loadNurseSettingsData() {
+  var session = JSON.parse(sessionStorage.getItem('medintel_user') || 'null');
+  if (!session) return;
+  var nameEl  = document.getElementById('nurse-profile-name');
+  var emailEl = document.getElementById('nurse-profile-email');
+  var phoneEl = document.getElementById('nurse-profile-phone');
+  if (nameEl  && session.name)  nameEl.value  = session.name;
+  if (emailEl && session.email) emailEl.value = session.email;
+  if (phoneEl && session.phone) phoneEl.value = session.phone;
+
+  // Load dept from nurses table
+  // Load dept from users table
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/users?id=eq.' + session.id + '&select=department', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    var data = await res.json();
+    if (data[0] && data[0].department) {
+      var deptEl = document.getElementById('nurse-profile-dept');
+      if (deptEl) deptEl.value = data[0].department;
+    }
+  } catch(e) {}
+
+  loadNursePreferences();
+  loadNurseTwoFAStatus();
+
+  // Apply saved dark mode
+  var savedDark = localStorage.getItem('medintel_nurse_dark');
+  if (savedDark === 'true') {
+    document.body.classList.add('dark-mode');
+    var toggle = document.getElementById('nurse-dark-mode-toggle');
+    if (toggle) toggle.checked = true;
+  }
+}
+
+async function loadNursePreferences() {
+  var session = JSON.parse(sessionStorage.getItem('medintel_user') || 'null');
+  if (!session) return;
+  try {
+    // Get nurse record first
+    var nRes = await fetch(SUPABASE_URL + '/rest/v1/nurses?user_id=eq.' + session.id + '&select=nurse_id', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    var nData = await nRes.json();
+    if (!nData[0]) return;
+    var nurseId = nData[0].nurse_id;
+
+    var res = await fetch(SUPABASE_URL + '/rest/v1/nurse_preferences?nurse_id=eq.' + nurseId + '&limit=1', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    var prefs = await res.json();
+
+    if (!prefs || prefs.length === 0) {
+      // Insert defaults
+      await fetch(SUPABASE_URL + '/rest/v1/nurse_preferences', {
+        method: 'POST',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ nurse_id: nurseId, dark_mode: false, timezone: 'Johannesburg (SAST)', email_notifications: true, sms_notifications: false, request_alerts: true })
+      });
+      return;
+    }
+
+    var p = prefs[0];
+    var darkToggle = document.getElementById('nurse-dark-mode-toggle');
+    if (darkToggle) darkToggle.checked = p.dark_mode || false;
+    document.body.classList.toggle('dark-mode', p.dark_mode || false);
+
+    var tzEl = document.getElementById('nurse-pref-timezone');
+    if (tzEl && p.timezone) tzEl.value = p.timezone;
+
+    var emailT = document.getElementById('nurse-notif-email');
+    var smsT   = document.getElementById('nurse-notif-sms');
+    var reqT   = document.getElementById('nurse-notif-requests');
+    if (emailT) emailT.checked = p.email_notifications !== false;
+    if (smsT)   smsT.checked   = p.sms_notifications   || false;
+    if (reqT)   reqT.checked   = p.request_alerts       !== false;
+  } catch(e) { console.error('loadNursePreferences:', e); }
+}
+
+async function getNurseId() {
+  var session = JSON.parse(sessionStorage.getItem('medintel_user') || 'null');
+  if (!session) return null;
+  var res = await fetch(SUPABASE_URL + '/rest/v1/nurses?user_id=eq.' + session.id + '&select=nurse_id', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  });
+  var data = await res.json();
+  return data[0]?.nurse_id || null;
+}
+
+async function saveNurseProfile() {
+  var session = JSON.parse(sessionStorage.getItem('medintel_user') || 'null');
+  if (!session) return;
+  var name  = document.getElementById('nurse-profile-name')?.value.trim();
+  var dept  = document.getElementById('nurse-profile-dept')?.value.trim();
+  var phone = document.getElementById('nurse-profile-phone')?.value.trim();
+  if (!name) { showToast('Name cannot be empty.'); return; }
+  try {
+    var nurseId = await getNurseId();
+    if (nurseId) {
+      var parts = name.split(' ');
+      await fetch(SUPABASE_URL + '/rest/v1/nurses?nurse_id=eq.' + nurseId, {
+        method: 'PATCH',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ first_name: parts[0] || '', last_name: parts.slice(1).join(' ') || '', department: dept || null })
+      });
+    }
+    showToast('✓ Profile updated successfully');
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function saveNursePreferences() {
+  var nurseId = await getNurseId();
+  if (!nurseId) return;
+  var dark = document.getElementById('nurse-dark-mode-toggle')?.checked || false;
+  var tz   = document.getElementById('nurse-pref-timezone')?.value || 'Johannesburg (SAST)';
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/nurse_preferences?nurse_id=eq.' + nurseId, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ dark_mode: dark, timezone: tz, updated_at: new Date().toISOString() })
+    });
+    document.body.classList.toggle('dark-mode', dark);
+    localStorage.setItem('medintel_nurse_dark', dark);
+    showToast('✓ Preferences saved');
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function saveNurseNotifPreferences() {
+  var nurseId = await getNurseId();
+  if (!nurseId) return;
+  var emailN = document.getElementById('nurse-notif-email')?.checked  ?? true;
+  var smsN   = document.getElementById('nurse-notif-sms')?.checked    ?? false;
+  var reqN   = document.getElementById('nurse-notif-requests')?.checked ?? true;
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/nurse_preferences?nurse_id=eq.' + nurseId, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ email_notifications: emailN, sms_notifications: smsN, request_alerts: reqN, updated_at: new Date().toISOString() })
+    });
+    showToast('✓ Notification preferences saved');
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function loadNurseTwoFAStatus() {
+  var session = JSON.parse(sessionStorage.getItem('medintel_user') || 'null');
+  if (!session) return;
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/users?id=eq.' + session.id + '&select=two_fa_enabled', {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    var data = await res.json();
+    var enabled = data[0]?.two_fa_enabled || false;
+    var toggle = document.getElementById('nurse-twofa-toggle');
+    var status = document.getElementById('nurse-twofa-status');
+    if (toggle) toggle.checked = enabled;
+    if (status) { status.textContent = enabled ? '2FA is enabled' : '2FA is disabled'; status.style.color = enabled ? '#16a34a' : '#6b7280'; }
+  } catch(e) { console.error('loadNurseTwoFAStatus:', e); }
+}
+
+async function toggleNurseTwoFA(enabled) {
+  var session = JSON.parse(sessionStorage.getItem('medintel_user') || 'null');
+  if (!session) return;
+  var status = document.getElementById('nurse-twofa-status');
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/users?id=eq.' + session.id, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ two_fa_enabled: enabled })
+    });
+    if (status) { status.textContent = enabled ? '2FA is enabled' : '2FA is disabled'; status.style.color = enabled ? '#16a34a' : '#6b7280'; }
+    session.two_fa_enabled = enabled;
+    sessionStorage.setItem('medintel_user', JSON.stringify(session));
+    showToast(enabled ? '✓ 2FA enabled' : '✓ 2FA disabled');
+  } catch(e) {
+    showToast('Error: ' + e.message);
+    var toggle = document.getElementById('nurse-twofa-toggle');
+    if (toggle) toggle.checked = !enabled;
+  }
+}
+
+async function sendNursePasswordReset() {
+  var session = JSON.parse(sessionStorage.getItem('medintel_user') || 'null');
+  if (!session) return;
+  try {
+    var res = await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'forgot_password', email: session.email, name: session.name })
+    });
+    var data = await res.json();
+    showToast(data.success ? '✓ Password reset code sent to your email' : 'Failed: ' + data.error);
+  } catch(e) { showToast('Error: ' + e.message); }
 }
 
 init();

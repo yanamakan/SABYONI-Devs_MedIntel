@@ -264,7 +264,7 @@
     document.getElementById("emailDisplay").textContent = email || "your email";
 
     // Guard — if no email in session, go back to login
-    //if (!email) window.location.href = "login.html";
+    if (!email) window.location.href = "login.html";
 
     startTimer();
 

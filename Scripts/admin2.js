@@ -19,6 +19,7 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
   document.getElementById('tab-' + name).style.display = 'block';
   btn.classList.add('active');
+  if (name === 'settings') loadAdminSettingsData();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -756,9 +757,254 @@ function handleLogout() {
 }
 
 // ════════════════════════════════════════════════════════════
+//  SETTINGS — SUB-TAB SWITCHING
+// ════════════════════════════════════════════════════════════
+function adminStabSwitch(btn) {
+  var stab = btn.dataset.stab;
+  document.querySelectorAll('.admin-stab').forEach(function(b) {
+    b.style.background = 'transparent';
+    b.style.color = '#6b7280';
+    b.style.boxShadow = 'none';
+  });
+  btn.style.background = '#fff';
+  btn.style.color = '#111827';
+  btn.style.boxShadow = '0 1px 3px rgba(0,0,0,.1)';
+
+  ['profile','preferences','notifications','security'].forEach(function(s) {
+    var el = document.getElementById('admin-stab-' + s);
+    if (el) el.style.display = 'none';
+  });
+  var target = document.getElementById('admin-stab-' + stab);
+  if (target) target.style.display = 'block';
+
+  if (stab === 'security') loadAdmin2FAStatus();
+  if (stab === 'preferences' || stab === 'notifications') loadAdminSettingsData();
+}
+
+// ════════════════════════════════════════════════════════════
+//  SETTINGS — LOAD ALL DATA
+// ════════════════════════════════════════════════════════════
+async function loadAdminSettingsData() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var nameEl  = document.getElementById('admin-profile-name');
+  var emailEl = document.getElementById('admin-profile-email');
+  var phoneEl = document.getElementById('admin-profile-phone');
+  if (nameEl  && user.name)  nameEl.value  = user.name;
+  if (emailEl && user.email) emailEl.value = user.email;
+  if (phoneEl && user.phone) phoneEl.value = user.phone;
+
+  try {
+    // Get admin_id first
+    const { data: adminData } = await db
+      .from('admins')
+      .select('admin_id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!adminData) return;
+
+    const { data: prefs } = await db
+      .from('admin_preferences')
+      .select('*')
+      .eq('admin_id', user.id)
+      .single();
+
+    if (!prefs) {
+      // Insert defaults
+      await db.from('admin_preferences').insert({
+        admin_id:            user.id,
+        dark_mode:           false,
+        timezone:            'Johannesburg (SAST)',
+        email_notifications: true,
+        sms_notifications:   false,
+        staff_alerts:        true,
+      });
+    } else {
+      var darkToggle  = document.getElementById('admin-dark-mode-toggle');
+      var tzSelect    = document.getElementById('admin-pref-timezone');
+      var emailToggle = document.getElementById('admin-notif-email');
+      var smsToggle   = document.getElementById('admin-notif-sms');
+
+      if (darkToggle) darkToggle.checked = prefs.dark_mode || false;
+      if (tzSelect && prefs.timezone) tzSelect.value = prefs.timezone;
+      document.body.classList.toggle('dark-mode', prefs.dark_mode || false);
+      localStorage.setItem('medintel_admin_dark_mode', prefs.dark_mode || false);
+
+      if (emailToggle) emailToggle.checked = prefs.email_notifications !== false;
+      if (smsToggle)   smsToggle.checked   = prefs.sms_notifications   || false;
+    }
+  } catch (err) {
+    console.warn('loadAdminSettingsData error:', err);
+  }
+
+  loadAdmin2FAStatus();
+}
+
+async function saveAdminPreferences() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var darkMode = document.getElementById('admin-dark-mode-toggle')?.checked || false;
+  var timezone = document.getElementById('admin-pref-timezone')?.value || 'Johannesburg (SAST)';
+
+  try {
+    const { error } = await db
+      .from('admin_preferences')
+      .upsert({
+        admin_id:   user.id,
+        dark_mode:  darkMode,
+        timezone:   timezone,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'admin_id' });
+
+    if (error) throw error;
+
+    document.body.classList.toggle('dark-mode', darkMode);
+    localStorage.setItem('medintel_admin_dark_mode', darkMode);
+    showToast('✓ Preferences saved', 'success');
+  } catch (err) {
+    showToast('Error saving preferences: ' + err.message, 'error');
+  }
+}
+
+async function saveAdminNotifPreferences() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var emailNotif = document.getElementById('admin-notif-email')?.checked  ?? true;
+  var smsNotif   = document.getElementById('admin-notif-sms')?.checked    ?? false;
+  var staffAlert = document.getElementById('admin-notif-alert-toggle')?.checked ?? true;
+
+  try {
+    const { error } = await db
+      .from('admin_preferences')
+      .upsert({
+        admin_id:            user.id,
+        email_notifications: emailNotif,
+        sms_notifications:   smsNotif,
+        staff_alerts:        staffAlert,
+        updated_at:          new Date().toISOString(),
+      }, { onConflict: 'admin_id' });
+
+    if (error) throw error;
+    showToast('✓ Notification preferences saved', 'success');
+  } catch (err) {
+    showToast('Error saving preferences: ' + err.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SETTINGS — SAVE PROFILE
+// ════════════════════════════════════════════════════════════
+async function saveAdminProfile() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var name  = document.getElementById('admin-profile-name').value.trim();
+  var phone = document.getElementById('admin-profile-phone').value.trim();
+  if (!name) { showToast('Name cannot be empty.', 'error'); return; }
+
+  try {
+    const { error } = await db
+      .from('admins')
+      .update({ first_name: name.split(' ')[0], last_name: name.split(' ').slice(1).join(' ') || '' })
+      .eq('user_id', user.id);
+    if (error) throw error;
+
+    user.name = name;
+    user.phone = phone;
+    sessionStorage.setItem('medintel_user', JSON.stringify(user));
+    showToast('✓ Profile updated successfully', 'success');
+  } catch (err) {
+    showToast('Error saving profile: ' + err.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SETTINGS — 2FA
+// ════════════════════════════════════════════════════════════
+async function loadAdmin2FAStatus() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  try {
+    const { data } = await db
+      .from('users')
+      .select('two_fa_enabled')
+      .eq('id', user.id)
+      .single();
+
+    var enabled = data?.two_fa_enabled || false;
+    var toggle  = document.getElementById('admin-twofa-toggle');
+    var status  = document.getElementById('admin-twofa-status');
+    if (toggle) toggle.checked      = enabled;
+    if (status) status.textContent  = enabled ? '2FA is enabled' : '2FA is disabled';
+    if (status) status.style.color  = enabled ? '#16a34a' : '#6b7280';
+  } catch (err) {
+    console.error('loadAdmin2FAStatus error:', err);
+  }
+}
+
+async function toggleAdmin2FA(enabled) {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var status = document.getElementById('admin-twofa-status');
+  try {
+    const { error } = await db
+      .from('users')
+      .update({ two_fa_enabled: enabled })
+      .eq('id', user.id);
+    if (error) throw error;
+
+    if (status) status.textContent = enabled ? '2FA is enabled' : '2FA is disabled';
+    if (status) status.style.color = enabled ? '#16a34a' : '#6b7280';
+    showToast(enabled ? '✓ Two-Factor Authentication enabled' : '✓ Two-Factor Authentication disabled', 'success');
+
+    user.two_fa_enabled = enabled;
+    sessionStorage.setItem('medintel_user', JSON.stringify(user));
+  } catch (err) {
+    showToast('Error updating 2FA: ' + err.message, 'error');
+    var toggle = document.getElementById('admin-twofa-toggle');
+    if (toggle) toggle.checked = !enabled;
+  }
+}
+
+async function sendAdminPasswordReset() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  try {
+    var res  = await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'forgot_password', email: user.email, name: user.name }),
+    });
+    var data = await res.json();
+    if (data.success) showToast('✓ Password reset code sent to your email', 'success');
+    else showToast('Failed to send reset code: ' + data.error, 'error');
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', async () => {
+  // Apply saved dark mode immediately to prevent flash
+  var savedDark = localStorage.getItem('medintel_admin_dark_mode');
+  if (savedDark === 'true') document.body.classList.add('dark-mode');
+
   await Promise.all([
     loadStats(),
     loadDoctors(),

@@ -544,6 +544,19 @@
           </button>
         </div>
 
+        <!-- Two-Factor Authentication -->
+        <div class="input-group" style="margin-top:20px;padding-top:20px;border-top:1px solid #f3f4f6;">
+          <label>Two-Factor Authentication</label>
+          <p class="pref-desc">When enabled, you will receive a 6-digit code to your email every time you log in.</p>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:12px;">
+            <label class="toggle-switch">
+              <input type="checkbox" id="patient-twofa-toggle" onchange="togglePatientTwoFA(this.checked)">
+              <span class="slider"></span>
+            </label>
+            <span id="patient-twofa-status" style="font-size:13px;color:#6b7280;">Loading...</span>
+          </div>
+        </div>
+
         <!-- Active Sessions -->
         <div class="input-group" style="margin-top:20px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">

@@ -1176,3 +1176,230 @@ body {
 .btn-delete-appt:hover {
   background: #fecaca;
 }
+
+/* ══ TOGGLE SWITCH SLIDER ══ */
+label > input[type="checkbox"] + span {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 99px;
+  transition: background .3s;
+}
+label > input[type="checkbox"] + span::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+label > input[type="checkbox"]:checked + span {
+  background: #22c55e;
+}
+label > input[type="checkbox"]:checked + span::before {
+  transform: translateX(20px);
+}
+
+/* ══ DARK MODE — NURSE ══ */
+body.dark-mode {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+}
+
+/* Header */
+body.dark-mode .header            { background: #1e293b !important; border-bottom-color: #334155 !important; }
+body.dark-mode .header-text h1    { color: #f1f5f9 !important; }
+body.dark-mode .header-text p     { color: #94a3b8 !important; }
+body.dark-mode .logo-wrap         { background: linear-gradient(135deg,#0e7490,#0284c7) !important; }
+body.dark-mode .notif-btn         { background: #1e293b !important; border-color: #334155 !important; color: #cbd5e1 !important; }
+body.dark-mode .logout-btn        { background: #1e293b !important; border-color: #334155 !important; color: #cbd5e1 !important; }
+
+/* Notification dropdown */
+body.dark-mode #notif-dropdown                          { background: #1e293b !important; border-color: #334155 !important; box-shadow: 0 12px 40px rgba(0,0,0,0.4) !important; }
+body.dark-mode #notif-dropdown > div                    { border-bottom-color: #334155 !important; }
+body.dark-mode #notif-dropdown > div > div:first-child  { color: #f1f5f9 !important; }
+body.dark-mode #notif-list > div                        { border-bottom-color: #334155 !important; color: #e2e8f0 !important; }
+
+/* ── STAT CARDS ── */
+body.dark-mode .stat-card         { background: #1e293b !important; border-color: #334155 !important; }
+body.dark-mode .stat-label        { color: #94a3b8 !important; }
+/* Keep the coloured numbers */
+body.dark-mode .stat-num.cyan     { color: #2dd4bf !important; }
+body.dark-mode .stat-num.blue     { color: #60a5fa !important; }
+body.dark-mode .stat-num.purple   { color: #c084fc !important; }
+body.dark-mode .stat-num.green    { color: #4ade80 !important; }
+
+/* Gradient tints on the 4 cards */
+body.dark-mode .stats .stat-card:nth-child(1) {
+  background: linear-gradient(150deg, #0d2e2a 0%, #1e293b 100%) !important;
+  border-color: #0d9488 !important;
+}
+body.dark-mode .stats .stat-card:nth-child(2) {
+  background: linear-gradient(150deg, #1e3a5f 0%, #1e293b 100%) !important;
+  border-color: #1d4ed8 !important;
+}
+body.dark-mode .stats .stat-card:nth-child(3) {
+  background: linear-gradient(150deg, #2e1065 0%, #1e293b 100%) !important;
+  border-color: #6d28d9 !important;
+}
+body.dark-mode .stats .stat-card:nth-child(4) {
+  background: linear-gradient(150deg, #052e16 0%, #1e293b 100%) !important;
+  border-color: #166534 !important;
+}
+
+/* ── TABS ── */
+body.dark-mode .tabs              { background: #1e293b !important; border-color: #334155 !important; }
+body.dark-mode .tab               { color: #94a3b8 !important; }
+body.dark-mode .tab:hover:not(.active) { color: #e2e8f0 !important; }
+body.dark-mode .tab.active        { background: #334155 !important; color: #f1f5f9 !important; box-shadow: 0 1px 4px rgba(0,0,0,0.4) !important; }
+
+/* ── PANELS ── */
+body.dark-mode .panel             { background: #1e293b !important; border-color: #334155 !important; }
+body.dark-mode #tab-vitals        { background: #0f172a !important; }
+body.dark-mode .panel-title       { color: #f1f5f9 !important; }
+body.dark-mode .panel-sub         { color: #94a3b8 !important; }
+
+/* ── DIAGNOSIS CARDS ── */
+body.dark-mode .diag-card         { background: #1e293b !important; border-color: #334155 !important; }
+body.dark-mode .diag-patient-name { color: #f1f5f9 !important; }
+body.dark-mode .diag-submitted    { color: #64748b !important; }
+body.dark-mode .symptoms-label    { color: #94a3b8 !important; }
+body.dark-mode .symptoms-box      { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+body.dark-mode .ai-analysis-box   { background: linear-gradient(135deg, #1a0d2e, #0f172a) !important; border-color: #4c1d95 !important; }
+body.dark-mode .ai-title          { color: #a78bfa !important; }
+body.dark-mode .ai-row-label      { color: #c4b5fd !important; }
+body.dark-mode .ai-row-val        { color: #e2e8f0 !important; }
+body.dark-mode .ai-list li        { color: #e2e8f0 !important; }
+body.dark-mode .ai-confidence-label { color: #94a3b8 !important; }
+body.dark-mode .conf-pct          { color: #94a3b8 !important; }
+body.dark-mode .nurse-notes-label { color: #f1f5f9 !important; }
+body.dark-mode .nurse-notes-area  { background: #0f172a !important; border-color: #334155 !important; color: #f1f5f9 !important; }
+body.dark-mode .nurse-notes-area:focus { border-color: #7c3aed !important; }
+
+/* Nurse manual diagnosis form labels */
+body.dark-mode #tab-pending label { color: #e2e8f0 !important; }
+body.dark-mode #tab-pending select,
+body.dark-mode #tab-pending textarea { background: #0f172a !important; border-color: #334155 !important; color: #f1f5f9 !important; }
+
+/* ── PATIENT TABLE ── */
+body.dark-mode .patient-table thead tr th { color: #94a3b8 !important; border-bottom-color: #334155 !important; background: #1e293b !important; }
+body.dark-mode .patient-table tbody tr td { color: #e2e8f0 !important; border-bottom-color: #334155 !important; }
+body.dark-mode .patient-table tbody tr:hover { background: #334155 !important; }
+body.dark-mode .view-btn          { background: #1e293b !important; border-color: #475569 !important; color: #e2e8f0 !important; }
+body.dark-mode .view-btn:hover    { background: #334155 !important; }
+
+/* ── VITAL CARDS ── */
+body.dark-mode .vital-card        { background: #1e293b !important; border-color: #334155 !important; }
+body.dark-mode .vital-name        { color: #f1f5f9 !important; }
+body.dark-mode .vital-condition   { color: #94a3b8 !important; }
+body.dark-mode .vital-divider     { background: #334155 !important; }
+body.dark-mode .vital-stat-label  { color: #94a3b8 !important; }
+body.dark-mode .vital-stat-val    { color: #f1f5f9 !important; }
+body.dark-mode .btn-history       { background: #1e293b !important; border-color: #475569 !important; color: #e2e8f0 !important; }
+body.dark-mode .btn-history:hover { background: #334155 !important; }
+
+/* ── SCHEDULE TABLE ── */
+body.dark-mode .schedule-table thead tr th { color: #94a3b8 !important; border-bottom-color: #334155 !important; background: #1e293b !important; }
+body.dark-mode .schedule-table tbody tr td { color: #e2e8f0 !important; border-bottom-color: #334155 !important; }
+body.dark-mode .status-badge.scheduled { border-color: #475569 !important; color: #cbd5e1 !important; background: #1e293b !important; }
+body.dark-mode .status-badge.confirmed { background: #334155 !important; color: #f1f5f9 !important; }
+body.dark-mode .status-badge.pending   { border-color: #475569 !important; color: #cbd5e1 !important; background: #1e293b !important; }
+body.dark-mode .btn-edit-appt     { background: #1e293b !important; border-color: #475569 !important; color: #e2e8f0 !important; }
+body.dark-mode .btn-edit-appt:hover { background: #334155 !important; }
+
+/* ── MODALS ── */
+body.dark-mode #record-modal > div,
+body.dark-mode #history-modal > div,
+body.dark-mode #patient-detail-modal > div,
+body.dark-mode #appointment-modal > div { background: #1e293b !important; }
+body.dark-mode #record-modal [style*="color:#111827"],
+body.dark-mode #history-modal [style*="color:#111827"],
+body.dark-mode #appointment-modal [style*="color:#111827"],
+body.dark-mode #patient-detail-modal [style*="color:#111827"] { color: #f1f5f9 !important; }
+body.dark-mode #record-modal [style*="color:#9ca3af"],
+body.dark-mode #appointment-modal [style*="color:#9ca3af"]    { color: #64748b !important; }
+body.dark-mode #record-modal label,
+body.dark-mode #appointment-modal label { color: #e2e8f0 !important; }
+body.dark-mode #record-modal input,
+body.dark-mode #record-modal textarea,
+body.dark-mode #appointment-modal select,
+body.dark-mode #appointment-modal textarea { background: #0f172a !important; border-color: #334155 !important; color: #f1f5f9 !important; }
+/* Patient detail modal inner boxes */
+body.dark-mode #detail-modal-body [style*="background:#f9fafb"] { background: #0f172a !important; }
+body.dark-mode #detail-modal-body [style*="color:#6b7280"]      { color: #94a3b8 !important; }
+body.dark-mode #detail-modal-body [style*="font-size:14px"]     { color: #e2e8f0 !important; }
+
+/* ── SETTINGS PANEL ── */
+body.dark-mode #tab-settings .diag-card { background: #1e293b !important; border-color: #334155 !important; }
+
+/* Settings sub-tab bar */
+body.dark-mode #tab-settings [style*="background:#f3f4f6;border-radius:10px"] {
+  background: #0f172a !important;
+}
+body.dark-mode .nurse-stab { color: #94a3b8 !important; background: transparent !important; box-shadow: none !important; }
+body.dark-mode .nurse-stab[style*="background:#fff"],
+body.dark-mode .nurse-stab[style*="background: #fff"] {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
+}
+
+/* Settings sub-panel headings */
+body.dark-mode #nurse-stab-profile [style*="font-size:14px;font-weight:700;color:#111827"],
+body.dark-mode #nurse-stab-preferences [style*="font-size:14px;font-weight:700;color:#111827"],
+body.dark-mode #nurse-stab-notifications [style*="font-size:14px;font-weight:700;color:#111827"],
+body.dark-mode #nurse-stab-security [style*="font-size:14px;font-weight:700;color:#111827"] { color: #f1f5f9 !important; }
+
+body.dark-mode #nurse-stab-profile [style*="font-size:13px;color:#6b7280"],
+body.dark-mode #nurse-stab-preferences [style*="font-size:13px;color:#6b7280"],
+body.dark-mode #nurse-stab-notifications [style*="font-size:13px;color:#6b7280"],
+body.dark-mode #nurse-stab-security [style*="font-size:13px;color:#6b7280"] { color: #94a3b8 !important; }
+
+/* Labels inside settings sub-panels */
+body.dark-mode #nurse-stab-profile label,
+body.dark-mode #nurse-stab-preferences label,
+body.dark-mode #nurse-stab-notifications label,
+body.dark-mode #nurse-stab-security label { color: #e2e8f0 !important; }
+
+/* Input wrappers in profile */
+body.dark-mode #nurse-stab-profile [style*="border:1.5px solid #e5e7eb"],
+body.dark-mode #nurse-stab-security [style*="border:1.5px solid #e5e7eb"] {
+  border-color: #334155 !important;
+  background: #0f172a !important;
+}
+body.dark-mode #nurse-stab-profile input  { background: transparent !important; color: #f1f5f9 !important; }
+
+/* Preferences pref-desc text */
+body.dark-mode #nurse-stab-preferences p  { color: #94a3b8 !important; }
+body.dark-mode #nurse-stab-notifications p { color: #94a3b8 !important; }
+
+/* Notification row labels */
+body.dark-mode #nurse-stab-notifications [style*="font-size:13px;font-weight:600;color:#374151"] { color: #e2e8f0 !important; }
+body.dark-mode #nurse-stab-notifications [style*="font-size:12px;color:#9ca3af"]                 { color: #64748b !important; }
+body.dark-mode #nurse-stab-preferences [style*="font-size:13px;font-weight:600;color:#374151"]   { color: #e2e8f0 !important; }
+
+/* Timezone select in preferences */
+body.dark-mode #nurse-pref-timezone { background: #0f172a !important; border-color: #334155 !important; color: #f1f5f9 !important; }
+
+/* Security strong headings */
+body.dark-mode #nurse-stab-security strong { color: #f1f5f9 !important; }
+body.dark-mode #nurse-stab-security [style*="font-size:12px;color:#6b7280"] { color: #94a3b8 !important; }
+
+/* Border dividers */
+body.dark-mode [style*="border-bottom:1px solid #f3f4f6"] { border-bottom-color: #334155 !important; }
+body.dark-mode [style*="border-top:1px solid #f3f4f6"]    { border-top-color: #334155 !important; }
+body.dark-mode [style*="padding:16px 0;border-bottom:1px solid #f3f4f6"] { border-bottom-color: #334155 !important; }
+
+/* Settings header icon text */
+body.dark-mode #tab-settings [style*="font-size:16px;font-weight:700;color:#111827"] { color: #f1f5f9 !important; }
+body.dark-mode #tab-settings [style*="font-size:13px;color:#6b7280"]                 { color: #94a3b8 !important; }
+
+/* Scrollbar */
+body.dark-mode ::-webkit-scrollbar-track { background: #1e293b; }
+body.dark-mode ::-webkit-scrollbar-thumb { background: #334155; }
+body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }

@@ -240,7 +240,10 @@ function switchSettingsSubTab(event, subId) {
   // Load data for each sub tab
   if (subId === 'prefSub')     loadPreferences();
   if (subId === 'notifSub')    loadPreferences();
-  if (subId === 'securitySub') loadActiveSessions();
+  if (subId === 'securitySub') {
+    loadActiveSessions();
+    loadPatientTwoFAStatus();
+  }
 }
 
 // ── VIDEO FILTER ──────────────────────────────────────────────
@@ -2421,6 +2424,52 @@ function escapeHtml(text) {
   var div = document.createElement('div');
   div.appendChild(document.createTextNode(text || ''));
   return div.innerHTML;
+}
+
+// ── 2FA ───────────────────────────────────────────────────────
+async function loadPatientTwoFAStatus() {
+  if (!supabaseClient || !currentUser) return;
+  try {
+    var result = await supabaseClient
+      .from('users')
+      .select('two_fa_enabled')
+      .eq('id', currentUser.id)
+      .single();
+
+    var enabled = result.data?.two_fa_enabled || false;
+    var toggle  = document.getElementById('patient-twofa-toggle');
+    var status  = document.getElementById('patient-twofa-status');
+    if (toggle) toggle.checked     = enabled;
+    if (status) status.textContent = enabled ? '2FA is enabled' : '2FA is disabled';
+    if (status) status.style.color = enabled ? '#16a34a' : '#6b7280';
+  } catch (err) {
+    console.error('loadPatientTwoFAStatus error:', err);
+  }
+}
+
+async function togglePatientTwoFA(enabled) {
+  if (!supabaseClient || !currentUser) return;
+  var status = document.getElementById('patient-twofa-status');
+  try {
+    var result = await supabaseClient
+      .from('users')
+      .update({ two_fa_enabled: enabled })
+      .eq('id', currentUser.id);
+
+    if (result.error) throw result.error;
+
+    if (status) status.textContent = enabled ? '2FA is enabled' : '2FA is disabled';
+    if (status) status.style.color = enabled ? '#16a34a' : '#6b7280';
+
+    currentUser.two_fa_enabled = enabled;
+    sessionStorage.setItem('medintel_user', JSON.stringify(currentUser));
+    addNotification(enabled ? '🔒 Two-Factor Authentication enabled' : '🔓 Two-Factor Authentication disabled');
+  } catch (err) {
+    console.error('togglePatientTwoFA error:', err);
+    var toggle = document.getElementById('patient-twofa-toggle');
+    if (toggle) toggle.checked = !enabled;
+    alert('Error updating 2FA: ' + err.message);
+  }
 }
 
 // ────────────────────────────────────────────────────────────

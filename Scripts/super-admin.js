@@ -402,7 +402,8 @@ async function loadStaffList() {
     const staffWithNames = await Promise.all(data.map(async (u) => {
       try {
         const table = u.role === 'doctor' ? 'doctors' : 'nurses';
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?user_id=eq.${u.id}&select=first_name,last_name,specialization`, {
+        const fields = u.role === 'doctor' ? 'first_name,last_name,specialization' : 'first_name,last_name';
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?user_id=eq.${u.id}&select=${fields}`, {
           headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
         });
         const profile = await res.json();

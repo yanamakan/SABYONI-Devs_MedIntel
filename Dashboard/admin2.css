@@ -114,7 +114,10 @@ body {
 
 /* ── MAIN ── */
 .main {
-  padding: 28px 32px 56px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 /* ── STATS GRID ── */
@@ -316,10 +319,19 @@ body {
 
 /* ── SECTION CARD ── */
 .section-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  overflow: hidden;
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Admin Settings Card Size */
+#tab-settings .section-card,
+#tab-settings .diag-card {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
 .section-header {
@@ -505,13 +517,14 @@ body {
 
 /* ── PATIENT QUEUE ── */
 .queue-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 8px 24px 28px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  width: 100%;
 }
 
 .queue-card {
+  width: 100%;
   border: 1.5px solid #e9d5ff;
   border-radius: 14px;
   padding: 20px 22px;
@@ -1327,3 +1340,24 @@ body.dark-mode [style*="padding:16px 0;border-bottom:1px solid #f3f4f6"] { borde
 body.dark-mode ::-webkit-scrollbar-track { background: #1e293b; }
 body.dark-mode ::-webkit-scrollbar-thumb { background: #334155; }
 body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+@media (max-width: 768px) {
+  .main {
+    padding: 12px;
+  }
+
+  .section-card {
+    width: 100%;
+    margin: 0 0 12px 0;
+    border-radius: 14px;
+  }
+
+  .tabs-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+}

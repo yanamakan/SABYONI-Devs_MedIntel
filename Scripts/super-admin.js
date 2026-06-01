@@ -592,7 +592,7 @@ async function toggleUserActive() {
     await logAction(`${newStatus ? 'Reactivated' : 'Deactivated'} account: ${document.getElementById('manage-email').value}`);
     showToast(`✓ Account ${newStatus ? 'reactivated' : 'deactivated'}`, 'success');
 
-    if (currentManageUserRole === 'admin') loadAdminList();
+    if (currentManageUserRole === 'admin') await loadAdminList();
     else loadStaffList();
 
   } catch (err) {
@@ -636,7 +636,7 @@ async function deleteUserAccount() {
     showToast(`✓ Account deleted`, 'success');
     closeManageModal();
 
-    if (currentManageUserRole === 'admin') loadAdminList();
+    if (currentManageUserRole === 'admin') await loadAdminList();
     else loadStaffList();
 
   } catch (err) {
@@ -680,7 +680,9 @@ async function createAdminAccount() {
     if (profileError) throw profileError;
 
     // Send first-login email
-    await fetch('https://sabyoni-devs-med-intel.vercel.app/api/email', {
+
+    
+    await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'first_login', email, name: fullName, tempPassword: password }),

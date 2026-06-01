@@ -125,7 +125,7 @@ function get2FAEmail(name, otp) {
           </div>
           <p style="color:#94a3b8;font-size:13px;margin-top:28px;">If this wasn't you, secure your account immediately by changing your password.</p>
         </div>
-        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 202 MedIntel · SABYONI Devs · POPIA Compliant</p>
+        <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:20px;">© 2026 MedIntel · SABYONI Devs · POPIA Compliant</p>
       </div>
     `,
   };

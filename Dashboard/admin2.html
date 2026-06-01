@@ -504,24 +504,64 @@
 
   <!-- ══ SETTINGS TAB ══ -->
 <div id="tab-settings" class="tab-content" style="display:none;">
-  <div class="section-card">
+  <div class="section-card" style="max-width:1400px;margin:0 auto;width:100%;">
 
-    <div style="padding:22px 26px 16px;">
-      <div class="section-title">Admin Account Settings</div>
-      <div class="section-sub">Manage your profile, preferences and security</div>
-    </div>
+    <div style="display:flex;align-items:center;gap:14px;padding:24px 26px 20px;">
+  
+  <div style="width:44px;height:44px;border-radius:12px;
+              background:linear-gradient(135deg,#0ea5e9,#6366f1);
+              display:flex;align-items:center;justify-content:center;
+              flex-shrink:0;">
+
+    <svg width="22" height="22" viewBox="0 0 24 24"
+         fill="none" stroke="white" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06
+               a2 2 0 0 1-2.83 2.83l-.06-.06
+               a1.65 1.65 0 0 0-1.82-.33
+               a1.65 1.65 0 0 0-1 1.51V21
+               a2 2 0 0 1-4 0v-.09
+               A1.65 1.65 0 0 0 9 19.4
+               a1.65 1.65 0 0 0-1.82.33l-.06.06
+               a2 2 0 0 1-2.83-2.83l.06-.06
+               A1.65 1.65 0 0 0 4.68 15
+               a1.65 1.65 0 0 0-1.51-1H3
+               a2 2 0 0 1 0-4h.09
+               A1.65 1.65 0 0 0 4.6 9
+               a1.65 1.65 0 0 0-.33-1.82l-.06-.06
+               a2 2 0 0 1 2.83-2.83l.06.06
+               A1.65 1.65 0 0 0 9 4.68
+               a1.65 1.65 0 0 0 1-1.51V3
+               a2 2 0 0 1 4 0v.09
+               a1.65 1.65 0 0 0 1 1.51
+               a1.65 1.65 0 0 0 1.82-.33l.06-.06
+               a2 2 0 0 1 2.83 2.83l-.06.06
+               A1.65 1.65 0 0 0 19.4 9
+               a1.65 1.65 0 0 0 1.51 1H21
+               a2 2 0 0 1 0 4h-.09
+               a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+
+  </div>
+
+  <div>
+    <div class="section-title">Admin Account Settings</div>
+    <div class="section-sub">Manage your profile, preferences and security</div>
+  </div>
+
+</div>
 
     <!-- Sub-tabs -->
-    <div style="padding:0 26px 24px;">
-      <div style="display:flex;gap:4px;background:#f3f4f6;border-radius:10px;padding:4px;margin-bottom:24px;">
+    <div style="padding:0 30px 30px;">
+      <div style="display:flex;gap:4px;background:#f3f4f6;border-radius:10px;padding:5px;margin-bottom:28px;">
         <button class="admin-stab active" data-stab="profile" onclick="adminStabSwitch(this)"
-          style="flex:1;padding:8px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,.1);">Profile</button>
+          style="flex:1;padding:10px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:#111827;box-shadow:0 1px 3px rgba(0,0,0,.1);">Profile</button>
         <button class="admin-stab" data-stab="preferences" onclick="adminStabSwitch(this)"
-          style="flex:1;padding:8px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">Preferences</button>
+          style="flex:1;padding:10px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">Preferences</button>
         <button class="admin-stab" data-stab="notifications" onclick="adminStabSwitch(this)"
-          style="flex:1;padding:8px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">Notifications</button>
+          style="flex:1;padding:10px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">Notifications</button>
         <button class="admin-stab" data-stab="security" onclick="adminStabSwitch(this)"
-          style="flex:1;padding:8px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">Security</button>
+          style="flex:1;padding:10px 12px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#6b7280;">Security</button>
       </div>
 
       <!-- PROFILE -->

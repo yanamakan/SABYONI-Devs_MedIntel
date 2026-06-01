@@ -105,7 +105,7 @@ async function loadGrowthChart() {
   try {
     const { data: patients } = await db
       .from('patients')
-      .select('patient_id');
+      .select('created_at');
 
     const { data: appointments } = await db
       .from('appointments')
@@ -122,7 +122,9 @@ async function loadGrowthChart() {
     }
 
     // Since we don't have created_at on patients yet, show cumulative total
-    const patientData = months.map(() => patients?.length || 0);
+    const patientData = months.map(m =>
+      (patients || []).filter(p => p.created_at && p.created_at.startsWith(m)).length
+    );
 
     // Count appointments per month
     const apptData = months.map(m =>

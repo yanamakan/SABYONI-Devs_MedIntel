@@ -33,12 +33,15 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .header-left {
   display: flex;
   align-items: center;
   gap: 13px;
+  flex-wrap: wrap;
 }
 
 .logo {
@@ -54,7 +57,7 @@ body {
 
 /* CORRECTED: Main heading text-gray-900, font text-2xl */
 .header-info h1 {
-  font-size: 1.5rem;
+  font-size: 18px;
   /* text-2xl */
   font-weight: 800;
   color: #111827;
@@ -65,7 +68,7 @@ body {
 
 /* CORRECTED: Subtext text-gray-600, text-sm */
 .header-info p {
-  font-size: 0.875rem;
+  font-size: 12px;
   /* text-sm */
   color: #4b5563;
   /* text-gray-600 */
@@ -117,14 +120,14 @@ body {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 16px;
 }
 
 /* ── STATS GRID ── */
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
   margin-bottom: 24px;
 }
 
@@ -206,6 +209,7 @@ body {
 /* ── TABS BAR ── */
 .tabs-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 18px;
@@ -216,12 +220,17 @@ body {
   display: flex;
   align-items: center;
   background: #e5e7eb;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 6px;
+  flex: 1;
   border-radius: 99px;
   padding: 4px;
-  gap: 2px;
+  gap: 8px;
 }
 
 .tab {
+  flex: 0 0 auto;
   padding: 8px 18px;
   border-radius: 99px;
   border: none;
@@ -235,6 +244,9 @@ body {
   white-space: nowrap;
   font-family: inherit;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.tabs::-webkit-scrollbar {
+  height: 4px;
 }
 
 .tab:hover {
@@ -362,6 +374,9 @@ body {
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
 }
 
 .data-table thead {
@@ -399,6 +414,9 @@ body {
 
 .data-table td:last-child {
   text-align: right;
+}
+.data-table table {
+  min-width: 700px;
 }
 
 .td-name {
@@ -673,7 +691,7 @@ body {
 .modal-box {
   background: #ffffff;
   border-radius: 18px;
-  width: 580px;
+  width: 95vw;
   max-width: 95%;
   max-height: 90vh;
   overflow-y: auto;
@@ -925,7 +943,7 @@ textarea::placeholder {
 
   .tabs-bar {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
   .data-table th,
@@ -1359,5 +1377,9 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
   .tabs {
     flex-wrap: wrap;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 }

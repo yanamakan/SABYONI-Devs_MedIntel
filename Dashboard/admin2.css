@@ -118,9 +118,9 @@ body {
 /* ── MAIN ── */
 .main {
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 16px;
+  max-width: 100%;
+  margin: 0;
+  padding: 24px;
 }
 
 /* ── STATS GRID ── */
@@ -339,11 +339,65 @@ body {
 }
 
 /* Admin Settings Card Size */
+.admin-settings-tabs {
+  display: flex;
+  gap: 4px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 5px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 768px) {
+  .admin-settings-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    scrollbar-width: none;
+    width: 100%;
+  }
+
+  .admin-settings-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-settings-tabs .admin-stab {
+    flex: 0 0 auto;
+    min-width: 120px;
+  }
+}
+@media (max-width: 768px) {
+  .admin-settings-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .admin-settings-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-stab {
+    flex: 0 0 auto !important;
+    min-width: 120px;
+  }
+}
 #tab-settings .section-card,
 #tab-settings .diag-card {
-  max-width: 900px;
+  width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 24px;
+}
+@media (max-width: 768px) {
+
+  #tab-settings .section-card,
+  #tab-settings .diag-card {
+    max-width: 100%;
+    padding: 16px;
+  }
+
 }
 
 .section-header {
@@ -352,6 +406,32 @@ body {
   align-items: flex-start;
   padding: 22px 26px 16px;
   gap: 16px;
+}
+#tab-doctors .section-card,
+#tab-nurses .section-card,
+#tab-appointments .section-card {
+  width: 100%;
+  max-width: 100%;
+}
+#tab-doctors table,
+#tab-nurses table,
+#tab-appointments table {
+  width: 100%;
+  table-layout: auto;
+}
+#tab-settings .tabs {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+#tab-settings .tabs::-webkit-scrollbar {
+  display: none;
+}
+
+#tab-settings .tab {
+  flex-shrink: 0;
 }
 
 /* CORRECTED: Section titles text-gray-900 */
@@ -416,7 +496,7 @@ body {
   text-align: right;
 }
 .data-table table {
-  min-width: 700px;
+  width: 100%;
 }
 
 .td-name {
@@ -996,44 +1076,46 @@ textarea::placeholder {
     justify-content: space-between;
   }
 }
+@media (max-width: 768px) {
 
-.modal-box {
-  width: 100%;
-  max-width: 100%;
-  min-height: 100dvh;
-  border-radius: 0;
-  padding: 20px 16px;
-  margin: 0;
-}
+  .modal-box {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100dvh;
+    border-radius: 0;
+    padding: 20px 16px;
+    margin: 0;
+  }
 
-.modal {
-  align-items: flex-end;
-}
+  .modal {
+    align-items: flex-end;
+  }
 
-.section-header {
-  flex-direction: column;
-  align-items: flex-start;
-}
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-.queue-card {
-  padding: 14px 16px;
-}
+  .queue-card {
+    padding: 14px 16px;
+  }
 
-.queue-name {
-  font-size: 0.9rem;
-}
+  .queue-name {
+    font-size: 0.9rem;
+  }
 
-.data-table .col-hide {
-  display: none;
-}
+  .data-table .col-hide {
+    display: none;
+  }
 
-.tabs {
-  width: 100%;
-}
+  .tabs {
+    width: 100%;
+  }
 
-.tab {
-  padding: 7px 14px;
-  font-size: 0.82rem;
+  .tab {
+    padding: 7px 14px;
+    font-size: 0.82rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1382,4 +1464,75 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }
     width: 100%;
     justify-content: space-between;
   }
+}
+/* Full width for Doctors, Nurses and Appointments */
+#tab-doctors .section-card,
+#tab-nurses .section-card,
+#tab-appointments .section-card {
+    width: 100%;
+    max-width: 100%;
+}
+#tab-doctors table,
+#tab-nurses table,
+#tab-appointments table {
+    width: 100%;
+    table-layout: auto;
+}
+/* ==========================================================
+   ADMIN DASHBOARD WIDTH FIX
+   ========================================================== */
+
+.main {
+    max-width: 100%;
+    width: 100%;
+    padding: 24px;
+}
+
+.tabs-bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tabs {
+    flex: 1;
+    width: 100%;
+}
+
+.tab-content {
+    width: 100%;
+}
+
+.section-card {
+    width: 100%;
+    max-width: none;
+}
+
+#tab-doctors,
+#tab-nurses,
+#tab-appointments,
+#tab-queue,
+#tab-settings {
+    width: 100%;
+}
+
+.data-table {
+    width: 100%;
+    display: table;
+    white-space: normal;
+}
+
+.data-table thead,
+.data-table tbody {
+    width: 100%;
+}
+
+.data-table tr {
+    width: 100%;
+}
+
+.data-table th,
+.data-table td {
+    white-space: nowrap;
 }

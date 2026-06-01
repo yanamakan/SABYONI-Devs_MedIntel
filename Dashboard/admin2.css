@@ -1536,3 +1536,13 @@ body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }
 .data-table td {
     white-space: nowrap;
 }
+body.dark-mode .admin-stab.active {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+.admin-settings-tabs {
+  background: #f3f4f6;
+}
+body.dark-mode .admin-settings-tabs {
+  background: #334155;
+}

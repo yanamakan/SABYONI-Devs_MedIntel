@@ -783,26 +783,30 @@ function handleLogout() {
 // ════════════════════════════════════════════════════════════
 function adminStabSwitch(btn) {
   var stab = btn.dataset.stab;
-  document.querySelectorAll('.admin-stab').forEach(function(b) {
-    b.style.background = 'transparent';
-    b.style.color = '#6b7280';
-    b.style.boxShadow = 'none';
-  });
-  btn.style.background = '#fff';
-  btn.style.color = '#111827';
-  btn.style.boxShadow = '0 1px 3px rgba(0,0,0,.1)';
 
+  // Remove active from all tabs
+  document.querySelectorAll('.admin-stab').forEach(function(b) {
+    b.classList.remove('active');
+  });
+
+  // Add active to clicked tab
+  btn.classList.add('active');
+
+  // Hide all panels
   ['profile','preferences','notifications','security'].forEach(function(s) {
     var el = document.getElementById('admin-stab-' + s);
     if (el) el.style.display = 'none';
   });
+
+  // Show selected panel
   var target = document.getElementById('admin-stab-' + stab);
   if (target) target.style.display = 'block';
 
   if (stab === 'security') loadAdmin2FAStatus();
-  if (stab === 'preferences' || stab === 'notifications') loadAdminSettingsData();
+  if (stab === 'preferences' || stab === 'notifications') {
+    loadAdminSettingsData();
+  }
 }
-
 // ════════════════════════════════════════════════════════════
 //  SETTINGS — LOAD ALL DATA
 // ════════════════════════════════════════════════════════════

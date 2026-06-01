@@ -683,7 +683,7 @@ async function createAdminAccount() {
     await fetch('https://sabyoni-devs-med-intel.vercel.app/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'first_login', email, name: fullName }),
+      body: JSON.stringify({ type: 'first_login', email, name: fullName, tempPassword: password }),
     });
 
     await logAction(`Created new admin account: ${email}`);

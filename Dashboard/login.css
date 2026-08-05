@@ -6,7 +6,10 @@
 
 body {
     font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, #dbeafe 0%, #ffffff 50%, #cffafe 100%);
+    background: linear-gradient(135deg,#bfdbfe 0%,
+    #dbeafe 35%,
+    #e0f2fe 65%,
+    #a5f3fc 100%);
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
@@ -69,13 +72,17 @@ header {
 .logo-icon {
     width: 72px;
     height: 72px;
-    background: linear-gradient(145deg, #1a6ff0 0%, #0ea5e9 100%);
-    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 22px rgba(26, 111, 240, 0.32);
     flex-shrink: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.logo-img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
 }
 
 /* Text block to the right of icon */
@@ -537,3 +544,30 @@ header .subtitle {
         text-align: center;
     }
 }
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 44px;
+}
+
+.eye-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  color: #888;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.eye-toggle:hover { color: #333; }
+.eye-toggle svg { width: 18px; height: 18px; pointer-events: none; }

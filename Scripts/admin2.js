@@ -1,47 +1,146 @@
 /* ============================================================
-   admin.js — MedIntel Admin Dashboard
+   admin2.js — MedIntel Admin Dashboard (Supabase — real schema)
    ============================================================ */
 
-/* ── TAB SWITCHING ── */
-function switchTab(name, btn) {
-  // Hide all tab content
-  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-  // Deactivate all tabs
-  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
-  // Show selected tab & activate button
-  document.getElementById('tab-' + name).style.display = 'block';
-  btn.classList.add('active');
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+//GENERATE A RANDOM PASSWORD WHICH WILL ACT AS A TEMP PASSWORD
+function generateTempPassword() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#!';
+  return Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
-/* ── NOTIFICATIONS ── */
+// ════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ════════════════════════════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  btn.classList.add('active');
+  if (name === 'settings') loadAdminSettingsData();
+}
+
+// ════════════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ════════════════════════════════════════════════════════════
 function toggleNotif() {
   const popup = document.getElementById('notifPopup');
   popup.classList.toggle('show');
-}
-
-function clearNotifs() {
-  document.getElementById('notifList').innerHTML =
-    '<div class="notif-item" style="color:#9ca3af;">No new notifications</div>';
-  document.getElementById('notifCount').textContent = '0';
-  document.getElementById('notifCount').style.background = '#9ca3af';
-}
-
-// Close popup when clicking outside
-document.addEventListener('click', function(e) {
-  const popup = document.getElementById('notifPopup');
-  const btn = e.target.closest('.header-btn');
-  if (!popup.contains(e.target) && !btn) {
-    popup.classList.remove('show');
+  if (popup.classList.contains('show')) {
+    loadAdminNotifications();
+    markAdminNotifsRead();
   }
+}
+
+async function clearNotifs() {
+  try {
+    await db.from('admin_notifications').delete().neq('notification_id', '00000000-0000-0000-0000-000000000000');
+    document.getElementById('notifList').innerHTML =
+      '<div class="notif-item" style="color:#9ca3af;">No new notifications</div>';
+    document.getElementById('notifCount').textContent = '0';
+    document.getElementById('notifCount').style.display = 'none';
+  } catch (err) {
+    console.error('clearNotifs error:', err);
+  }
+}
+
+async function loadAdminNotifications() {
+  const listEl = document.getElementById('notifList');
+  if (!listEl) return;
+  listEl.innerHTML = '<div class="notif-item" style="color:#9ca3af;">Loading...</div>';
+
+  try {
+    const { data, error } = await db
+      .from('admin_notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(15);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      listEl.innerHTML = '<div class="notif-item" style="color:#9ca3af;">No new notifications</div>';
+      return;
+    }
+
+    listEl.innerHTML = data.map(n => `
+      <div class="notif-item${n.is_read ? '' : ' notif-unread'}" style="padding:10px 14px;border-bottom:1px solid #f3f4f6;">
+        <div style="font-size:13px;color:#111827;font-weight:${n.is_read ? '400' : '600'};">${escapeHtml(n.message)}</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:3px;">${getTimeAgo(n.created_at)}</div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    console.error('loadAdminNotifications error:', err);
+    listEl.innerHTML = '<div class="notif-item" style="color:#ef4444;">Failed to load notifications.</div>';
+  }
+}
+
+async function markAdminNotifsRead() {
+  try {
+    await db.from('admin_notifications').update({ is_read: true }).eq('is_read', false);
+    document.getElementById('notifCount').style.display = 'none';
+  } catch (err) {
+    console.error('markAdminNotifsRead error:', err);
+  }
+}
+
+async function addAdminNotification(message, type = 'info') {
+  try {
+    await db.from('admin_notifications').insert({ message, type, is_read: false });
+    await refreshNotifCount();
+  } catch (err) {
+    console.error('addAdminNotification error:', err);
+  }
+}
+
+async function refreshNotifCount() {
+  try {
+    const { count } = await db
+      .from('admin_notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_read', false);
+
+    const badge = document.getElementById('notifCount');
+    if (count && count > 0) {
+      badge.textContent = count;
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch (err) {
+    console.error('refreshNotifCount error:', err);
+  }
+}
+
+function getTimeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (diff < 60)   return 'Just now';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  return Math.floor(diff / 86400) + 'd ago';
+}
+
+document.addEventListener('click', function (e) {
+  const popup = document.getElementById('notifPopup');
+  const btn   = e.target.closest('.header-btn');
+  if (popup && !popup.contains(e.target) && !btn) popup.classList.remove('show');
 });
 
-/* ── MODALS ── */
+// ════════════════════════════════════════════════════════════
+//  MODALS
+// ════════════════════════════════════════════════════════════
 function openAddStaffModal() {
   clearModalErrors();
   document.getElementById('addStaffModal').classList.remove('hidden');
 }
 
 function openScheduleModal() {
+  populateDoctorDropdown();
+  populatePatientDropdown();
   document.getElementById('scheduleModal').classList.remove('hidden');
 }
 
@@ -49,233 +148,906 @@ function closeModal(id) {
   document.getElementById(id).classList.add('hidden');
 }
 
-// Close modal on backdrop click
-document.addEventListener('click', function(e) {
+document.addEventListener('click', function (e) {
   document.querySelectorAll('.modal:not(.hidden)').forEach(modal => {
     if (e.target === modal) modal.classList.add('hidden');
   });
 });
 
-/* ── ADD STAFF ── */
 function clearModalErrors() {
-  ['errStaffName','errStaffEmail','errStaffRole','errStaffDept','errStaffPass'].forEach(id => {
+  ['errStaffName','errStaffEmail','errStaffRole','errStaffDept'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = '';
   });
 }
 
-function submitAddStaff() {
+// ════════════════════════════════════════════════════════════
+//  LOAD STATS
+// ════════════════════════════════════════════════════════════
+async function loadStats() {
+  try {
+    const [
+      { count: doctorCount },
+      { count: nurseCount },
+      { count: apptCount },
+      { count: atRiskCount },
+    ] = await Promise.all([
+      db.from('users').select('*', { count: 'exact', head: true }).eq('role', 'doctor').eq('is_active', true),
+      db.from('users').select('*', { count: 'exact', head: true }).eq('role', 'nurse').eq('is_active', true),
+      db.from('appointments').select('*', { count: 'exact', head: true }),
+      db.from('patients').select('*', { count: 'exact', head: true }).eq('at_risk', true),
+    ]);
+
+    document.getElementById('statDoctors').textContent      = doctorCount ?? 0;
+    document.getElementById('statNurses').textContent       = nurseCount  ?? 0;
+    document.getElementById('statAppointments').textContent = apptCount   ?? 0;
+    document.getElementById('statUrgent').textContent       = atRiskCount ?? 0;
+
+    document.querySelectorAll('.tab').forEach(t => {
+      if (t.textContent.startsWith('Doctors'))      t.textContent = `Doctors (${doctorCount ?? 0})`;
+      if (t.textContent.startsWith('Nurses'))       t.textContent = `Nurses (${nurseCount ?? 0})`;
+      if (t.textContent.startsWith('Appointments')) t.textContent = `Appointments (${apptCount ?? 0})`;
+    });
+  } catch (err) {
+    console.error('loadStats error:', err);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOAD DOCTORS
+// ════════════════════════════════════════════════════════════
+async function loadDoctors() {
+  const tbody = document.getElementById('doctorsTableBody');
+  tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;color:#9ca3af;text-align:center;">Loading doctors...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from('users')
+      .select('id, email, department, is_active')
+      .eq('role', 'doctor')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;color:#9ca3af;text-align:center;">No doctors found.</td></tr>`;
+      return;
+    }
+
+    const doctorsWithNames = await Promise.all(data.map(async (u) => {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/doctors?user_id=eq.${u.id}&select=first_name,last_name,specialization`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        const profile = await res.json();
+        return { ...u, profile: profile[0] || null };
+      } catch {
+        return { ...u, profile: null };
+      }
+    }));
+
+    tbody.innerHTML = doctorsWithNames.map(u => {
+      const name     = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email.split('@')[0];
+      const dept     = u.department || 'Not assigned';
+      const spec     = u.profile?.specialization || '—';
+      const isActive = u.is_active !== false;
+
+      return `
+        <tr>
+          <td>
+            <div class="td-name">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+                <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+                <circle cx="20" cy="10" r="2"/>
+              </svg>
+              ${escapeHtml(name)}
+            </div>
+          </td>
+          <td>${escapeHtml(u.email)}</td>
+          <td><span class="badge-dept">${escapeHtml(dept)}</span></td>
+          <td>${escapeHtml(spec)}</td>
+          <td><span class="${isActive ? 'badge-active' : 'badge-pending'}">${isActive ? 'Active' : 'Inactive'}</span></td>
+          <td>
+            <button class="btn btn-red" onclick="removeStaff('${u.id}', '${escapeHtml(name)}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+              </svg>
+              Remove
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('loadDoctors error:', err);
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:20px;color:#ef4444;text-align:center;">Failed to load doctors.</td></tr>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOAD NURSES
+// ════════════════════════════════════════════════════════════
+async function loadNurses() {
+  const tbody = document.getElementById('nursesTableBody');
+  tbody.innerHTML = `<tr><td colspan="5" style="padding:20px;color:#9ca3af;text-align:center;">Loading nurses...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from('users')
+      .select('id, email, department, is_active')
+      .eq('role', 'nurse')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="padding:20px;color:#9ca3af;text-align:center;">No nurses found.</td></tr>`;
+      return;
+    }
+
+    const nursesWithNames = await Promise.all(data.map(async (u) => {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/nurses?user_id=eq.${u.id}&select=first_name,last_name`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
+        const profile = await res.json();
+        return { ...u, profile: profile[0] || null };
+      } catch {
+        return { ...u, profile: null };
+      }
+    }));
+
+    tbody.innerHTML = nursesWithNames.map(u => {
+      const name     = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email.split('@')[0];
+      const dept     = u.department || 'Not assigned';
+      const isActive = u.is_active !== false;
+
+      return `
+        <tr>
+          <td>
+            <div class="td-name">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              ${escapeHtml(name)}
+            </div>
+          </td>
+          <td>${escapeHtml(u.email)}</td>
+          <td><span class="badge-dept">${escapeHtml(dept)}</span></td>
+          <td><span class="${isActive ? 'badge-active' : 'badge-pending'}">${isActive ? 'Active' : 'Inactive'}</span></td>
+          <td>
+            <button class="btn btn-red" onclick="removeStaff('${u.id}', '${escapeHtml(name)}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+              </svg>
+              Remove
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('loadNurses error:', err);
+    tbody.innerHTML = `<tr><td colspan="5" style="padding:20px;color:#ef4444;text-align:center;">Failed to load nurses.</td></tr>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOAD APPOINTMENTS
+// ════════════════════════════════════════════════════════════
+async function loadAppointments() {
+  const tbody = document.getElementById('appointmentsTableBody');
+  tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;color:#9ca3af;text-align:center;">Loading appointments...</td></tr>`;
+
+  try {
+    const { data, error } = await db
+      .from('appointments')
+      .select(`
+        appointment_id,
+        date,
+        time,
+        status,
+        notes,
+        patients!appointments_patient_id_fkey(first_name, last_name, at_risk),
+        doctors!appointments_doctor_id_fkey(first_name, last_name)
+      `)
+      .order('date', { ascending: false })
+      .limit(50);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;color:#9ca3af;text-align:center;">No appointments found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(a => {
+      const p           = a.patients ?? {};
+      const d           = a.doctors  ?? {};
+      const patientName = [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const doctorName  = [d.first_name, d.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const timeDisplay = a.time ? a.time.substring(0, 5) : '--:--';
+
+      const urgencyBadge = p.at_risk
+        ? '<span class="badge-high">high</span>'
+        : '<span class="badge-low">low</span>';
+
+      const statusBadge = {
+        scheduled: '<span class="badge-scheduled">Scheduled</span>',
+        pending:   '<span class="badge-pending">Pending</span>',
+        confirmed: '<span class="badge-confirmed">Confirmed</span>',
+      }[a.status] || `<span class="badge-pending">${escapeHtml(a.status || 'Unknown')}</span>`;
+
+      const actionCell = a.status === 'confirmed'
+        ? '<span class="action-confirmed-text">Confirmed</span>'
+        : `<button class="btn btn-green" onclick="confirmAppt(this, '${a.appointment_id}')">
+             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+               <polyline points="20 6 9 17 4 12"/>
+             </svg>
+             Confirm
+           </button>`;
+
+      return `
+        <tr>
+          <td style="font-weight:700;color:#111827;">${escapeHtml(patientName)}</td>
+          <td>${escapeHtml(doctorName)}</td>
+          <td>${escapeHtml(a.date || '--')}</td>
+          <td>
+            <span class="td-time">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              ${timeDisplay}
+            </span>
+          </td>
+          <td>${statusBadge}</td>
+          <td>${urgencyBadge}</td>
+          <td>${actionCell}</td>
+        </tr>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('loadAppointments error:', err);
+    tbody.innerHTML = `<tr><td colspan="7" style="padding:20px;color:#ef4444;text-align:center;">Failed to load appointments.</td></tr>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  LOAD PATIENT QUEUE
+// ════════════════════════════════════════════════════════════
+async function loadPatientQueue() {
+  const container = document.querySelector('.queue-list');
+  if (!container) return;
+  container.innerHTML = `<div style="padding:28px;text-align:center;color:#9ca3af;">Loading queue...</div>`;
+
+  try {
+    const { data, error } = await db
+      .from('appointments')
+      .select(`
+        appointment_id,
+        date,
+        status,
+        notes,
+        patients!appointments_patient_id_fkey(patient_id, first_name, last_name, phone, at_risk, risk_reason)
+      `)
+      .in('status', ['pending', 'scheduled'])
+      .order('date', { ascending: true })
+      .limit(20);
+
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      container.innerHTML = `<div style="padding:28px;text-align:center;color:#9ca3af;">No patients in queue.</div>`;
+      return;
+    }
+
+    data.sort((a, b) => (a.patients?.at_risk ? 0 : 1) - (b.patients?.at_risk ? 0 : 1));
+
+    container.innerHTML = data.map((a, i) => {
+      const p       = a.patients ?? {};
+      const name    = [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const phone   = escapeHtml(p.phone || 'N/A');
+      const date    = escapeHtml(a.date  || '--');
+      const isHigh  = p.at_risk === true;
+      const summary = escapeHtml(p.risk_reason || a.notes || 'No summary available.');
+
+      const cardClass = isHigh ? 'queue-high' : 'queue-low';
+      const badgeHtml = isHigh
+        ? '<span class="badge-high">HIGH</span><span class="urgent-circle">!</span>'
+        : '<span class="badge-low">LOW</span>';
+
+      return `
+        <div class="queue-card ${cardClass}">
+          <div class="queue-top">
+            <div class="queue-avatar">${i + 1}</div>
+            <div class="queue-info">
+              <div class="queue-name">${escapeHtml(name)}</div>
+              <div class="queue-condition">${isHigh ? 'At Risk' : 'Stable'}</div>
+              <div class="queue-phone">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12
+                           19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72
+                           12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6
+                           l.92-.92a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 17Z"/>
+                </svg>
+                ${phone}
+              </div>
+            </div>
+            <div class="queue-right">
+              <div class="queue-badges">${badgeHtml}</div>
+              <div class="queue-next">Next: ${date}</div>
+            </div>
+          </div>
+          <div class="queue-divider"></div>
+          <div class="queue-summary">
+            <span class="ai-label">AI Summary:</span> ${summary}
+          </div>
+        </div>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('loadPatientQueue error:', err);
+    container.innerHTML = `<div style="padding:28px;text-align:center;color:#ef4444;">Failed to load queue.</div>`;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  POPULATE DROPDOWNS
+// ════════════════════════════════════════════════════════════
+async function populateDoctorDropdown() {
+  const select = document.getElementById('apptDoctor');
+  if (!select) return;
+  select.innerHTML = '<option value="">Select doctor...</option>';
+
+  try {
+    const { data } = await db
+      .from('doctors')
+      .select('doctor_id, first_name, last_name, users!doctors_user_id_fkey(is_active)')
+      .order('first_name');
+
+    (data || []).forEach(d => {
+      if (d.users?.is_active === false) return;
+      const name = [d.first_name, d.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const opt  = document.createElement('option');
+      opt.value       = d.doctor_id;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.warn('populateDoctorDropdown error:', err);
+  }
+}
+
+async function populatePatientDropdown() {
+  const select = document.getElementById('apptPatient');
+  if (!select) return;
+  select.innerHTML = '<option value="">Select patient...</option>';
+
+  try {
+    const { data } = await db
+      .from('patients')
+      .select('patient_id, first_name, last_name')
+      .order('first_name');
+
+    (data || []).forEach(p => {
+      const name = [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Unknown';
+      const opt  = document.createElement('option');
+      opt.value       = p.patient_id;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    console.warn('populatePatientDropdown error:', err);
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  ADD STAFF
+// ════════════════════════════════════════════════════════════
+async function submitAddStaff() {
   clearModalErrors();
-  const name  = document.getElementById('staffName').value.trim();
-  const email = document.getElementById('staffEmail').value.trim();
-  const role  = document.getElementById('staffRole').value;
-  const dept  = document.getElementById('staffDept').value;
-  const spec  = document.getElementById('staffSpec').value.trim();
-  const pass  = document.getElementById('staffPass').value;
+
+  const fullName = document.getElementById('staffName').value.trim();
+  const email    = document.getElementById('staffEmail').value.trim();
+  const role     = document.getElementById('staffRole').value;
+  const dept     = document.getElementById('staffDept').value;
+  const spec     = document.getElementById('staffSpec').value.trim();
+  const password = generateTempPassword();
 
   let valid = true;
-  if (!name)  { document.getElementById('errStaffName').textContent  = 'Name is required';     valid = false; }
-  if (!email) { document.getElementById('errStaffEmail').textContent = 'Email is required';    valid = false; }
-  if (!role)  { document.getElementById('errStaffRole').textContent  = 'Role is required';     valid = false; }
-  if (!dept)  { document.getElementById('errStaffDept').textContent  = 'Department required';  valid = false; }
-  if (!pass)  { document.getElementById('errStaffPass').textContent  = 'Password is required'; valid = false; }
+  if (!fullName) { document.getElementById('errStaffName').textContent  = 'Name is required';     valid = false; }
+  if (!email)    { document.getElementById('errStaffEmail').textContent = 'Email is required';    valid = false; }
+  if (!role)     { document.getElementById('errStaffRole').textContent  = 'Role is required';     valid = false; }
+  if (!dept)     { document.getElementById('errStaffDept').textContent  = 'Department required';  valid = false; }
   if (!valid) return;
 
-  if (role === 'doctor') {
-    addDoctorRow(name, email, dept, spec || 'Doctor');
-    updateStat('statDoctors', 1);
-    updateTabLabel('doctors');
-  } else {
-    addNurseRow(name, email, dept);
-    updateStat('statNurses', 1);
-    updateTabLabel('nurses');
-  }
+  const [firstName, ...rest] = fullName.split(' ');
+  const lastName = rest.join(' ');
 
-  closeModal('addStaffModal');
+  try {
+    const { data: authData, error: authError } = await db.auth.signUp({
+      email, password, options: { data: { role } }
+    });
+    if (authError) throw authError;
 
-  // Reset form
-  ['staffName','staffEmail','staffSpec','staffPass'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('staffRole').value = '';
-  document.getElementById('staffDept').value = '';
-}
+    const userId = authData.user?.id;
+    if (!userId) throw new Error('No user ID returned.');
 
-function addDoctorRow(name, email, dept, spec) {
-  const tbody = document.getElementById('doctorsTableBody');
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>
-      <div class="td-name">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
-          <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
-          <circle cx="20" cy="10" r="2"/>
-        </svg>
-        ${name}
-      </div>
-    </td>
-    <td>${email}</td>
-    <td><span class="badge-dept">${dept}</span></td>
-    <td>${spec}</td>
-    <td><span class="badge-active">Active</span></td>
-    <td>
-      <button class="btn btn-red" onclick="removeDoctor('${name}', this)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-          <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-        </svg>
-        Remove
-      </button>
-    </td>`;
-  tbody.appendChild(row);
-}
+    const { error: userError } = await db.from('users').insert({
+      id: userId, email, role, department: dept, must_reset_password: true
+    });
+    if (userError) throw userError;
 
-function addNurseRow(name, email, dept) {
-  const tbody = document.getElementById('nursesTableBody');
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td>
-      <div class="td-name">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-        ${name}
-      </div>
-    </td>
-    <td>${email}</td>
-    <td><span class="badge-dept">${dept}</span></td>
-    <td><span class="badge-active">Active</span></td>
-    <td>
-      <button class="btn btn-red" onclick="removeNurse('${name}', this)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-          <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-        </svg>
-        Remove
-      </button>
-    </td>`;
-  tbody.appendChild(row);
-}
+    if (role === 'doctor') {
+      const { error } = await db.from('doctors').insert({
+        user_id: userId, first_name: firstName, last_name: lastName,
+        specialization: spec || dept,
+      });
+      if (error) throw error;
+    } else if (role === 'nurse') {
+      const { error } = await db.from('nurses').insert({
+        user_id: userId, first_name: firstName, last_name: lastName,
+      });
+      if (error) throw error;
+    }
 
-/* ── REMOVE STAFF ── */
-function removeDoctor(name, btn) {
-  if (!confirm(`Remove ${name} from the system?`)) return;
-  const row = (btn || document.querySelector(`#doctorsTableBody button[onclick*="${name}"]`)).closest('tr');
-  row.remove();
-  updateStat('statDoctors', -1);
-  updateTabLabel('doctors');
-}
+    // Send first-login email
+    await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'first_login', email, name: fullName, tempPassword: password }),
+    });
 
-function removeNurse(name, btn) {
-  if (!confirm(`Remove ${name} from the system?`)) return;
-  const row = (btn || document.querySelector(`#nursesTableBody button[onclick*="${name}"]`)).closest('tr');
-  row.remove();
-  updateStat('statNurses', -1);
-  updateTabLabel('nurses');
-}
+    await addAdminNotification(`👤 New ${role} added: ${fullName} — ${dept}`, 'staff');
+    showToast(`✓ ${role.charAt(0).toUpperCase() + role.slice(1)} created! Reset email sent to ${email}.`, 'success');
+    closeModal('addStaffModal');
 
-/* ── CONFIRM APPOINTMENT ── */
-function confirmAppt(btn, patient) {
-  const row = btn.closest('tr');
-  // Update status badge
-  const statusCell = row.cells[4];
-  statusCell.innerHTML = '<span class="badge-confirmed">Confirmed</span>';
-  // Replace button with greyed text
-  btn.closest('td').innerHTML = '<span class="action-confirmed-text">Confirmed</span>';
-  // Update urgent count if high
-  const urgencyCell = row.cells[5];
-  if (urgencyCell.querySelector('.badge-high')) {
-    updateStat('statUrgent', -1);
+    ['staffName','staffEmail','staffSpec'].forEach(id =>
+      document.getElementById(id).value = ''
+    );
+    document.getElementById('staffRole').value = '';
+    document.getElementById('staffDept').value = '';
+    await Promise.all([loadStats(), loadDoctors(), loadNurses()]);
+
+  } catch (err) {
+    showToast(err.message || 'Failed to create account.', 'error');
   }
 }
 
-/* ── SCHEDULE APPOINTMENT ── */
-function submitSchedule() {
-  const patient  = document.getElementById('apptPatient').value.trim();
-  const doctor   = document.getElementById('apptDoctor').value;
-  const date     = document.getElementById('apptDate').value;
-  const time     = document.getElementById('apptTime').value;
-  const urgency  = document.getElementById('apptUrgency').value;
-  const status   = document.getElementById('apptStatus').value;
+// ════════════════════════════════════════════════════════════
+//  REMOVE STAFF
+// ════════════════════════════════════════════════════════════
+async function removeStaff(userId, name) {
+  if (!confirm(`Permanently delete ${name} from the system? This cannot be undone.`)) return;
 
-  if (!patient || !doctor || !date || !time) {
-    alert('Please fill in all required fields.');
+  try {
+    // Get email first for otp cleanup
+    const { data: userData } = await db
+      .from('users')
+      .select('email, role')
+      .eq('id', userId)
+      .single();
+
+    const email = userData?.email;
+    const role  = userData?.role;
+
+    // 1. Delete profile row
+    if (role === 'doctor') await db.from('doctors').delete().eq('user_id', userId);
+    if (role === 'nurse')  await db.from('nurses').delete().eq('user_id', userId);
+
+    // 2. Delete notifications
+    await db.from('doctor_notifications').delete().eq('doctor_id', userId);
+    await db.from('nurse_notifications').delete().eq('user_id', userId);
+
+    // 3. Delete otp_codes
+    if (email) await db.from('otp_codes').delete().eq('email', email);
+
+    // 4. Delete users row
+    const { error } = await db.from('users').delete().eq('id', userId);
+    if (error) throw error;
+
+    // 5. Delete from Supabase Auth
+    await fetch('/api/delete-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+
+    await addAdminNotification(`🗑️ Staff deleted: ${name}`, 'staff');
+    showToast(`✓ ${name} deleted successfully`, 'success');
+    await Promise.all([loadStats(), loadDoctors(), loadNurses()]);
+
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+function removeDoctor(userId, name) { return removeStaff(userId, name); }
+function removeNurse(userId, name)  { return removeStaff(userId, name); }
+
+// ════════════════════════════════════════════════════════════
+//  CONFIRM APPOINTMENT
+// ════════════════════════════════════════════════════════════
+async function confirmAppt(btn, appointmentId) {
+  try {
+    const { error } = await db
+      .from('appointments')
+      .update({ status: 'confirmed' })
+      .eq('appointment_id', appointmentId);
+    if (error) throw error;
+
+    const row = btn.closest('tr');
+    if (row) {
+      row.cells[4].innerHTML = '<span class="badge-confirmed">Confirmed</span>';
+      row.cells[6].innerHTML = '<span class="action-confirmed-text">Confirmed</span>';
+    }
+    await addAdminNotification(`✅ Appointment confirmed for patient`, 'appointment');
+    await loadStats();
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SCHEDULE APPOINTMENT
+// ════════════════════════════════════════════════════════════
+async function submitSchedule() {
+  const patientId = document.getElementById('apptPatient').value;
+  const doctorId  = document.getElementById('apptDoctor').value;
+  const date      = document.getElementById('apptDate').value;
+  const time      = document.getElementById('apptTime').value;
+  const status    = document.getElementById('apptStatus').value;
+
+  if (!patientId || !doctorId || !date || !time) {
+    await addAdminNotification(`📅 New appointment scheduled`, 'appointment');
     return;
   }
 
-  const tbody = document.getElementById('appointmentsTableBody');
-  const fmtTime = time.substring(0,5);
+  try {
+    const { data: { user } } = await db.auth.getUser();
 
-  const urgencyBadge = {
-    high:   '<span class="badge-high">high</span>',
-    medium: '<span class="badge-medium">medium</span>',
-    low:    '<span class="badge-low">low</span>',
-  }[urgency];
+    const { error } = await db.from('appointments').insert({
+      patient_id: patientId,
+      doctor_id:  doctorId,
+      date,
+      time,
+      status,
+      created_by: user?.email || 'admin',
+    });
+    if (error) throw error;
 
-  const statusBadge = {
-    scheduled: '<span class="badge-scheduled">Scheduled</span>',
-    pending:   '<span class="badge-pending">Pending</span>',
-  }[status];
+    showToast('✓ Appointment scheduled!', 'success');
+    closeModal('scheduleModal');
+    document.getElementById('apptDate').value    = '';
+    document.getElementById('apptTime').value    = '';
+    document.getElementById('apptDoctor').value  = '';
+    document.getElementById('apptPatient').value = '';
+    await Promise.all([loadStats(), loadAppointments()]);
 
-  const actionBtn = status === 'pending'
-    ? `<button class="btn btn-green" onclick="confirmAppt(this, '${patient}')">
-         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-         Confirm
-       </button>`
-    : '';
-
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td style="font-weight:700;color:#111827;">${patient}</td>
-    <td>${doctor}</td>
-    <td>${date}</td>
-    <td>
-      <span class="td-time">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        ${fmtTime}
-      </span>
-    </td>
-    <td>${statusBadge}</td>
-    <td>${urgencyBadge}</td>
-    <td>${actionBtn}</td>`;
-  tbody.appendChild(row);
-
-  updateStat('statAppointments', 1);
-  if (urgency === 'high') updateStat('statUrgent', 1);
-
-  closeModal('scheduleModal');
-  // Reset
-  ['apptPatient','apptDate','apptTime'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('apptDoctor').value = '';
+  } catch (err) {
+    showToast(err.message || 'Failed to schedule appointment.', 'error');
+  }
 }
 
-/* ── STAT COUNTER HELPERS ── */
-function updateStat(id, delta) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const current = parseInt(el.textContent) || 0;
-  el.textContent = Math.max(0, current + delta);
+// ════════════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════════════
+function showToast(message, type = 'success') {
+  const existing = document.getElementById('admin-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'admin-toast';
+  toast.style.cssText = `
+    position:fixed;bottom:28px;right:28px;padding:14px 22px;
+    border-radius:12px;font-size:0.9rem;font-weight:600;color:#fff;
+    z-index:99999;box-shadow:0 8px 30px rgba(0,0,0,0.15);
+    background:${type === 'success' ? '#16a34a' : '#ef4444'};
+    transition:opacity 0.3s;font-family:inherit;
+  `;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
 }
 
-function updateTabLabel(type) {
-  const counts = {
-    doctors: document.getElementById('doctorsTableBody')?.rows.length || 0,
-    nurses:  document.getElementById('nursesTableBody')?.rows.length || 0,
-  };
-  const labels = { doctors: 'Doctors', nurses: 'Nurses' };
-  document.querySelectorAll('.tab').forEach(tab => {
-    const label = labels[type];
-    if (label && tab.textContent.startsWith(label)) {
-      tab.textContent = `${label} (${counts[type]})`;
-    }
-  });
+// ════════════════════════════════════════════════════════════
+//  ESCAPE HTML
+// ════════════════════════════════════════════════════════════
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* ── LOGOUT ── */
+// ════════════════════════════════════════════════════════════
+//  LOGOUT
+// ════════════════════════════════════════════════════════════
 function handleLogout() {
-  
-    window.location.href = 'login.html';
-  
+  if (typeof sessionLogout === 'function') sessionLogout();
+  else { sessionStorage.clear(); window.location.href = 'login.html'; }
 }
+
+// ════════════════════════════════════════════════════════════
+//  SETTINGS — SUB-TAB SWITCHING
+// ════════════════════════════════════════════════════════════
+function adminStabSwitch(btn) {
+  var stab = btn.dataset.stab;
+
+  // Remove active from all tabs
+  document.querySelectorAll('.admin-stab').forEach(function(b) {
+    b.classList.remove('active');
+  });
+
+  // Add active to clicked tab
+  btn.classList.add('active');
+
+  // Hide all panels
+  ['profile','preferences','notifications','security'].forEach(function(s) {
+    var el = document.getElementById('admin-stab-' + s);
+    if (el) el.style.display = 'none';
+  });
+
+  // Show selected panel
+  var target = document.getElementById('admin-stab-' + stab);
+  if (target) target.style.display = 'block';
+
+  if (stab === 'security') loadAdmin2FAStatus();
+  if (stab === 'preferences' || stab === 'notifications') {
+    loadAdminSettingsData();
+  }
+}
+// ════════════════════════════════════════════════════════════
+//  SETTINGS — LOAD ALL DATA
+// ════════════════════════════════════════════════════════════
+async function loadAdminSettingsData() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var nameEl  = document.getElementById('admin-profile-name');
+  var emailEl = document.getElementById('admin-profile-email');
+  var phoneEl = document.getElementById('admin-profile-phone');
+  if (nameEl  && user.name)  nameEl.value  = user.name;
+  if (emailEl && user.email) emailEl.value = user.email;
+  if (phoneEl && user.phone) phoneEl.value = user.phone;
+
+  try {
+    // Get admin_id first
+    const { data: adminData } = await db
+      .from('admins')
+      .select('admin_id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!adminData) return;
+
+    const { data: prefs } = await db
+      .from('admin_preferences')
+      .select('*')
+      .eq('admin_id', user.id)
+      .single();
+
+    if (!prefs) {
+      // Insert defaults
+      await db.from('admin_preferences').insert({
+        admin_id:            user.id,
+        dark_mode:           false,
+        timezone:            'Johannesburg (SAST)',
+        email_notifications: true,
+        sms_notifications:   false,
+        staff_alerts:        true,
+      });
+    } else {
+      var darkToggle  = document.getElementById('admin-dark-mode-toggle');
+      var tzSelect    = document.getElementById('admin-pref-timezone');
+      var emailToggle = document.getElementById('admin-notif-email');
+      var smsToggle   = document.getElementById('admin-notif-sms');
+
+      if (darkToggle) darkToggle.checked = prefs.dark_mode || false;
+      if (tzSelect && prefs.timezone) tzSelect.value = prefs.timezone;
+      document.body.classList.toggle('dark-mode', prefs.dark_mode || false);
+      localStorage.setItem('medintel_admin_dark_mode', prefs.dark_mode || false);
+
+      if (emailToggle) emailToggle.checked = prefs.email_notifications !== false;
+      if (smsToggle)   smsToggle.checked   = prefs.sms_notifications   || false;
+    }
+  } catch (err) {
+    console.warn('loadAdminSettingsData error:', err);
+  }
+
+  loadAdmin2FAStatus();
+}
+
+async function saveAdminPreferences() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var darkMode = document.getElementById('admin-dark-mode-toggle')?.checked || false;
+  var timezone = document.getElementById('admin-pref-timezone')?.value || 'Johannesburg (SAST)';
+
+  try {
+    const { error } = await db
+      .from('admin_preferences')
+      .upsert({
+        admin_id:   user.id,
+        dark_mode:  darkMode,
+        timezone:   timezone,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'admin_id' });
+
+    if (error) throw error;
+
+    document.body.classList.toggle('dark-mode', darkMode);
+    localStorage.setItem('medintel_admin_dark_mode', darkMode);
+    showToast('✓ Preferences saved', 'success');
+  } catch (err) {
+    showToast('Error saving preferences: ' + err.message, 'error');
+  }
+}
+
+async function saveAdminNotifPreferences() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var emailNotif = document.getElementById('admin-notif-email')?.checked  ?? true;
+  var smsNotif   = document.getElementById('admin-notif-sms')?.checked    ?? false;
+  var staffAlert = document.getElementById('admin-notif-alert-toggle')?.checked ?? true;
+
+  try {
+    const { error } = await db
+      .from('admin_preferences')
+      .upsert({
+        admin_id:            user.id,
+        email_notifications: emailNotif,
+        sms_notifications:   smsNotif,
+        staff_alerts:        staffAlert,
+        updated_at:          new Date().toISOString(),
+      }, { onConflict: 'admin_id' });
+
+    if (error) throw error;
+    showToast('✓ Notification preferences saved', 'success');
+  } catch (err) {
+    showToast('Error saving preferences: ' + err.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SETTINGS — SAVE PROFILE
+// ════════════════════════════════════════════════════════════
+async function saveAdminProfile() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var name  = document.getElementById('admin-profile-name').value.trim();
+  var phone = document.getElementById('admin-profile-phone').value.trim();
+  if (!name) { showToast('Name cannot be empty.', 'error'); return; }
+
+  try {
+    const { error } = await db
+      .from('admins')
+      .update({ first_name: name.split(' ')[0], last_name: name.split(' ').slice(1).join(' ') || '' })
+      .eq('user_id', user.id);
+    if (error) throw error;
+
+    user.name = name;
+    user.phone = phone;
+    sessionStorage.setItem('medintel_user', JSON.stringify(user));
+    showToast('✓ Profile updated successfully', 'success');
+  } catch (err) {
+    showToast('Error saving profile: ' + err.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SETTINGS — 2FA
+// ════════════════════════════════════════════════════════════
+async function loadAdmin2FAStatus() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  try {
+    const { data } = await db
+      .from('users')
+      .select('two_fa_enabled')
+      .eq('id', user.id)
+      .single();
+
+    var enabled = data?.two_fa_enabled || false;
+    var toggle  = document.getElementById('admin-twofa-toggle');
+    var status  = document.getElementById('admin-twofa-status');
+    if (toggle) toggle.checked      = enabled;
+    if (status) status.textContent  = enabled ? '2FA is enabled' : '2FA is disabled';
+    if (status) status.style.color  = enabled ? '#16a34a' : '#6b7280';
+  } catch (err) {
+    console.error('loadAdmin2FAStatus error:', err);
+  }
+}
+
+async function toggleAdmin2FA(enabled) {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  var status = document.getElementById('admin-twofa-status');
+  try {
+    const { error } = await db
+      .from('users')
+      .update({ two_fa_enabled: enabled })
+      .eq('id', user.id);
+    if (error) throw error;
+
+    if (status) status.textContent = enabled ? '2FA is enabled' : '2FA is disabled';
+    if (status) status.style.color = enabled ? '#16a34a' : '#6b7280';
+    showToast(enabled ? '✓ Two-Factor Authentication enabled' : '✓ Two-Factor Authentication disabled', 'success');
+
+    user.two_fa_enabled = enabled;
+    sessionStorage.setItem('medintel_user', JSON.stringify(user));
+  } catch (err) {
+    showToast('Error updating 2FA: ' + err.message, 'error');
+    var toggle = document.getElementById('admin-twofa-toggle');
+    if (toggle) toggle.checked = !enabled;
+  }
+}
+
+async function sendAdminPasswordReset() {
+  var raw = sessionStorage.getItem('medintel_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+
+  try {
+    var res  = await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'forgot_password', email: user.email, name: user.name }),
+    });
+    var data = await res.json();
+    if (data.success) showToast('✓ Password reset code sent to your email', 'success');
+    else showToast('Failed to send reset code: ' + data.error, 'error');
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  // Apply saved dark mode immediately to prevent flash
+  var savedDark = localStorage.getItem('medintel_admin_dark_mode');
+  if (savedDark === 'true') document.body.classList.add('dark-mode');
+
+  await Promise.all([
+    loadStats(),
+    loadDoctors(),
+    loadNurses(),
+    loadAppointments(),
+    loadPatientQueue(),
+    refreshNotifCount(),
+  ]);
+
+  setInterval(async () => {
+    await Promise.all([
+      loadStats(),
+      loadDoctors(),
+      loadNurses(),
+      loadAppointments(),
+      loadPatientQueue(),
+      refreshNotifCount(),
+    ]);
+  }, 60000);
+});

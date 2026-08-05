@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MedIntel — Two-Factor Authentication</title>
+  <link rel="stylesheet" href="login.css"/>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    .logo-text h1 {
+    margin: 0;
+    }
+    .logo-text p {
+      margin: 0;
+    }
+    body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+    header {
+      margin: 0%;
+      padding: 10px 0 5px 0;
+      margin-top: 15px;
+      margin-bottom: 5px;
+    }
+
+    .otp-card {
+      margin: 0 auto 10px auto; 
+    }
+    .logo-img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    }
+    .otp-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+      border-radius: 20px;
+      padding: 50px;
+      max-width: 580px;
+      margin: 0 auto;
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+    .otp-card h2 { 
+      font-size: 25px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 10px;
+    }
+    .otp-card p.sub { 
+      color: #64748b;
+      font-size: 15px;
+      line-height: 1.6; 
+      margin:0 0 28px; 
+    }
+    .lock-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      color: #3b82f6;
+      background: rgba(59,130,246,0.12);
+      border-radius: 50%;
+      padding: 18px;
+    }
+
+    .lock-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+    .otp-input-wrapper {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0 28px;
+    }
+    .otp-input-wrapper input {
+    width: 58px;
+    height: 64px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 2px solid rgba(59, 130, 246, 0.35);
+    color: #6175a1;
+    transition: all 0.25s ease;
+    }
+    .otp-input-wrapper input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: rgba(255,255,255,0.25);
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.25);
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: #1e3a5f;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #2d5a9e; }
+    .btn-link {
+      background: none;
+      border: none;
+      color: #3b82f6;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 14px;
+      display: block;
+      width: 100%;
+    }
+    #otpMessage {
+      font-size: 14px;
+      margin-top: 14px;
+      min-height: 20px;
+    }
+    .timer { color:#94a3b8; font-size:13px; margin-top:10px; }
+    /* Floating bubbles */
+    .bubble {
+      position: fixed;
+      bottom: -150px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 35% 35%,
+        rgba(180, 215, 245, 0.55),
+        rgba(130, 185, 230, 0.2)
+      );
+      border: 1px solid rgba(160, 205, 240, 0.35);
+      animation: floatUp linear infinite;
+      pointer-events: none;
+      z-index: 0;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.9;
+      }
+
+      90% {
+        opacity: 0.4;
+      }
+
+      100% {
+        transform: translateY(-110vh);
+        opacity: 0;
+      }
+    }
+    header,
+    .otp-card {
+      position: relative;
+      z-index: 1;
+    }
+    @media (max-width: 600px) {
+  .otp-card {
+    width: 92vw;
+    padding: 25px 18px;
+    margin: 20px auto;
+    border-radius: 14px;
+  }
+
+  .otp-card h2 {
+    font-size: 22px;
+  }
+
+  .otp-card p.sub {
+    font-size: 13px;
+  }
+
+  .otp-input-wrapper {
+    gap: 6px;
+  }
+
+  .otp-input-wrapper input {
+    width: 44px;
+    height: 52px;
+    font-size: 20px;
+  }
+
+  .btn-primary {
+    font-size: 14px;
+    padding: 12px;
+  }
+}
+* {
+  box-sizing: border-box;
+}
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-wrapper">
+      <div class="logo-icon">
+        <img src="MedIntel_logo.png" alt="MedIntel_logo" class="logo-img">
+      </div>
+      <div class="logo-text">
+        <h1>MedIntel</h1>
+        <p class="tagline">Intelligent Medical Support</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="otp-card">
+    <div class="lock-icon">
+      <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+    <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+    <circle cx="12" cy="16" r="1"></circle>
+  </svg>
+    </div>
+    <h2>Two-Factor Authentication</h2>
+    <p class="sub">A 6-digit verification code was sent to<br/><strong id="emailDisplay"></strong></p>
+
+    <div class="otp-input-wrapper">
+      <input type="text" maxlength="1" class="otp-digit" oninput="otpAutoTab(this, 0)" onkeydown="otpBackspace(event, 0)"/>
+      <input type="text" maxlength="1" class="otp-digit" oninput="otpAutoTab(this, 1)" onkeydown="otpBackspace(event, 1)"/>
+      <input type="text" maxlength="1" class="otp-digit" oninput="otpAutoTab(this, 2)" onkeydown="otpBackspace(event, 2)"/>
+      <input type="text" maxlength="1" class="otp-digit" oninput="otpAutoTab(this, 3)" onkeydown="otpBackspace(event, 3)"/>
+      <input type="text" maxlength="1" class="otp-digit" oninput="otpAutoTab(this, 4)" onkeydown="otpBackspace(event, 4)"/>
+      <input type="text" maxlength="1" class="otp-digit" oninput="otpAutoTab(this, 5)" onkeydown="otpBackspace(event, 5)"/>
+    </div>
+
+    <button class="btn-primary" onclick="verifyOTP()">Verify & Login</button>
+    <button class="btn-link" onclick="resendOTP()">Resend code</button>
+    <div class="timer" id="timerDisplay"></div>
+    <div id="otpMessage"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../Scripts/config.js"></script>
+
+  <script>
+    const API_BASE = "https://sabyoni-devs-med-intel.vercel.app";
+    const email = sessionStorage.getItem("twofa_email");
+    const redirectPage = sessionStorage.getItem("twofa_redirect");
+
+    let countdown = 300; // 5 minutes
+    let timerInterval;
+
+    document.getElementById("emailDisplay").textContent = email || "your email";
+
+    // Guard — if no email in session, go back to login
+    if (!email) window.location.href = "login.html";
+
+    startTimer();
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      countdown = 300;
+      timerInterval = setInterval(() => {
+        countdown--;
+        const m = Math.floor(countdown / 60);
+        const s = countdown % 60;
+        document.getElementById("timerDisplay").textContent =
+          `Code expires in ${m}:${s.toString().padStart(2, "0")}`;
+        if (countdown <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("timerDisplay").textContent = "Code expired. Please resend.";
+        }
+      }, 1000);
+    }
+
+    function showMsg(text, type) {
+      const el = document.getElementById("otpMessage");
+      const colors = { error: "#ef4444", info: "#3b82f6", success: "#16a34a" };
+      el.style.cssText = `color:${colors[type]};font-size:14px;margin-top:12px;`;
+      el.textContent = text;
+    }
+
+    function otpAutoTab(input, index) {
+      input.value = input.value.replace(/[^0-9]/g, "");
+      const digits = document.querySelectorAll(".otp-digit");
+      if (input.value && index < 5) digits[index + 1].focus();
+    }
+
+    function otpBackspace(event, index) {
+      const digits = document.querySelectorAll(".otp-digit");
+      if (event.key === "Backspace" && !digits[index].value && index > 0) {
+        digits[index - 1].focus();
+      }
+    }
+
+    async function verifyOTP() {
+      const digits = document.querySelectorAll(".otp-digit");
+      const otp = Array.from(digits).map(d => d.value).join("");
+
+      if (otp.length !== 6) { showMsg("Please enter all 6 digits.", "error"); return; }
+
+      showMsg("Verifying...", "info");
+
+      const res = await fetch(`${API_BASE}/api/email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "verify_otp", email, otp, otp_type: "2fa" }),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        clearInterval(timerInterval);
+        sessionStorage.removeItem("twofa_email");
+        sessionStorage.removeItem("twofa_redirect");
+        showMsg("Verified! Redirecting...", "success");
+        setTimeout(() => window.location.href = redirectPage || "login.html", 1000);
+      } else {
+        showMsg(data.error || "Invalid code. Try again.", "error");
+      }
+    }
+
+    async function resendOTP() {
+      showMsg("Resending code...", "info");
+      const res = await fetch(`${API_BASE}/api/email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "2fa", email }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showMsg("New code sent!", "success");
+        startTimer();
+        document.querySelectorAll(".otp-digit").forEach(d => d.value = "");
+        document.querySelectorAll(".otp-digit")[0].focus();
+      } else {
+        showMsg("Failed to resend. Try again.", "error");
+      }
+    }
+  
+  // Floating bubbles
+  (function () {
+    const sizes = [30, 50, 70, 90, 110, 140];
+    const lefts = [5, 12, 22, 35, 48, 58, 68, 78, 88, 95];
+    const delays = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18];
+    const durations = [10, 13, 16, 19, 22];
+
+    lefts.forEach((left, i) => {
+      const el = document.createElement('div');
+      el.className = 'bubble';
+      el.style.cssText = `
+        width: ${sizes[i % sizes.length]}px;
+        height: ${sizes[i % sizes.length]}px;
+        left: ${left}%;
+        animation-duration: ${durations[i % durations.length]}s;
+        animation-delay: ${delays[i]}s;
+      `;
+      document.body.appendChild(el);
+    });
+  })();
+
+  </script>
+</body>
+</html>

@@ -14,8 +14,8 @@ body {
   /* CORRECTED: from-blue-50 via-white to-cyan-50 */
   background: #ffffff;
   background-image:
-    radial-gradient(ellipse at 0% 0%, rgba(219, 234, 254, 0.7) 0%, transparent 50%),
-    radial-gradient(ellipse at 100% 100%, rgba(207, 250, 254, 0.5) 0%, transparent 50%);
+  radial-gradient(ellipse at 0% 0%, rgba(191, 219, 254, 0.85) 0%, transparent 60%),
+  radial-gradient(ellipse at 100% 100%, rgba(165, 243, 252, 0.75) 0%, transparent 60%);
   color: #111827;
   font-size: 14px;
   line-height: 1.5;
@@ -33,12 +33,15 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .header-left {
   display: flex;
   align-items: center;
   gap: 13px;
+  flex-wrap: wrap;
 }
 
 .logo {
@@ -54,7 +57,7 @@ body {
 
 /* CORRECTED: Main heading text-gray-900, font text-2xl */
 .header-info h1 {
-  font-size: 1.5rem;
+  font-size: 18px;
   /* text-2xl */
   font-weight: 800;
   color: #111827;
@@ -65,7 +68,7 @@ body {
 
 /* CORRECTED: Subtext text-gray-600, text-sm */
 .header-info p {
-  font-size: 0.875rem;
+  font-size: 12px;
   /* text-sm */
   color: #4b5563;
   /* text-gray-600 */
@@ -114,14 +117,17 @@ body {
 
 /* ── MAIN ── */
 .main {
-  padding: 28px 32px 56px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 24px;
 }
 
 /* ── STATS GRID ── */
 .stats {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
   margin-bottom: 24px;
 }
 
@@ -203,6 +209,7 @@ body {
 /* ── TABS BAR ── */
 .tabs-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 18px;
@@ -213,12 +220,17 @@ body {
   display: flex;
   align-items: center;
   background: #e5e7eb;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 6px;
+  flex: 1;
   border-radius: 99px;
   padding: 4px;
-  gap: 2px;
+  gap: 8px;
 }
 
 .tab {
+  flex: 0 0 auto;
   padding: 8px 18px;
   border-radius: 99px;
   border: none;
@@ -232,6 +244,9 @@ body {
   white-space: nowrap;
   font-family: inherit;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.tabs::-webkit-scrollbar {
+  height: 4px;
 }
 
 .tab:hover {
@@ -316,10 +331,73 @@ body {
 
 /* ── SECTION CARD ── */
 .section-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  overflow: hidden;
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Admin Settings Card Size */
+.admin-settings-tabs {
+  display: flex;
+  gap: 4px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 5px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 768px) {
+  .admin-settings-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    scrollbar-width: none;
+    width: 100%;
+  }
+
+  .admin-settings-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-settings-tabs .admin-stab {
+    flex: 0 0 auto;
+    min-width: 120px;
+  }
+}
+@media (max-width: 768px) {
+  .admin-settings-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .admin-settings-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-stab {
+    flex: 0 0 auto !important;
+    min-width: 120px;
+  }
+}
+#tab-settings .section-card,
+#tab-settings .diag-card {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+}
+@media (max-width: 768px) {
+
+  #tab-settings .section-card,
+  #tab-settings .diag-card {
+    max-width: 100%;
+    padding: 16px;
+  }
+
 }
 
 .section-header {
@@ -328,6 +406,32 @@ body {
   align-items: flex-start;
   padding: 22px 26px 16px;
   gap: 16px;
+}
+#tab-doctors .section-card,
+#tab-nurses .section-card,
+#tab-appointments .section-card {
+  width: 100%;
+  max-width: 100%;
+}
+#tab-doctors table,
+#tab-nurses table,
+#tab-appointments table {
+  width: 100%;
+  table-layout: auto;
+}
+#tab-settings .tabs {
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+
+#tab-settings .tabs::-webkit-scrollbar {
+  display: none;
+}
+
+#tab-settings .tab {
+  flex-shrink: 0;
 }
 
 /* CORRECTED: Section titles text-gray-900 */
@@ -350,6 +454,9 @@ body {
 .data-table {
   width: 100%;
   border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
 }
 
 .data-table thead {
@@ -387,6 +494,9 @@ body {
 
 .data-table td:last-child {
   text-align: right;
+}
+.data-table table {
+  width: 100%;
 }
 
 .td-name {
@@ -505,13 +615,14 @@ body {
 
 /* ── PATIENT QUEUE ── */
 .queue-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 8px 24px 28px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  width: 100%;
 }
 
 .queue-card {
+  width: 100%;
   border: 1.5px solid #e9d5ff;
   border-radius: 14px;
   padding: 20px 22px;
@@ -660,7 +771,7 @@ body {
 .modal-box {
   background: #ffffff;
   border-radius: 18px;
-  width: 580px;
+  width: 95vw;
   max-width: 95%;
   max-height: 90vh;
   overflow-y: auto;
@@ -912,7 +1023,7 @@ textarea::placeholder {
 
   .tabs-bar {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
   .data-table th,
@@ -965,44 +1076,46 @@ textarea::placeholder {
     justify-content: space-between;
   }
 }
+@media (max-width: 768px) {
 
-.modal-box {
-  width: 100%;
-  max-width: 100%;
-  min-height: 100dvh;
-  border-radius: 0;
-  padding: 20px 16px;
-  margin: 0;
-}
+  .modal-box {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100dvh;
+    border-radius: 0;
+    padding: 20px 16px;
+    margin: 0;
+  }
 
-.modal {
-  align-items: flex-end;
-}
+  .modal {
+    align-items: flex-end;
+  }
 
-.section-header {
-  flex-direction: column;
-  align-items: flex-start;
-}
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-.queue-card {
-  padding: 14px 16px;
-}
+  .queue-card {
+    padding: 14px 16px;
+  }
 
-.queue-name {
-  font-size: 0.9rem;
-}
+  .queue-name {
+    font-size: 0.9rem;
+  }
 
-.data-table .col-hide {
-  display: none;
-}
+  .data-table .col-hide {
+    display: none;
+  }
 
-.tabs {
-  width: 100%;
-}
+  .tabs {
+    width: 100%;
+  }
 
-.tab {
-  padding: 7px 14px;
-  font-size: 0.82rem;
+  .tab {
+    padding: 7px 14px;
+    font-size: 0.82rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1100,4 +1213,336 @@ textarea::placeholder {
   .queue-card {
     padding: 14px 14px;
   }
+}
+
+/* ══ TOGGLE SWITCH SLIDER ══ */
+label > input[type="checkbox"] + span {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: #d1d5db;
+  border-radius: 99px;
+  transition: background .3s;
+}
+label > input[type="checkbox"] + span::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+label > input[type="checkbox"]:checked + span {
+  background: #22c55e;
+}
+label > input[type="checkbox"]:checked + span::before {
+  transform: translateX(20px);
+}
+
+/* ══ DARK MODE — ADMIN ══ */
+body.dark-mode {
+  background: #0f172a;
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(30,58,138,.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(76,29,149,.15) 0%, transparent 50%);
+  color: #e2e8f0;
+}
+
+/* Header */
+body.dark-mode .header            { background: #1e293b; border-bottom-color: #334155; }
+body.dark-mode .header-info h1    { color: #f1f5f9; }
+body.dark-mode .header-info p     { color: #94a3b8; }
+body.dark-mode .logo              { background: linear-gradient(135deg,#0e7490,#0284c7); }
+body.dark-mode .header-btn        { background: #1e293b; border-color: #334155; color: #cbd5e1; }
+body.dark-mode .header-btn:hover  { background: #334155; }
+
+/* Stat cards */
+body.dark-mode .stat-card         { background: #1e293b; border-color: #334155; }
+body.dark-mode .stat-label        { color: #94a3b8; }
+body.dark-mode .stat-sub          { color: #64748b; }
+body.dark-mode .stat-blue         { background: linear-gradient(135deg,#1e3a5f,#1e293b); border-color: #1d4ed8; }
+body.dark-mode .stat-teal         { background: linear-gradient(135deg,#064e3b,#1e293b); border-color: #0d9488; }
+body.dark-mode .stat-purple       { background: linear-gradient(135deg,#2e1065,#1e293b); border-color: #6d28d9; }
+body.dark-mode .stat-red          { background: linear-gradient(135deg,#450a0a,#1e293b); border-color: #dc2626; }
+/* Keep number colours vivid in dark */
+body.dark-mode .stat-num.blue     { color: #60a5fa; }
+body.dark-mode .stat-num.teal     { color: #2dd4bf; }
+body.dark-mode .stat-num.purple   { color: #c084fc; }
+body.dark-mode .stat-num.red      { color: #f87171; }
+
+/* Tabs */
+body.dark-mode .tabs              { background: #1e293b; }
+body.dark-mode .tab               { color: #94a3b8; }
+body.dark-mode .tab:hover         { color: #f1f5f9; }
+body.dark-mode .tab.active        { background: #334155; color: #f1f5f9; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+
+/* Section cards & tables */
+body.dark-mode .section-card      { background: #1e293b; border-color: #334155; }
+body.dark-mode .section-title     { color: #f1f5f9; }
+body.dark-mode .section-sub       { color: #94a3b8; }
+body.dark-mode .data-table th     { color: #94a3b8; background: #1e293b; border-bottom-color: #334155; }
+body.dark-mode .data-table td     { color: #e2e8f0; border-bottom-color: #334155; }
+body.dark-mode .data-table tbody tr:hover { background: #263146; }
+body.dark-mode .td-name           { color: #f1f5f9; }
+body.dark-mode .td-time           { color: #cbd5e1; }
+
+/* Badges in dark */
+body.dark-mode .badge-dept        { background: #334155; border-color: #475569; color: #e2e8f0; }
+body.dark-mode .badge-scheduled   { background: #1e293b; border-color: #475569; color: #cbd5e1; }
+body.dark-mode .badge-pending     { background: #1e293b; border-color: #475569; color: #cbd5e1; }
+body.dark-mode .badge-confirmed   { background: #1d4ed8; color: #fff; }
+body.dark-mode .action-confirmed-text { color: #64748b; }
+
+/* ── APPOINTMENTS: fix blending colours ── */
+body.dark-mode #appointmentsTableBody td:first-child { color: #f1f5f9 !important; font-weight: 700; }
+body.dark-mode #appointmentsTableBody td:nth-child(2) { color: #cbd5e1 !important; }
+body.dark-mode .badge-high   { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
+body.dark-mode .badge-medium { background: #1e293b; color: #e2e8f0; border: 1px solid #475569; }
+body.dark-mode .badge-low    { background: #1e293b; border-color: #475569; color: #94a3b8; }
+
+/* ── PATIENT QUEUE: softer colours ── */
+body.dark-mode .queue-card        { background: #1e293b; border-color: #334155; }
+/* High — soft red */
+body.dark-mode .queue-high        {
+  background: linear-gradient(135deg, #2d1515 0%, #1e293b 100%);
+  border-left-color: #f87171;
+  border-color: #4b1c1c;
+}
+/* Medium — soft purple */
+body.dark-mode .queue-medium      {
+  background: linear-gradient(135deg, #1f133a 0%, #1e293b 100%);
+  border-left-color: #c084fc;
+  border-color: #3b1f6e;
+}
+/* Low — soft green */
+body.dark-mode .queue-low         {
+  background: linear-gradient(135deg, #0d2218 0%, #1e293b 100%);
+  border-left-color: #4ade80;
+  border-color: #14532d;
+}
+body.dark-mode .queue-name        { color: #f1f5f9; }
+body.dark-mode .queue-condition   { color: #94a3b8; }
+body.dark-mode .queue-phone       { color: #64748b; }
+body.dark-mode .queue-next        { color: #64748b; }
+body.dark-mode .queue-summary     { color: #cbd5e1; }
+body.dark-mode .queue-divider     { background: #334155; }
+body.dark-mode .ai-label          { color: #a78bfa; }
+body.dark-mode .urgent-circle     { border-color: #f87171; color: #f87171; }
+/* Softer HIGH/LOW badges in queue */
+body.dark-mode .queue-high .badge-high   { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+body.dark-mode .queue-low  .badge-low    { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); border-radius: 99px; }
+
+/* Notification popup */
+body.dark-mode .notif-popup       { background: #1e293b; border-color: #334155; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+body.dark-mode .notif-popup-header { color: #60a5fa; }
+body.dark-mode .notif-popup-header button { color: #94a3b8; }
+body.dark-mode .notif-item        { color: #cbd5e1; border-bottom-color: #334155; }
+
+/* ── SCHEDULE APPOINTMENT MODAL: fix hidden headings ── */
+body.dark-mode .modal-box         { background: #1e293b; }
+body.dark-mode .modal-title       { color: #f1f5f9; }
+body.dark-mode .modal-sub         { color: #94a3b8; }
+body.dark-mode .modal-close       { color: #94a3b8; }
+body.dark-mode .modal-close:hover { color: #f1f5f9; }
+body.dark-mode label              { color: #e2e8f0; }
+body.dark-mode input              { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+body.dark-mode select             { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+body.dark-mode textarea           { background: #0f172a; border-color: #334155; color: #f1f5f9; }
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus     { border-color: #3b82f6; background: #1e293b; }
+
+/* ── SETTINGS TAB: contained card, proper spacing ── */
+/* Wrap the settings content in a card feel */
+body.dark-mode #tab-settings .section-card {
+  background: #1e293b;
+  border-color: #334155;
+  border-radius: 16px;
+  padding: 28px;
+}
+
+/* Sub-tab switcher bar */
+body.dark-mode #tab-settings [style*="background:#f3f4f6;border-radius:10px"] {
+  background: #0f172a !important;
+  border: 1px solid #334155 !important;
+}
+/* Sub-tab buttons — unselected */
+body.dark-mode .admin-stab {
+  color: #94a3b8 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+/* Sub-tab buttons — active/selected */
+body.dark-mode .admin-stab[style*="background:#fff"],
+body.dark-mode .admin-stab[style*="background: #fff"] {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important;
+}
+
+/* Settings sub-panel headings */
+body.dark-mode #admin-stab-profile [style*="font-size:14px;font-weight:700;color:#111827"],
+body.dark-mode #admin-stab-preferences [style*="font-size:14px;font-weight:700;color:#111827"],
+body.dark-mode #admin-stab-notifications [style*="font-size:14px;font-weight:700;color:#111827"],
+body.dark-mode #admin-stab-security [style*="font-size:14px;font-weight:700;color:#111827"] { color: #f1f5f9 !important; }
+
+body.dark-mode #admin-stab-profile [style*="font-size:13px;color:#6b7280"],
+body.dark-mode #admin-stab-preferences [style*="font-size:13px;color:#6b7280"],
+body.dark-mode #admin-stab-notifications [style*="font-size:13px;color:#6b7280"],
+body.dark-mode #admin-stab-security [style*="font-size:13px;color:#6b7280"] { color: #94a3b8 !important; }
+
+/* Settings form labels */
+body.dark-mode #admin-stab-profile label,
+body.dark-mode #admin-stab-preferences label,
+body.dark-mode #admin-stab-notifications label,
+body.dark-mode #admin-stab-security label { color: #e2e8f0 !important; }
+
+/* Input wrappers */
+body.dark-mode #admin-stab-profile [style*="border:1.5px solid #e5e7eb;border-radius:9px"],
+body.dark-mode #admin-stab-security [style*="border:1.5px solid #e5e7eb;border-radius:9px"] {
+  border-color: #334155 !important;
+  background: #0f172a !important;
+}
+body.dark-mode #admin-stab-profile input { background: transparent !important; color: #f1f5f9 !important; }
+
+/* Preferences inline text */
+body.dark-mode #admin-stab-preferences [style*="font-size:13px;font-weight:600;color:#374151"] { color: #e2e8f0 !important; }
+body.dark-mode #admin-stab-preferences [style*="font-size:12px;color:#9ca3af"]                 { color: #64748b !important; }
+body.dark-mode #admin-stab-preferences p { color: #94a3b8 !important; }
+body.dark-mode #admin-pref-timezone      { background: #0f172a !important; border-color: #334155 !important; color: #f1f5f9 !important; }
+
+/* Notification rows */
+body.dark-mode #admin-stab-notifications [style*="font-size:13px;font-weight:600;color:#374151"] { color: #e2e8f0 !important; }
+body.dark-mode #admin-stab-notifications [style*="font-size:12px;color:#9ca3af"]                  { color: #64748b !important; }
+body.dark-mode #admin-stab-notifications p { color: #94a3b8 !important; }
+
+/* Security */
+body.dark-mode #admin-stab-security strong { color: #f1f5f9 !important; }
+body.dark-mode #admin-stab-security [style*="font-size:12px;color:#6b7280"] { color: #94a3b8 !important; }
+body.dark-mode #admin-stab-security [style*="border:1.5px solid #e5e7eb;background:#fff"] {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+body.dark-mode #admin-twofa-status { color: #94a3b8; }
+
+/* Border dividers inside settings */
+body.dark-mode [style*="border-bottom:1px solid #f3f4f6"] { border-bottom-color: #334155 !important; }
+body.dark-mode [style*="border-top:1px solid #f3f4f6"]    { border-top-color: #334155 !important; }
+body.dark-mode [style*="padding:14px 0;border-bottom:1px solid #f3f4f6"] { border-bottom-color: #334155 !important; }
+body.dark-mode [style*="padding:16px 0;border-bottom:1px solid #f3f4f6"] { border-bottom-color: #334155 !important; }
+
+/* Scrollbar */
+body.dark-mode ::-webkit-scrollbar-track { background: #1e293b; }
+body.dark-mode ::-webkit-scrollbar-thumb { background: #334155; }
+body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+@media (max-width: 768px) {
+  .main {
+    padding: 12px;
+  }
+
+  .section-card {
+    width: 100%;
+    margin: 0 0 12px 0;
+    border-radius: 14px;
+  }
+
+  .tabs-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+/* Full width for Doctors, Nurses and Appointments */
+#tab-doctors .section-card,
+#tab-nurses .section-card,
+#tab-appointments .section-card {
+    width: 100%;
+    max-width: 100%;
+}
+#tab-doctors table,
+#tab-nurses table,
+#tab-appointments table {
+    width: 100%;
+    table-layout: auto;
+}
+/* ==========================================================
+   ADMIN DASHBOARD WIDTH FIX
+   ========================================================== */
+
+.main {
+    max-width: 100%;
+    width: 100%;
+    padding: 24px;
+}
+
+.tabs-bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tabs {
+    flex: 1;
+    width: 100%;
+}
+
+.tab-content {
+    width: 100%;
+}
+
+.section-card {
+    width: 100%;
+    max-width: none;
+}
+
+#tab-doctors,
+#tab-nurses,
+#tab-appointments,
+#tab-queue,
+#tab-settings {
+    width: 100%;
+}
+
+.data-table {
+    width: 100%;
+    display: table;
+    white-space: normal;
+}
+
+.data-table thead,
+.data-table tbody {
+    width: 100%;
+}
+
+.data-table tr {
+    width: 100%;
+}
+
+.data-table th,
+.data-table td {
+    white-space: nowrap;
+}
+body.dark-mode .admin-stab.active {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+.admin-settings-tabs {
+  background: #f3f4f6;
+}
+body.dark-mode .admin-settings-tabs {
+  background: #334155;
 }

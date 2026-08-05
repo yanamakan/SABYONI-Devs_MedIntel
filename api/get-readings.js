@@ -1,5 +1,4 @@
-import "dotenv/config";
-import { supabase } from "../src/models/supabase.js";
+import { supabase } from "../BackEnd/src/models/supabase.js";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -7,12 +6,14 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") return res.status(200).end();
-  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "GET")
+    return res.status(405).json({ error: "Method not allowed" });
 
   try {
     const { patientId } = req.query;
 
-    if (!patientId) return res.status(400).json({ error: "patientId is required" });
+    if (!patientId)
+      return res.status(400).json({ error: "patientId is required" });
 
     const { data, error } = await supabase
       .from("patient_vitals")

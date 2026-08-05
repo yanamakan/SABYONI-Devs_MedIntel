@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MedIntel | Patient Portal</title>
   <link rel="stylesheet" href="patient.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="patient-body">
 
@@ -19,7 +20,7 @@
     </div>
     <div class="header-info">
       <h1>Patient Portal</h1>
-      <p>James Wilson</p>
+      <p id="headerPatientName">Loading...</p>
     </div>
   </div>
   <div class="header-right">
@@ -58,19 +59,19 @@
   <section class="stats-grid">
     <div class="stat-card border-green">
       <small>Upcoming Appointments</small>
-      <h2 class="text-green">1</h2>
+      <h2 class="text-green" id="statAppointments">—</h2>
     </div>
     <div class="stat-card border-blue">
       <small>Active Prescriptions</small>
-      <h2 class="text-blue">1</h2>
+      <h2 class="text-blue" id="statPrescriptions">—</h2>
     </div>
     <div class="stat-card border-purple">
       <small>Medical Records</small>
-      <h2 class="text-purple">2</h2>
+      <h2 class="text-purple" id="statRecords">—</h2>
     </div>
     <div class="stat-card border-yellow">
-      <small>Messages</small>
-      <h2 class="text-yellow">2</h2>
+      <small>Notifications Sent</small>
+      <h2 class="text-yellow" id="statMessages">—</h2>
     </div>
   </section>
 
@@ -92,36 +93,35 @@
       <div class="content-box">
         <h3>Patient Information</h3>
         <div class="info-grid">
-          <div class="info-group"><label>Full Name</label><strong>James Wilson</strong></div>
-          <div class="info-group"><label>Age</label><strong>41 years</strong></div>
-          <div class="info-group"><label>Gender</label><strong>Male</strong></div>
-          <div class="info-group"><label>Email</label><strong>james.wilson@example.com</strong></div>
-          <div class="info-group"><label>Phone</label><strong>+27 82 123 4567</strong></div>
-          <div class="info-group"><label>Last Visit</label><strong>2026-03-10</strong></div>
+          <div class="info-group"><label>Full Name</label><strong id="infoName">Loading...</strong></div>
+          <div class="info-group"><label>Age</label><strong id="infoAge">—</strong></div>
+          <div class="info-group"><label>Email</label><strong id="infoEmail">—</strong></div>
+          <div class="info-group"><label>Phone</label><strong id="infoPhone">—</strong></div>
+          <div class="info-group"><label>Last Visit</label><strong id="infoLastVisit">—</strong></div>
         </div>
       </div>
       <div class="content-box">
         <h3>Quick Actions</h3>
         <div class="action-list">
-          <button class="action-row-btn">
+          <button class="action-row-btn" onclick="handleQuickAction('book')">
             <span class="action-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </span>
             Book New Appointment
           </button>
-          <button class="action-row-btn">
+          <button class="action-row-btn" onclick="handleQuickAction('upload')">
             <span class="action-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </span>
             Upload Medical Document
           </button>
-          <button class="action-row-btn">
+          <button class="action-row-btn" onclick="handleQuickAction('message')">
             <span class="action-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </span>
             Message Your Doctor
           </button>
-          <button class="action-row-btn">
+          <button class="action-row-btn" onclick="handleQuickAction('certificate')">
             <span class="action-icon">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             </span>
@@ -133,41 +133,15 @@
 
     <div class="content-box">
       <h3>Recent Activity</h3>
-      <div class="activity-list">
+      <div class="activity-list" id="recentActivityList">
+        <!-- Fallback static content shown until JS loads -->
         <div class="activity-item">
           <span class="act-icon blue">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </span>
           <div class="act-text">
-            <strong>Appointment scheduled with Dr. Michael Chen</strong>
-            <small>2 days ago</small>
-          </div>
-        </div>
-        <div class="activity-item">
-          <span class="act-icon green">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-          </span>
-          <div class="act-text">
-            <strong>New prescription added: Amlodipine 5mg</strong>
-            <small>5 days ago</small>
-          </div>
-        </div>
-        <div class="activity-item">
-          <span class="act-icon purple">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          </span>
-          <div class="act-text">
-            <strong>Medical records updated</strong>
-            <small>1 week ago</small>
-          </div>
-        </div>
-        <div class="activity-item">
-          <span class="act-icon yellow">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          </span>
-          <div class="act-text">
-            <strong>Appointment reminder: March 20, 9:00 AM</strong>
-            <small>1 week ago</small>
+            <strong>Loading recent activity...</strong>
+            <small>Please wait</small>
           </div>
         </div>
       </div>
@@ -176,62 +150,96 @@
 
   <!-- ===== AI HEALTH ASSISTANT ===== -->
   <section id="aiHealthAssistantSection" class="tab-content" style="display:none;">
+
+    <!-- Top row: input card + result panel side by side -->
     <div class="portal-row">
       <div class="content-box ai-input-card">
         <div class="ai-card-header">
           <span class="ai-brain-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+            </svg>
           </span>
           <div>
-            <h3>AI Health Assistant</h3>
-            <p>Describe your symptoms for instant AI-powered health assessment</p>
+            <h3>ARIA Health Assistant</h3>
+            <p>Describe your symptoms for an AI-powered health assessment</p>
           </div>
         </div>
         <div class="input-area">
           <label>Describe Your Symptoms</label>
           <textarea id="symptomsInput" placeholder="E.g., I've been experiencing headaches and mild fever for 2 days..."></textarea>
         </div>
-        <button class="btn-ai-gradient" onclick="getAIAnalysis()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
-          Get AI Analysis
-        </button>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn-ai-gradient" onclick="getAIAnalysis()" style="flex:1;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+            </svg>
+            Get AI Analysis
+          </button>
+          <!-- HISTORY BUTTON — sits next to the main button -->
+          <button class="aria-history-btn" onclick="toggleChatHistoryPanel()" title="View chat history">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            History
+          </button>
+        </div>
         <p class="disclaimer-text">AI assistance is for informational purposes only. Always consult with a healthcare professional.</p>
       </div>
-      <div class="empty-state-card">
+
+      <!-- ARIA RESULT PANEL -->
+      <div id="ariaResultPanel" class="content-box" style="display:none;">
+        <div id="ariaResultContent"></div>
+      </div>
+
+      <!-- Empty state shown before first analysis -->
+      <div id="ariaEmptyState" class="empty-state-card">
         <div class="empty-content">
           <div class="ghost-brain">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+            </svg>
           </div>
           <p>Describe your symptoms to receive<br>an AI-powered health assessment</p>
         </div>
       </div>
     </div>
+
+    <!-- SLIDE-OUT PANEL — outside portal-row, at section level -->
+    <div id="ariaHistoryPanel" class="aria-history-panel">
+      <div class="aria-history-panel-header">
+        <div>
+          <h4>ARIA Chat History</h4>
+          <p>Your previous health assessments</p>
+        </div>
+        <button class="aria-history-close" onclick="toggleChatHistoryPanel()">✕</button>
+      </div>
+      <div id="ariaChatHistory" class="aria-history-list">
+        <div class="loading-row">Loading...</div>
+      </div>
+    </div>
+
+    <!-- OVERLAY — also outside portal-row -->
+    <div id="ariaHistoryOverlay" class="aria-history-overlay" onclick="toggleChatHistoryPanel()"></div>
+
   </section>
 
   <!-- ===== APPOINTMENTS ===== -->
   <section id="appointmentsSection" class="tab-content" style="display:none;">
     <div class="content-box">
-      <div class="card-header-main">
-        <h3>Your Appointments</h3>
-        <p>View and manage your scheduled appointments</p>
-      </div>
-      <div class="appointment-list">
-        <div class="appointment-card">
-          <div class="appt-info">
-            <h4>Dr. Michael Chen</h4>
-            <div class="appt-meta">
-              <span>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                2026-03-20
-              </span>
-              <span>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                09:00
-              </span>
-            </div>
-          </div>
-          <span class="status-badge scheduled">Scheduled</span>
+      <div class="card-header-main" style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <h3>Your Appointments</h3>
+          <p>View and manage your scheduled appointments</p>
         </div>
+        <button class="btn-book-new" onclick="openBookingModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Book New
+        </button>
+      </div>
+      <div class="appointment-list" id="appointmentList">
+        <div class="loading-row">Loading appointments...</div>
       </div>
     </div>
   </section>
@@ -243,23 +251,8 @@
         <h3>Active Prescriptions</h3>
         <p>Your current medications and dosage information</p>
       </div>
-      <div class="prescription-list">
-        <div class="prescription-card">
-          <div class="presc-content">
-            <div class="presc-header-row">
-              <span class="presc-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
-              </span>
-              <h4>Amlodipine</h4>
-            </div>
-            <div class="presc-details">
-              <p>Dosage: 5mg</p>
-              <p>Frequency: Once daily</p>
-              <p class="presc-meta">Prescribed by Dr. Michael Chen on 2026-02-15</p>
-            </div>
-          </div>
-          <button class="btn-refill">Request Refill</button>
-        </div>
+      <div class="prescription-list" id="prescriptionList">
+        <div class="loading-row">Loading prescriptions...</div>
       </div>
     </div>
   </section>
@@ -271,327 +264,316 @@
         <h3>Medical History</h3>
         <p>Your complete medical records and visit history</p>
       </div>
-      <div class="records-list">
-        <div class="record-card">
-          <div class="record-header">
-            <h4>Hypertension</h4>
-            <span class="record-date">2026-02-15</span>
-          </div>
-          <p class="doctor-name">Dr. Michael Chen</p>
-          <p class="record-summary">Blood pressure: 145/95. Prescribed Amlodipine 5mg.</p>
-          <button class="btn-view-report">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            View Full Report
-          </button>
-        </div>
-        <div class="record-card">
-          <div class="record-header">
-            <h4>Annual Checkup</h4>
-            <span class="record-date">2026-01-10</span>
-          </div>
-          <p class="doctor-name">Dr. Emily Rodriguez</p>
-          <p class="record-summary">General health good. Continue current medications.</p>
-          <button class="btn-view-report">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            View Full Report
-          </button>
-        </div>
+      <div class="records-list" id="recordsList">
+        <div class="loading-row">Loading medical records...</div>
       </div>
     </div>
   </section>
 
-  <!-- ===== CLINIC MAP ===== -->
+    <!-- ===== CLINIC MAP ===== -->
   <section id="clinicMapSection" class="tab-content" style="display:none;">
     <div class="map-container-box">
+
+      <!-- Header -->
       <div class="map-main-header">
         <h3>Clinic Map</h3>
-        <p>Find your way to the clinic</p>
+        <p>Find nearby clinics and pharmacies based on your location</p>
       </div>
+
+      <!-- Search bar + filter toggle -->
       <div class="map-sub-header">
         <div class="map-title-group">
-          <h4>Find Nearby Clinics &amp; Pharmacies</h4>
-          <p>6 facilities found near you</p>
+          <h4 id="mapResultTitle">Finding facilities near you...</h4>
+          <p id="mapResultCount">Waiting for location</p>
         </div>
         <div class="map-filter-toggle">
-          <button class="toggle-btn active">
+          <button class="toggle-btn active" id="filterNearest" onclick="setMapFilter('nearest', this)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
             Nearest
           </button>
-          <button class="toggle-btn">
+          <button class="toggle-btn" id="filterTopRated" onclick="setMapFilter('top_rated', this)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             Top Rated
           </button>
         </div>
       </div>
-      <div class="map-interactive-area">
-        <span class="map-pin" style="top:20%;left:15%;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="#ef4444"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>
-        </span>
-        <span class="map-pin" style="bottom:25%;left:35%;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="#22c55e"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>
-        </span>
-        <span class="map-pin" style="top:45%;right:15%;">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="#3b82f6"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>
-        </span>
-        <div class="map-center-content">
-          <div class="big-blue-pin">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="#3b82f6"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>
-          </div>
-          <h4>Interactive Map View</h4>
-          <p>Map integration ready for deployment. Shows clinic locations with interactive markers and navigation.</p>
-          <button class="btn-location-services">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            Enable Location Services
-          </button>
+
+      <!-- Map canvas -->
+      <div id="googleMap" class="google-map-canvas">
+        <div class="map-loading-state" id="mapLoadingState">
+          <div class="map-loading-spinner"></div>
+          <p>Getting your location...</p>
         </div>
       </div>
-      <div class="facility-display-grid">
-        <div class="facility-item-card">
-          <div class="card-top"><h5>City Medical Center</h5><span class="badge nearby">Nearby</span></div>
-          <div class="card-rating">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            4.8 <span class="dot">•</span> 1.2 km away
-          </div>
-          <p class="card-detail">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            123 Main Street, Johannesburg
-          </p>
-          <p class="card-detail">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg>
-            +27 11 123 4567
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Mon-Fri: 8AM-6PM
-          </p>
-          <div class="tag-row"><span class="f-tag">General Practice</span><span class="f-tag">Pharmacy</span><span class="f-tag">Emergency</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Sandton Health Clinic</h5><span class="badge close">Close</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.6 <span class="dot">•</span> 2.5 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> 45 Rivonia Road, Sandton</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 234 5678 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mon-Sat: 7AM-8PM</p>
-          <div class="tag-row"><span class="f-tag">Specialists</span><span class="f-tag">Pharmacy</span><span class="f-tag">Lab Tests</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Melrose Arch Medical Centre</h5><span class="badge close">Close</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.7 <span class="dot">•</span> 3.2 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Melrose Arch, Johannesburg</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 678 9012 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mon-Sat: 8AM-7PM</p>
-          <div class="tag-row"><span class="f-tag">Specialists</span><span class="f-tag">Dentistry</span><span class="f-tag">Optometry</span><span class="f-tag">Pharmacy</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Rosebank Medical Plaza</h5><span class="badge close">Close</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.7 <span class="dot">•</span> 3.8 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> 78 Oxford Road, Rosebank</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 345 6789 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mon-Fri: 9AM-5PM</p>
-          <div class="tag-row"><span class="f-tag">General Practice</span><span class="f-tag">Pharmacy</span><span class="f-tag">Radiology</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Greenside Family Clinic</h5><span class="badge far">Far</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.5 <span class="dot">•</span> 4.1 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Gleneagles Road, Greenside</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 567 8901 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mon-Fri: 8AM-5PM</p>
-          <div class="tag-row"><span class="f-tag">General Practice</span><span class="f-tag">Pediatrics</span><span class="f-tag">Vaccinations</span></div>
-        </div>
-        <div class="facility-item-card">
-          <div class="card-top"><h5>Fourways Life Hospital</h5><span class="badge far">Far</span></div>
-          <div class="card-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 4.9 <span class="dot">•</span> 5.2 km away</div>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Cedar Road, Fourways</p>
-          <p class="card-detail"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg> +27 11 456 7890 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 24/7 Emergency</p>
-          <div class="tag-row"><span class="f-tag">Hospital</span><span class="f-tag">Emergency</span><span class="f-tag">Pharmacy</span><span class="f-tag">Surgery</span></div>
-        </div>
+
+      <!-- Location error state -->
+      <div id="mapErrorState" class="map-error-state" style="display:none;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <p id="mapErrorMsg">Location access denied.</p>
+        <button class="btn-location-services" onclick="initMap()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Try Again
+        </button>
       </div>
+
+      <!-- Facilities list -->
+      <div id="facilityList" class="facility-display-grid" style="margin-top:20px;">
+        <!-- populated by JS -->
+      </div>
+
     </div>
   </section>
 
   <!-- ===== YOUTUBE VIDEOS ===== -->
   <section id="youtubeVideosSection" class="tab-content" style="display:none;">
     <div class="video-portal-container">
+
+      <!-- Header -->
       <div class="video-header">
-        <h3>YouTube Videos</h3>
-        <p>Watch educational videos about health and wellness</p>
+        <h3>Health & Wellness Videos</h3>
+        <p>Tell us how you're feeling and we'll find the right videos for you</p>
       </div>
-      <div class="video-search-wrapper">
-        <span class="search-icon">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </span>
-        <input type="text" placeholder="Search videos..." class="video-search-input">
+
+      <!-- Feeling input -->
+      <div class="video-feeling-box">
+        <div class="video-feeling-input-row">
+          <div class="video-search-wrapper" style="flex:1;margin-bottom:0;">
+            <span class="search-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </span>
+            <input type="text" id="feelingInput" placeholder="How are you feeling? e.g. stressed, muscle strain, can't sleep..." class="video-search-input" onkeydown="if(event.key==='Enter') searchVideosByFeeling()">
+          </div>
+          <button class="btn-feeling-search" onclick="searchVideosByFeeling()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Find Videos
+          </button>
+        </div>
+
+        <!-- Quick mood buttons -->
+        <div class="video-mood-chips">
+          <button class="mood-chip" onclick="quickFeeling('stressed')">😰 Stressed</button>
+          <button class="mood-chip" onclick="quickFeeling('muscle strain')">💪 Muscle Strain</button>
+          <button class="mood-chip" onclick="quickFeeling('anxious')">😟 Anxious</button>
+          <button class="mood-chip" onclick="quickFeeling('can\'t sleep')">😴 Can't Sleep</button>
+          <button class="mood-chip" onclick="quickFeeling('headache')">🤕 Headache</button>
+          <button class="mood-chip" onclick="quickFeeling('back pain')">🔙 Back Pain</button>
+          <button class="mood-chip" onclick="quickFeeling('tired')">😩 Tired</button>
+          <button class="mood-chip" onclick="quickFeeling('need to relax')">🧘 Need to Relax</button>
+        </div>
       </div>
-      <div class="video-filter-bar">
-        <button class="filter-item active" onclick="filterVideos('all',this)">All Videos</button>
-        <button class="filter-item" onclick="filterVideos('exercise',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="m12 8-4 4 4 4"/></svg>
-          Exercise
-        </button>
-        <button class="filter-item" onclick="filterVideos('relaxation',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          Relaxation
-        </button>
-        <button class="filter-item" onclick="filterVideos('meditation',this)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
-          Meditation
-        </button>
+
+      <!-- Results label -->
+      <div id="videoResultLabel" class="video-result-label" style="display:none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        <span id="videoResultText">Showing results for: </span>
+        <button class="video-clear-btn" onclick="clearVideoSearch()">✕ Clear</button>
       </div>
-      <div class="video-grid">
-        <div class="video-card exercise"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/ml6cT4AZdqI" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>10 Minute Full Body Workout</h4><p>FitnessBlender</p></div></div>
-        <div class="video-card exercise"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/v7AYKMP6rOE" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Morning Yoga for Beginners</h4><p>Yoga With Adriene</p></div></div>
-        <div class="video-card meditation"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/ZToicYcHIOU" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Guided Meditation for Relaxation</h4><p>Calm Meditation</p></div></div>
-        <div class="video-card relaxation"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/5Dq9efwhFIs" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>5 Minute Breathing Exercise</h4><p>Mindful Movement</p></div></div>
-        <div class="video-card exercise"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/5LogA_wYOnY" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Cardio HIIT Workout</h4><p>POPSUGAR Fitness</p></div></div>
-        <div class="video-card meditation"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/aEqlQvczauQ" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Sleep Meditation</h4><p>The Honest Guys</p></div></div>
+
+      <!-- Loading state -->
+      <div id="videoLoadingState" style="display:none;" class="video-loading">
+        <div class="map-loading-spinner"></div>
+        <p>Finding the best videos for you...</p>
       </div>
+
+      <!-- Error state -->
+      <div id="videoErrorState" style="display:none;" class="video-error">
+        <p id="videoErrorMsg">Could not load videos. Please try again.</p>
+      </div>
+
+      <!-- Video grid -->
+      <div class="video-grid" id="videoGrid">
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/inpok4MKVLM" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>5 Minute Meditation You Can Do Anywhere</h4><p>Goodful</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/COp7BR_Dvps" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>10 Minute Morning Yoga</h4><p>Yoga With Adriene</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/4pKly2JojMw" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Full Body Stretch for Beginners</h4><p>MommaStrong</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/O-6f5wQXSu8" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Anxiety Relief Breathing Exercise</h4><p>Headspace</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/1ZYbU82GVz4" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>Guided Sleep Meditation</h4><p>Great Meditation</p></div></div>
+        <div class="video-card"><div class="video-wrapper"><iframe src="https://www.youtube.com/embed/sTANio_2E0Q" frameborder="0" allowfullscreen></iframe></div><div class="video-info"><h4>10 Minute Full Body Workout</h4><p>HASfit</p></div></div>
+      </div>
+
     </div>
   </section>
 
   <!-- ===== SETTINGS ===== -->
-  <section id="settingsSection" class="tab-content" style="display:none;">
-    <div class="settings-container">
-      <div class="settings-header-main">
-        <div class="settings-icon-box">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
-        </div>
-        <div>
-          <h3>Settings</h3>
-          <p>Manage your account and preferences</p>
-        </div>
+<section id="settingsSection" class="tab-content" style="display:none;">
+  <div class="settings-container">
+    <div class="settings-header-main">
+      <div class="settings-icon-box">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
       </div>
-      <div class="settings-sub-nav">
-        <button class="s-nav-btn active" onclick="switchSettingsSubTab(event,'profileSub')">Profile</button>
-        <button class="s-nav-btn" onclick="switchSettingsSubTab(event,'prefSub')">Preferences</button>
-        <button class="s-nav-btn" onclick="switchSettingsSubTab(event,'notifSub')">Notifications</button>
-        <button class="s-nav-btn" onclick="switchSettingsSubTab(event,'securitySub')">Security</button>
+      <div>
+        <h3>Settings</h3>
+        <p>Manage your account and preferences</p>
+      </div>
+    </div>
+
+    <div class="settings-sub-nav">
+      <button class="s-nav-btn active" onclick="switchSettingsSubTab(event,'profileSub')">Profile</button>
+      <button class="s-nav-btn" onclick="switchSettingsSubTab(event,'prefSub')">Preferences</button>
+      <button class="s-nav-btn" onclick="switchSettingsSubTab(event,'notifSub')">Notifications</button>
+      <button class="s-nav-btn" onclick="switchSettingsSubTab(event,'securitySub')">Security</button>
+    </div>
+
+    <!-- ── PROFILE ── -->
+    <div id="profileSub" class="settings-sub-content">
+      <div class="settings-form-box">
+        <div class="form-header"><h4>Personal Information</h4><p>Update your personal details</p></div>
+        <div class="input-group">
+          <label>Full Name</label>
+          <div class="input-wrapper">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="settingsName" placeholder="Full name">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Email</label>
+          <div class="input-wrapper">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="settingsEmail" placeholder="Email address" readonly style="opacity:0.6;cursor:not-allowed;">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Phone Number</label>
+          <div class="input-wrapper">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg>
+            <input type="text" id="settingsPhone" placeholder="Phone number">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Date of Birth</label>
+          <div class="input-wrapper">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input type="date" id="settingsDob">
+          </div>
+        </div>
+        <button class="btn-save-changes" onclick="saveProfileChanges()">Save Changes</button>
       </div>
 
-      <!-- Profile -->
-      <div id="profileSub" class="settings-sub-content">
-        <div class="settings-form-box">
-          <div class="form-header"><h4>Personal Information</h4><p>Update your personal details</p></div>
-          <div class="input-group">
-            <label>Full Name</label>
-            <div class="input-wrapper">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <input type="text" value="James Wilson">
+      <!-- Danger Zone -->
+      <div class="danger-zone-box">
+        <h4 class="danger-title">Danger Zone</h4>
+        <p class="danger-desc">Permanently delete your account and all associated data. This action cannot be undone.</p>
+        <button class="btn-delete-account" onclick="deleteAccount()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          Delete My Account
+        </button>
+      </div>
+    </div>
+
+    <!-- ── PREFERENCES ── -->
+    <div id="prefSub" class="settings-sub-content" style="display:none;">
+      <div class="settings-form-box">
+        <div class="form-header"><h4>Display &amp; Language</h4><p>Customize your app experience</p></div>
+        <div class="pref-row">
+          <div class="pref-text">
+            <div class="pref-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              Dark Mode
             </div>
+            <p class="pref-desc" style="margin-top:6px;">
+              ⚠️ Language changes will apply on next login when full translation is enabled.
+            </p>
           </div>
-          <div class="input-group">
-            <label>Email</label>
-            <div class="input-wrapper">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <input type="email" value="james.wilson@example.com">
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Phone Number</label>
-            <div class="input-wrapper">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg>
-              <input type="text" value="+27 82 123 4567">
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Date of Birth</label>
-            <div class="input-wrapper">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <input type="date" placeholder="yyyy/mm/dd">
-            </div>
-          </div>
-          <button class="btn-save-changes">Save Changes</button>
+          <label class="toggle-switch"><input type="checkbox" id="darkToggle"><span class="slider"></span></label>
         </div>
-        <div class="danger-zone-box">
-          <h4 class="danger-title">Danger Zone</h4>
-          <p class="danger-desc">Permanently delete your account and all associated data</p>
-          <button class="btn-delete-account">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-            Delete My Account
+        <div class="input-group">
+          <label>Language</label>
+          <div class="select-wrapper">
+            <select id="prefLanguage" disabled style="opacity:0.6;cursor:not-allowed;">
+              <option value="English">English</option>
+            </select>
+            <p style="font-size:.75rem;color:#9ca3af;margin-top:4px;">Only English is currently supported.</p>
+            <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Time Zone</label>
+          <div class="select-wrapper">
+            <select id="prefTimezone">
+              <option value="Johannesburg (SAST)">Johannesburg (SAST)</option>
+              <option value="London (GMT)">London (GMT)</option>
+              <option value="New York (EST)">New York (EST)</option>
+              <option value="Dubai (GST)">Dubai (GST)</option>
+            </select>
+            <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+        <button class="btn-save-changes btn-save-pref" onclick="savePreferences()">Save Preferences</button>
+      </div>
+    </div>
+
+    <!-- ── NOTIFICATIONS ── -->
+    <div id="notifSub" class="settings-sub-content" style="display:none;">
+      <div class="settings-form-box">
+        <div class="form-header"><h4>Notification Preferences</h4><p>Choose how you want to be notified</p></div>
+        <div class="notif-row">
+          <div class="notif-info">
+            <div class="notif-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Email Notifications
+            </div>
+            <p class="notif-subtext">Receive appointment reminders and updates via email</p>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="notifEmail" checked><span class="slider"></span></label>
+        </div>
+        
+        <button class="btn-save-changes btn-save-notif" onclick="saveNotificationPreferences()" style="margin-top:16px;">Save Preferences</button>
+      </div>
+    </div>
+
+    <!-- ── SECURITY ── -->
+    <div id="securitySub" class="settings-sub-content" style="display:none;">
+      <div class="settings-form-box">
+        <div class="form-header"><h4>Security Settings</h4><p>Manage your account security</p></div>
+
+        <!-- Change Password -->
+        <div class="input-group">
+          <label>Password</label>
+          <p class="pref-desc">Keep your account secure with a strong password</p>
+          <button class="btn-outline-wide" onclick="openChangePasswordModal()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Change Password
           </button>
         </div>
-      </div>
 
-      <!-- Preferences -->
-      <div id="prefSub" class="settings-sub-content" style="display:none;">
-        <div class="settings-form-box">
-          <div class="form-header"><h4>Display &amp; Language</h4><p>Customize your app experience</p></div>
-          <div class="pref-row">
-            <div class="pref-text">
-              <div class="pref-label">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                Dark Mode
-              </div>
-              <p class="pref-desc">Enable dark theme</p>
-            </div>
-            <label class="toggle-switch"><input type="checkbox" id="darkToggle"><span class="slider"></span></label>
-          </div>
-          <div class="input-group">
-            <label>Language</label>
-            <div class="select-wrapper">
-              <select><option>English</option><option>Afrikaans</option><option>isiZulu</option></select>
-              <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Time Zone</label>
-            <div class="select-wrapper">
-              <select><option>Johannesburg (SAST)</option><option>London (GMT)</option><option>New York (EST)</option></select>
-              <svg class="select-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
+        <!-- Two-Factor Authentication -->
+        <div class="input-group" style="margin-top:20px;padding-top:20px;border-top:1px solid #f3f4f6;">
+          <label>Two-Factor Authentication</label>
+          <p class="pref-desc">When enabled, you will receive a 6-digit code to your email every time you log in.</p>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:12px;">
+            <label class="toggle-switch">
+              <input type="checkbox" id="patient-twofa-toggle" onchange="togglePatientTwoFA(this.checked)">
+              <span class="slider"></span>
+            </label>
+            <span id="patient-twofa-status" style="font-size:13px;color:#6b7280;">Loading...</span>
           </div>
         </div>
-      </div>
 
-      <!-- Notifications -->
-      <div id="notifSub" class="settings-sub-content" style="display:none;">
-        <div class="settings-form-box">
-          <div class="form-header"><h4>Notification Preferences</h4><p>Choose how you want to be notified</p></div>
-          <div class="notif-row">
-            <div class="notif-info">
-              <div class="notif-label">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                Email Notifications
-              </div>
-              <p class="notif-subtext">Receive updates via email</p>
+        <!-- Active Sessions -->
+        <div class="input-group" style="margin-top:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div>
+              <label style="margin-bottom:2px;">Active Sessions</label>
+              <p class="pref-desc">Devices where you are currently logged in</p>
             </div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="slider"></span></label>
-          </div>
-          <div class="notif-row">
-            <div class="notif-info">
-              <div class="notif-label">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 17Z"/></svg>
-                SMS Notifications
-              </div>
-              <p class="notif-subtext">Receive alerts via text message</p>
-            </div>
-            <label class="toggle-switch"><input type="checkbox"><span class="slider"></span></label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Security -->
-      <div id="securitySub" class="settings-sub-content" style="display:none;">
-        <div class="settings-form-box">
-          <div class="form-header"><h4>Security Settings</h4><p>Manage your account security</p></div>
-          <div class="input-group">
-            <label>Password</label>
-            <p class="pref-desc">Last changed: 30 days ago</p>
-            <button class="btn-outline-wide" onclick="handleSecurityAction('password')">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              Change Password
+            <button class="btn-outline-wide" style="margin-top:0;font-size:12px;" onclick="revokeAllSessions()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              Revoke All
             </button>
           </div>
-          <div class="input-group">
-            <label>Two-Factor Authentication</label>
-            <p class="pref-desc">Add an extra layer of security</p>
-            <button class="btn-outline-wide" onclick="handleSecurityAction('2fa')">Enable 2FA</button>
-          </div>
-          <div class="input-group">
-            <label>Active Sessions</label>
-            <p class="pref-desc">Manage devices where you're logged in</p>
-            <button class="btn-outline-wide" onclick="handleSecurityAction('sessions')">View Active Sessions</button>
+          <div id="activeSessionsList">
+            <div class="loading-row">Loading sessions...</div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+
+  </div>
+</section>
 
 </main>
 
+<script src="../Scripts/config.js"></script>
+<script src="../Scripts/session.js"></script>
 <script src="../Scripts/patient.js"></script>
 </body>
 </html>
